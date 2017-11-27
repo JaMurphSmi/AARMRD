@@ -10,12 +10,22 @@
 <title>Spring Boot</title>
 </head>
 <body>
-  <h1>Spring Boot - MVC web application example</h1>
+  <h1>Anonymization application Implementation</h1>
   <hr>
 
   <h2>Your name is ${name}.</h2><br>
-  Fuck you ${name}, thinking you're better than me.
-  You're a piece of shit ${name}
+  This is an example of spring finally working on<br>
+  a local Tomcat 8.5 server, built with Maven
+  <div class="form">
+    <form action="home" method="post" onsubmit="return validate()">
+      <table>
+        <tr>
+          <td>Continue to skeleton Homepage</td>
+          <td><input type="submit" value="Submit"></td>
+        </tr>
+      </table>
+    </form>
+  </div>
 
 </body>
 </html>

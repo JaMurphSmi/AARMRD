@@ -5,3 +5,18 @@
 	border-radius: 7px;
 	padding: 20px;
 }
+
+.data
+{
+ align: left;
+ border-style: groove; 
+ border-color: coral; 
+ border-width: 3px;
+}
+.hierarchy
+{
+ align: right;
+ border-style: groove; 
+ border-color: coral; 
+ border-width: 3px;
+}
