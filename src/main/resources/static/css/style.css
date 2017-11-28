@@ -6,17 +6,20 @@
 	padding: 20px;
 }
 
-.data
-{
- align: left;
- border-style: groove; 
- border-color: coral; 
- border-width: 3px;
+#data {
+    width: 600px;
+    float: left;
+    height: 300px;
+    border-style: groove; 
+    border-color: coral; 
+	border-width: 3px;
+    
 }
-.hierarchy
-{
- align: right;
- border-style: groove; 
- border-color: coral; 
- border-width: 3px;
+#hierarchy {
+    width: 600px;
+    float: left;
+    height: 300px;
+    border-style: groove; 
+    border-color: coral; 
+	border-width: 3px;
 }

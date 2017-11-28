@@ -10,7 +10,7 @@
   <h1>Anonymization application Homepage</h1>
   <hr>
 
-  <h2>${message}, ${name}.</h2><br>
+  <h2>${message}.</h2><br>
   There's nothing here atm, but hopefully this will have<br>
   the components needed to do my first anonymization at some point!
   <div id="data">
