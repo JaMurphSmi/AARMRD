@@ -8,10 +8,10 @@
 <link rel="stylesheet" href="/resources/css/style.css">
 <script type="text/javascript" src="/resources/js/app.js"></script>
 
-<title>Spring Boot</title>
+<title>WebNonymize</title>
 </head>
 <body>
-  <h1>Spring Boot - MVC web application example</h1>
+  <h1>Spring Boot - MVC web application skeleton</h1>
   <hr>
 
   <div class="form">

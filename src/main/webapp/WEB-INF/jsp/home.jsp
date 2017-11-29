@@ -26,11 +26,11 @@
   This is where hierarchies should go eventually
   </div>
   <div class="form">
-    <form action="home" method="post" onsubmit="return validate()">
+    <form action="anonymize" method="post" onsubmit="return validate()">
       <table>
         <tr>
           <td>Continue to skeleton Anonymization Screen</td>
-          <td><input type="button" value="button" onclick="fooledYou();"></td>
+          <td><input type="submit" value="Move On"></td>
         </tr>
       </table>
     </form>
