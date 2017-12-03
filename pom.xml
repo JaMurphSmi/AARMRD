@@ -22,6 +22,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
+		<hibernate.version>5.1.0.Final</hibernate.version>
 	</properties>
 
 	<dependencies>
@@ -48,11 +49,56 @@
       <version>1.1.2</version>
     </dependency>
     <dependency>
-        <groupId>org.springframework.data</groupId>
-        <artifactId>spring-data-jpa</artifactId>
-        <version>2.0.2.RELEASE</version>
-    </dependency>
-
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        
+    <!-- newest additions to the pom -->
+    
+    <dependency>
+	   <groupId>org.springframework</groupId>
+	   <artifactId>spring-context-support</artifactId>
+	   </dependency>
+    <dependency>
+	   <groupId>org.springframework</groupId>
+	   <artifactId>spring-aop</artifactId>
+	   </dependency>
+    
+    <!-- Dependencies for Hibernate and ORM  -->  
+  <dependency>
+   <groupId>com.h2database</groupId>
+   <artifactId>h2</artifactId>
+      </dependency>
+  <dependency>
+   <groupId>org.springframework</groupId>
+   <artifactId>spring-orm</artifactId>
+   </dependency>
+  <dependency>
+   <groupId>org.hibernate</groupId>
+   <artifactId>hibernate-entitymanager</artifactId>
+   </dependency>
+  
+  <!-- newest additions to the pom file -->
+    
+    
+    
+	<!-- adding dependency for sqlite jdbc -->
+    <dependency>
+        <groupId>org.xerial</groupId>
+        <artifactId>sqlite-jdbc</artifactId>
+	</dependency>
+    
+    <dependency>
+   		<groupId>net.kemitix</groupId>
+  		<artifactId>sqlite-dialect</artifactId>
+   		<version>0.1.0</version>
+  	</dependency>
+    
+    <!--  -->
+    <!-- Original sqlite dependency artifact from hibernate.dialect was not being -->
+    <!-- found correctly, therefore used the above kemitix dependency -->
+    <!--  -->
+    
     <!-- Tomcat for JSP rendering -->
     <dependency>
       <groupId>org.apache.tomcat.embed</groupId>
