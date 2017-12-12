@@ -2,6 +2,15 @@ package org.anonymize.anonymizationapp.model;
 
 public class Person {
 	
+	public Person() {
+		this.id = 0;
+		this.firstName = "";
+		this.lastName = "";
+		this.title = "";
+		this.country = "";
+		
+	}
+	
 	public Person(int id, String firstName, String lastName, String title, String country) {
 		this.id = id;
 		this.firstName = firstName;
