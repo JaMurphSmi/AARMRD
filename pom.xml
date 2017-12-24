@@ -80,7 +80,13 @@
   
   <!-- newest additions to the pom file -->
     
-    
+    <!-- Attempting to add ARX library -->
+    <dependency>
+    	<groupId>org.arx.deidentifier</groupId>
+    	<artifactId>libarx</artifactId>
+    	<version>3.6.0</version>
+    </dependency>
+    <!-- Attempting to add ARX library -->
     
 	<!-- adding dependency for sqlite jdbc -->
     <dependency>
