@@ -3,21 +3,16 @@ package org.anonymize.anonymizationapp.controller;
 
 // Importing ARX required modules, dependencies etc
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 import org.deidentifier.arx.ARXAnonymizer;
 import org.deidentifier.arx.ARXConfiguration;
-import org.deidentifier.arx.ARXLattice.ARXNode;
 import org.deidentifier.arx.ARXResult;
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.AttributeType.Hierarchy.DefaultHierarchy;
 import org.deidentifier.arx.Data;
 import org.deidentifier.arx.Data.DefaultData;
-import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
 // ARX related stuff 
@@ -61,7 +56,7 @@ public class AnonymizationController extends AnonymizationBase {
        gender.add("male", "*");
        gender.add("female", "*");
 
-       // Only excerpts for readability
+       // Need to add a hierarchy for each individual field
        DefaultHierarchy zipcode = Hierarchy.create();
        zipcode.add("81667", "8166*", "816**", "81***", "8****", "*****");
        zipcode.add("81675", "8167*", "816**", "81***", "8****", "*****");
@@ -89,15 +84,7 @@ public class AnonymizationController extends AnonymizationBase {
        while (transformed.hasNext()) {
            System.out.print("   ");
            System.out.println(Arrays.toString(transformed.next()));
-  }
-
-	   
-	   
-	   
-	   
-	   
-	   
-	   
+  }   
       return "anonymize";
    }
    
