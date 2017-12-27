@@ -61,7 +61,7 @@ public class AnonymizationController extends AnonymizationBase {
        // Print info
        printResult(result, data);
        
-       // Write results
+       // Write results to file
        System.out.print(" - Writing data...");
        result.getOutput(false).save("src/main/resources/templates/output/test_anonymized.csv", ';');
        System.out.println("Done!");
