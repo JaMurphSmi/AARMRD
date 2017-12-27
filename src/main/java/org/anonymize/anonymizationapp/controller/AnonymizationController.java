@@ -10,6 +10,7 @@ import java.util.Iterator;
 import org.deidentifier.arx.ARXAnonymizer;
 import org.deidentifier.arx.ARXConfiguration;
 import org.deidentifier.arx.ARXResult;
+import org.deidentifier.arx.AttributeType;
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.AttributeType.Hierarchy.DefaultHierarchy;
 import org.deidentifier.arx.Data;
@@ -36,7 +37,7 @@ public class AnonymizationController extends AnonymizationBase {
 	   model.addAttribute("figures", secArray);
 	   
 	   //adding some hardcoded examples for ARX
-	   ///////removed for input from file
+	   ///////removed for input from file, also shortens code substantially
        //adding some harcoded examples for ARX
 	   
        //implementing a hardcoded, local, imported file here
@@ -44,6 +45,8 @@ public class AnonymizationController extends AnonymizationBase {
        Data data = Data.create("src/main/resources/templates/data/test_data.csv", StandardCharsets.UTF_8, ';');
        
        // Define input files
+       data.getDefinition().setAttributeType("age", AttributeType.IDENTIFYING_ATTRIBUTE);
+       data.getDefinition().setAttributeType("gender", AttributeType.INSENSITIVE_ATTRIBUTE);
        data.getDefinition().setAttributeType("age", Hierarchy.create("src/main/resources/templates/hierarchy/test_age.csv", StandardCharsets.UTF_8, ';'));
        data.getDefinition().setAttributeType("gender", Hierarchy.create("src/main/resources/templates/hierarchy/test_gender.csv", StandardCharsets.UTF_8, ';'));
        data.getDefinition().setAttributeType("zipcode", Hierarchy.create("src/main/resources/templates/hierarchy/test_zipcode.csv", StandardCharsets.UTF_8, ';'));
@@ -57,13 +60,15 @@ public class AnonymizationController extends AnonymizationBase {
        config.addPrivacyModel(new KAnonymity(2));
        config.setMaxOutliers(0d);
        ARXResult result = anonymizer.anonymize(data, config);
+
        
+/// from here        
        // Print info
        printResult(result, data);
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized2.csv", ';');
        System.out.println("Done!");
        
     // Process results
@@ -73,6 +78,7 @@ public class AnonymizationController extends AnonymizationBase {
            System.out.print("   ");
            System.out.println(Arrays.toString(transformed.next()));
        }  
+/// to here seems to be a constant       
        
       return "anonymize";
    }
