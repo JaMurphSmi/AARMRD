@@ -79,6 +79,8 @@ public class AnonymizationController extends AnonymizationBase {
        
        // Obtain a handle for the transformed data
        DataHandle outHandle = result.getOutput(false);
+       //implicitly done to both handle objects
+       outHandle.sort(false, 2);
        
        System.out.println(outHandle.getNumRows());
        System.out.println(outHandle.getNumColumns());
@@ -91,7 +93,7 @@ public class AnonymizationController extends AnonymizationBase {
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized3.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized4.csv", ';');
        System.out.println("Done!");
        
     // Process results
