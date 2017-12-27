@@ -15,6 +15,8 @@ import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.AttributeType.Hierarchy.DefaultHierarchy;
 import org.deidentifier.arx.Data;
 import org.deidentifier.arx.Data.DefaultData;
+import org.deidentifier.arx.DataHandle;
+import org.deidentifier.arx.DataType;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
 // ARX related stuff 
@@ -44,9 +46,23 @@ public class AnonymizationController extends AnonymizationBase {
        //will never be multiple 'data', or 'anonymizer', or 'config', or 'result' instance
        Data data = Data.create("src/main/resources/templates/data/test_data.csv", StandardCharsets.UTF_8, ';');
        
-       // Define input files
+       
+       // Obtain a handle
+       DataHandle inHandle = data.getHandle();
+
+       // Read the encoded data
+       System.out.println(inHandle.getNumRows());
+       System.out.println(inHandle.getNumColumns());
+       System.out.println(inHandle.getAttributeName(0));
+       System.out.println(inHandle.getValue(0, 0));
+       
+       // Define how field effects identifiability
        data.getDefinition().setAttributeType("age", AttributeType.IDENTIFYING_ATTRIBUTE);
        data.getDefinition().setAttributeType("gender", AttributeType.INSENSITIVE_ATTRIBUTE);
+       // Define a field's type, 1 of 5 supported
+       data.getDefinition().setDataType("zipcode", DataType.DECIMAL);
+       
+       // Define input hierarchy files
        data.getDefinition().setAttributeType("age", Hierarchy.create("src/main/resources/templates/hierarchy/test_age.csv", StandardCharsets.UTF_8, ';'));
        data.getDefinition().setAttributeType("gender", Hierarchy.create("src/main/resources/templates/hierarchy/test_gender.csv", StandardCharsets.UTF_8, ';'));
        data.getDefinition().setAttributeType("zipcode", Hierarchy.create("src/main/resources/templates/hierarchy/test_zipcode.csv", StandardCharsets.UTF_8, ';'));
@@ -60,7 +76,14 @@ public class AnonymizationController extends AnonymizationBase {
        config.addPrivacyModel(new KAnonymity(2));
        config.setMaxOutliers(0d);
        ARXResult result = anonymizer.anonymize(data, config);
-
+       
+       // Obtain a handle for the transformed data
+       DataHandle outHandle = result.getOutput(false);
+       
+       System.out.println(outHandle.getNumRows());
+       System.out.println(outHandle.getNumColumns());
+       System.out.println(outHandle.getAttributeName(0));
+       System.out.println(outHandle.getValue(0, 0));
        
 /// from here        
        // Print info
@@ -68,7 +91,7 @@ public class AnonymizationController extends AnonymizationBase {
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized2.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized3.csv", ';');
        System.out.println("Done!");
        
     // Process results
