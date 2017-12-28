@@ -71,6 +71,10 @@ public class AnonymizationController extends AnonymizationBase {
        data.getDefinition().setAttributeType("zipcode", Hierarchy.create("src/main/resources/templates/hierarchy/test_zipcode.csv", StandardCharsets.UTF_8, ';'));
        data.getDefinition().setAttributeType("phoneno", Hierarchy.create("src/main/resources/templates/hierarchy/test_phoneno.csv", StandardCharsets.UTF_8, ';'));
 
+       // set the minimal generalization height
+       data.getDefinition().setMinimumGeneralization("zipcode", 3);
+       data.getDefinition().setMaximumGeneralization("zipcode", 3);
+       data.getDefinition().setMinimumGeneralization("gender", 1);
        // Create an instance of the anonymizer
        ARXAnonymizer anonymizer = new ARXAnonymizer();
        
@@ -100,10 +104,10 @@ public class AnonymizationController extends AnonymizationBase {
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized6.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized7.csv", ';');
        System.out.println("Done!");
        
-    // Process results
+       // Process results
        System.out.println(" - Transformed data:");
        Iterator<String[]> transformed = result.getOutput(false).iterator();
        while (transformed.hasNext()) {
