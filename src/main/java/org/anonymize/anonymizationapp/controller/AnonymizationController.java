@@ -55,8 +55,8 @@ public class AnonymizationController extends AnonymizationBase {
        // Read the encoded data
        System.out.println("inHandle rows name is " + inHandle.getNumRows());
        System.out.println("inHandle columns name is " + inHandle.getNumColumns());
-       System.out.println("outHandle field name is " + inHandle.getAttributeName(0));
-       System.out.println("outHandle field value is " + inHandle.getValue(0, 0));
+       System.out.println("inHandle field name is " + inHandle.getAttributeName(0));
+       System.out.println("inHandle value of the field is " + inHandle.getValue(0, 0));
        
        // Define how field effects identifiability
        data.getDefinition().setAttributeType("age", AttributeType.SENSITIVE_ATTRIBUTE);
