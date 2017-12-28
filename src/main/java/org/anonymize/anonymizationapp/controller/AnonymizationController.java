@@ -63,6 +63,9 @@ public class AnonymizationController extends AnonymizationBase {
        //data.getDefinition().setAttributeType("age", AttributeType.IDENTIFYING_ATTRIBUTE);
        data.getDefinition().setAttributeType("gender", AttributeType.INSENSITIVE_ATTRIBUTE);
        // Define a field's type, 1 of 5 supported
+       // set the datatypes
+       data.getDefinition().setDataType("age", DataType.DECIMAL);
+       data.getDefinition().setDataType("gender", DataType.STRING);
        data.getDefinition().setDataType("zipcode", DataType.DECIMAL);
        
        // Define input hierarchy files
