@@ -19,6 +19,7 @@ import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.DataType;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
+import org.deidentifier.arx.metric.Metric;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
 // ARX related stuff 
 
@@ -52,10 +53,10 @@ public class AnonymizationController extends AnonymizationBase {
        DataHandle inHandle = data.getHandle();
 
        // Read the encoded data
-       System.out.println(inHandle.getNumRows());
-       System.out.println(inHandle.getNumColumns());
-       System.out.println(inHandle.getAttributeName(0));
-       System.out.println(inHandle.getValue(0, 0));
+       System.out.println("inHandle rows name is " + inHandle.getNumRows());
+       System.out.println("inHandle columns name is " + inHandle.getNumColumns());
+       System.out.println("outHandle field name is " + inHandle.getAttributeName(0));
+       System.out.println("outHandle field value is " + inHandle.getValue(0, 0));
        
        // Define how field effects identifiability
        data.getDefinition().setAttributeType("age", AttributeType.SENSITIVE_ATTRIBUTE);
@@ -78,6 +79,9 @@ public class AnonymizationController extends AnonymizationBase {
        config.addPrivacyModel(new RecursiveCLDiversity("age", 3, 2));
        config.addPrivacyModel(new KAnonymity(2));
        config.setMaxOutliers(0d);
+       // setting a height metric
+       config.setQualityModel(Metric.createHeightMetric());
+       
        ARXResult result = anonymizer.anonymize(data, config);
        
        // Obtain a handle for the transformed data
@@ -85,10 +89,10 @@ public class AnonymizationController extends AnonymizationBase {
        //implicitly done to both handle objects
        outHandle.sort(false, 2);
        
-       System.out.println(outHandle.getNumRows());
-       System.out.println(outHandle.getNumColumns());
-       System.out.println(outHandle.getAttributeName(0));
-       System.out.println(outHandle.getValue(0, 0));
+       System.out.println("outHandle rows is " + outHandle.getNumRows());
+       System.out.println("outHandle columns is " + outHandle.getNumColumns());
+       System.out.println("outHandle field name is " + outHandle.getAttributeName(0));
+       System.out.println("outHandle value of the field is " + outHandle.getValue(0, 0));
        
 /// from here        
        // Print info
@@ -96,7 +100,7 @@ public class AnonymizationController extends AnonymizationBase {
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized5.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized6.csv", ';');
        System.out.println("Done!");
        
     // Process results
