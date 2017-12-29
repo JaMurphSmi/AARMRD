@@ -17,6 +17,7 @@ import org.deidentifier.arx.Data;
 import org.deidentifier.arx.Data.DefaultData;
 import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.DataType;
+import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
@@ -46,8 +47,7 @@ public class AnonymizationController extends AnonymizationBase {
 	   
        //implementing a hardcoded, local, imported file here
        //will never be multiple 'data', or 'anonymizer', or 'config', or 'result' instance
-       Data data = Data.create("src/main/resources/templates/data/test_data.csv", StandardCharsets.UTF_8, ';');
-       
+       Data data = Data.create("src/main/resources/templates/data/medical_test_data.csv", StandardCharsets.UTF_8, ';');
        
        // Obtain a handle
        DataHandle inHandle = data.getHandle();
@@ -58,33 +58,85 @@ public class AnonymizationController extends AnonymizationBase {
        System.out.println("inHandle field name is " + inHandle.getAttributeName(0));
        System.out.println("inHandle value of the field is " + inHandle.getValue(0, 0));
        
+       
        // Define how field effects identifiability
        data.getDefinition().setAttributeType("age", AttributeType.SENSITIVE_ATTRIBUTE);
        //data.getDefinition().setAttributeType("age", AttributeType.IDENTIFYING_ATTRIBUTE);
-       data.getDefinition().setAttributeType("gender", AttributeType.INSENSITIVE_ATTRIBUTE);
+       //data.getDefinition().setAttributeType("gender", AttributeType.INSENSITIVE_ATTRIBUTE);
+       
        // Define a field's type, 1 of 5 supported
        // set the datatypes
        data.getDefinition().setDataType("age", DataType.DECIMAL);
-       data.getDefinition().setDataType("gender", DataType.STRING);
+       //data.getDefinition().setDataType("gender", DataType.STRING);
        data.getDefinition().setDataType("zipcode", DataType.DECIMAL);
        
        // Define input hierarchy files
        //data.getDefinition().setAttributeType("age", Hierarchy.create("src/main/resources/templates/hierarchy/test_age.csv", StandardCharsets.UTF_8, ';'));
-       data.getDefinition().setAttributeType("gender", Hierarchy.create("src/main/resources/templates/hierarchy/test_gender.csv", StandardCharsets.UTF_8, ';'));
-       data.getDefinition().setAttributeType("zipcode", Hierarchy.create("src/main/resources/templates/hierarchy/test_zipcode.csv", StandardCharsets.UTF_8, ';'));
-       data.getDefinition().setAttributeType("phoneno", Hierarchy.create("src/main/resources/templates/hierarchy/test_phoneno.csv", StandardCharsets.UTF_8, ';'));
-
+       // not needed for t closeness test
+       //data.getDefinition().setAttributeType("gender", Hierarchy.create("src/main/resources/templates/hierarchy/test_gender.csv", StandardCharsets.UTF_8, ';'));
+       //data.getDefinition().setAttributeType("phoneno", Hierarchy.create("src/main/resources/templates/hierarchy/test_phoneno.csv", StandardCharsets.UTF_8, ';'));
+       
+       data.getDefinition().setAttributeType("age", Hierarchy.create("src/main/resources/templates/hierarchy/medical_test_age.csv", StandardCharsets.UTF_8, ';'));
+       data.getDefinition().setAttributeType("zipcode", Hierarchy.create("src/main/resources/templates/hierarchy/medical_test_zipcode.csv", StandardCharsets.UTF_8, ';'));
+       
+    // Define sensitive value hierarchy
+       DefaultHierarchy disease = Hierarchy.create();
+       disease.add("flu",
+                   "respiratory infection",
+                   "vascular lung disease",
+                   "respiratory & digestive system disease");
+       disease.add("pneumonia",
+                   "respiratory infection",
+                   "vascular lung disease",
+                   "respiratory & digestive system disease");
+       disease.add("bronchitis",
+                   "respiratory infection",
+                   "vascular lung disease",
+                   "respiratory & digestive system disease");
+       disease.add("pulmonary edema",
+                   "vascular lung disease",
+                   "vascular lung disease",
+                   "respiratory & digestive system disease");
+       disease.add("pulmonary embolism",
+                   "vascular lung disease",
+                   "vascular lung disease",
+                   "respiratory & digestive system disease");
+       disease.add("gastric ulcer",
+                   "stomach disease",
+                   "digestive system disease",
+                   "respiratory & digestive system disease");
+       disease.add("stomach cancer",
+                   "stomach disease",
+                   "digestive system disease",
+                   "respiratory & digestive system disease");
+       disease.add("gastritis",
+                   "stomach disease",
+                   "digestive system disease",
+                   "respiratory & digestive system disease");
+       disease.add("colitis",
+                   "colon disease",
+                   "digestive system disease",
+                   "respiratory & digestive system disease");
+       disease.add("colon cancer",
+                   "colon disease",
+                   "digestive system disease",
+    		   	   "respiratory & digestive system disease");
+       
+       //Hierarchy disease = Hierarchy.create("src/main/resources/templates/hierarchy/medical_test_disease.csv", StandardCharsets.UTF_8, ';');
        // set the minimal generalization height
-       data.getDefinition().setMinimumGeneralization("zipcode", 3);
+       /*data.getDefinition().setMinimumGeneralization("zipcode", 3);
        data.getDefinition().setMaximumGeneralization("zipcode", 3);
-       data.getDefinition().setMinimumGeneralization("gender", 1);
+       data.getDefinition().setMinimumGeneralization("gender", 1);*/
+       data.getDefinition().setAttributeType("disease", AttributeType.SENSITIVE_ATTRIBUTE);
+       
        // Create an instance of the anonymizer
        ARXAnonymizer anonymizer = new ARXAnonymizer();
        
        // Execute the algorithm
        ARXConfiguration config = ARXConfiguration.create();
-       config.addPrivacyModel(new RecursiveCLDiversity("age", 3, 2));
+       //config.addPrivacyModel(new RecursiveCLDiversity("age", 3, 2));
        config.addPrivacyModel(new KAnonymity(2));
+       config.addPrivacyModel(new HierarchicalDistanceTCloseness("disease", 0.6d, disease));
        config.setMaxOutliers(0d);
        // setting a height metric
        config.setQualityModel(Metric.createHeightMetric());
@@ -107,7 +159,7 @@ public class AnonymizationController extends AnonymizationBase {
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized7.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized9.csv", ';');
        System.out.println("Done!");
        
        // Process results

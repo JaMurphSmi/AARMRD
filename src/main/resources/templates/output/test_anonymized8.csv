@@ -1,0 +1,10 @@
+zipcode;age;disease
+4767*;<=40;stomach cancer
+4760*;<=40;stomach cancer
+4767*;<=40;pneumonia
+4760*;<=40;gastritis
+4790*;>40;gastritis
+4767*;<=40;gastric ulcer
+4790*;>40;flu
+4790*;>40;bronchitis
+4760*;<=40;bronchitis
