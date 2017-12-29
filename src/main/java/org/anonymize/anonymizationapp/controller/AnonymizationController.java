@@ -60,7 +60,7 @@ public class AnonymizationController extends AnonymizationBase {
        data.add("h", "Harry", "48972", "47", "Bulgaria", "1");
        data.add("i", "Iris", "48970", "52", "France", "1");
        data.add("j", "Steve", "47906", "42", "China", "1");
-       data.add("j", "Mickie", "48970", "22", "Russia", "0");
+       data.add("k", "Mickie", "48970", "22", "Russia", "0");
 	   
 // Define research subset
        ///// can supply a subset directly
@@ -74,8 +74,21 @@ public class AnonymizationController extends AnonymizationBase {
        
        ///// can create a subset through variability 
        DataSelector selector = DataSelector.create(data).field("sen").equals("1");
-       DataSubset subset = DataSubset.create(data, selector);
        
+       ///// complex subset selector
+      /* DataSelector selector = DataSelector.create(data)
+               .begin()
+                   .field("identifier").equals("b")
+                   .and()
+                   .field("nationality").equals("Canada")
+               .end()
+               .or().field("identifier").equals("c")
+               .or().field("name").equals("Christine")
+               .or().equals("Frank")
+               .or().equals("Harry")
+               .or().equals("Iris");*/
+
+       DataSubset subset = DataSubset.create(data, selector);
        
        // Obtain a handle
 /*	   DataHandle inHandle = data.getHandle();
@@ -141,28 +154,30 @@ public class AnonymizationController extends AnonymizationBase {
        data.getDefinition().setMinimumGeneralization("gender", 1);*/
        //data.getDefinition().setAttributeType("disease", AttributeType.SENSITIVE_ATTRIBUTE);
        
-    // Set data attribute types
-       data.getDefinition().setAttributeType("identifier", AttributeType.IDENTIFYING_ATTRIBUTE);//will be suppressed
+       // Set data attribute types
+       // Set data attribute types
+       data.getDefinition().setAttributeType("identifier", AttributeType.IDENTIFYING_ATTRIBUTE);
        data.getDefinition().setAttributeType("name", AttributeType.IDENTIFYING_ATTRIBUTE);
-       data.getDefinition().setAttributeType("zip", zip);//generalization will be applied
+       data.getDefinition().setAttributeType("zip", zip);
        data.getDefinition().setAttributeType("age", age);
        data.getDefinition().setAttributeType("nationality", nationality);
        data.getDefinition().setAttributeType("sen", AttributeType.INSENSITIVE_ATTRIBUTE);
        
-// Create and configure instance of the anonymizer
+       // Create and configure instance of the anonymizer
        ARXAnonymizer anonymizer = new ARXAnonymizer();
        ARXConfiguration config = ARXConfiguration.create();
-       //config.addPrivacyModel(new RecursiveCLDiversity("age", 3, 2));
-       config.addPrivacyModel(new KAnonymity(1));
+       config.addPrivacyModel(new KAnonymity(2));
        config.addPrivacyModel(new DPresence(1d / 2d, 2d / 3d, subset));
        config.setMaxOutliers(0d);
+       config.setQualityModel(Metric.createEntropyMetric());
+       //config.addPrivacyModel(new RecursiveCLDiversity("age", 3, 2));
        // setting a height metric
-       config.setQualityModel(Metric.createHeightMetric());
+       //config.setQualityModel(Metric.createHeightMetric());
        
        // Execute the algorithm
        ARXResult result = anonymizer.anonymize(data, config);
        
-    // Print input
+       // Print input
        System.out.println(" - Input data:");
        print(data.getHandle().iterator());
 
@@ -182,21 +197,21 @@ public class AnonymizationController extends AnonymizationBase {
        
 /// from here        
        // Print info
+       System.out.print(" Just about to hit 'printResult()'");
        printResult(result, data);
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized13.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized14.csv", ';');
        System.out.println("Done!");
        
     // Print results
-       System.out.println(" - Transformed data:");
-       print(result.getOutput(false).iterator());
-
-       // Print results
-       System.out.println(" - Transformed research subset:");
-       print(result.getOutput(false).getView().iterator());
-       
+	       System.out.println(" - Transformed data:");
+	       print(result.getOutput(false).iterator());
+	
+	       // Print results
+	       System.out.println(" - Transformed research subset:");
+	       print(result.getOutput(false).getView().iterator());
        // Process results
        /*System.out.println(" - Transformed data:");
        Iterator<String[]> transformed = result.getOutput(false).iterator();
