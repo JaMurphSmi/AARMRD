@@ -17,6 +17,7 @@ import org.deidentifier.arx.AttributeType.Hierarchy.DefaultHierarchy;
 import org.deidentifier.arx.Data;
 import org.deidentifier.arx.Data.DefaultData;
 import org.deidentifier.arx.DataHandle;
+import org.deidentifier.arx.DataSelector;
 import org.deidentifier.arx.DataSubset;
 import org.deidentifier.arx.DataType;
 import org.deidentifier.arx.criteria.DPresence;
@@ -58,13 +59,23 @@ public class AnonymizationController extends AnonymizationBase {
        data.add("g", "Gail", "48973", "33", "Spain", "0");
        data.add("h", "Harry", "48972", "47", "Bulgaria", "1");
        data.add("i", "Iris", "48970", "52", "France", "1");
+       data.add("j", "Steve", "47906", "42", "China", "1");
+       data.add("j", "Mickie", "48970", "22", "Russia", "0");
 	   
 // Define research subset
+       ///// can supply a subset directly
        //DefaultData subsetData = Data.create();
        //subsetData.add("identifier", "name", "zip", "age", "nationality", "sen");
        //subsetData.add("b", "Bob", "47903", "59", "Canada", "1");
        //subsetData.add("c", "Christine", "47906", "42", "USA", "1");
-       DataSubset subset = DataSubset.create(data, new HashSet<Integer>(Arrays.asList(1, 2, 5, 7, 8)));
+       
+       ///// Define research subset by directly selecting specific indexes of that set
+       //DataSubset subset = DataSubset.create(data, new HashSet<Integer>(Arrays.asList(1, 2, 5, 7, 8)));
+       
+       ///// can create a subset through variability 
+       DataSelector selector = DataSelector.create(data).field("sen").equals("1");
+       DataSubset subset = DataSubset.create(data, selector);
+       
        
        // Obtain a handle
 /*	   DataHandle inHandle = data.getHandle();
@@ -111,6 +122,8 @@ public class AnonymizationController extends AnonymizationBase {
        nationality.add("Bulgaria", "E. Europe", "Europe", "*");
        nationality.add("France", "W. Europe", "Europe", "*");
        nationality.add("Spain", "W. Europe", "Europe", "*");
+       nationality.add("China", "E. Asia", "Asia", "*");
+       nationality.add("Russia", "N.E. Asia", "Asia", "*");
 
        DefaultHierarchy zip = Hierarchy.create();
        zip.add("47630", "4763*", "476*", "47*", "4*", "*");
@@ -140,7 +153,7 @@ public class AnonymizationController extends AnonymizationBase {
        ARXAnonymizer anonymizer = new ARXAnonymizer();
        ARXConfiguration config = ARXConfiguration.create();
        //config.addPrivacyModel(new RecursiveCLDiversity("age", 3, 2));
-       config.addPrivacyModel(new KAnonymity(2));
+       config.addPrivacyModel(new KAnonymity(1));
        config.addPrivacyModel(new DPresence(1d / 2d, 2d / 3d, subset));
        config.setMaxOutliers(0d);
        // setting a height metric
@@ -173,7 +186,7 @@ public class AnonymizationController extends AnonymizationBase {
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized11.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized13.csv", ';');
        System.out.println("Done!");
        
     // Print results
