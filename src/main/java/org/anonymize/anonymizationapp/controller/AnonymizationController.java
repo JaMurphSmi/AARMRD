@@ -46,10 +46,10 @@ public class AnonymizationController extends AnonymizationBase {
 	   
        //Data data = Data.create("src/main/resources/templates/data/medical_test_data.csv", StandardCharsets.UTF_8, ';');
        
-	   // Define public dataset
-       DefaultData data = Data.create();
+// Define public dataset
+	   DefaultData data = Data.create();
        data.add("identifier", "name", "zip", "age", "nationality", "sen");
-       data.add("a", "Alice", "47906", "35", "USA", "0");
+       data.add("a", "Ailish", "47906", "35", "USA", "0");
        data.add("b", "Bob", "47903", "59", "Canada", "1");
        data.add("c", "Christine", "47906", "42", "USA", "1");
        data.add("d", "Dirk", "47630", "18", "Brazil", "0");
@@ -60,6 +60,10 @@ public class AnonymizationController extends AnonymizationBase {
        data.add("i", "Iris", "48970", "52", "France", "1");
 	   
 // Define research subset
+       //DefaultData subsetData = Data.create();
+       //subsetData.add("identifier", "name", "zip", "age", "nationality", "sen");
+       //subsetData.add("b", "Bob", "47903", "59", "Canada", "1");
+       //subsetData.add("c", "Christine", "47906", "42", "USA", "1");
        DataSubset subset = DataSubset.create(data, new HashSet<Integer>(Arrays.asList(1, 2, 5, 7, 8)));
        
        // Obtain a handle
