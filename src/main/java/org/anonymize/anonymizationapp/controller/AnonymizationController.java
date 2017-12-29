@@ -135,7 +135,7 @@ public class AnonymizationController extends AnonymizationBase {
        // Execute the algorithm
        ARXConfiguration config = ARXConfiguration.create();
        //config.addPrivacyModel(new RecursiveCLDiversity("age", 3, 2));
-       config.addPrivacyModel(new KAnonymity(2));
+       config.addPrivacyModel(new KAnonymity(3));
        config.addPrivacyModel(new HierarchicalDistanceTCloseness("disease", 0.6d, disease));
        config.setMaxOutliers(0d);
        // setting a height metric
@@ -159,7 +159,7 @@ public class AnonymizationController extends AnonymizationBase {
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized9.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized10.csv", ';');
        System.out.println("Done!");
        
        // Process results
