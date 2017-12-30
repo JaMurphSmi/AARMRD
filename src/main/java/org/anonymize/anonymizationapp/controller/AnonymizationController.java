@@ -20,6 +20,9 @@ import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.DataSelector;
 import org.deidentifier.arx.DataSubset;
 import org.deidentifier.arx.DataType;
+import org.deidentifier.arx.aggregates.StatisticsContingencyTable;
+import org.deidentifier.arx.aggregates.StatisticsContingencyTable.Entry;
+import org.deidentifier.arx.aggregates.StatisticsFrequencyDistribution;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.KAnonymity;
@@ -121,7 +124,7 @@ public class AnonymizationController extends AnonymizationBase {
        // Create an instance of the anonymizer
        ARXAnonymizer anonymizer = new ARXAnonymizer();
        ARXConfiguration config = ARXConfiguration.create();
-       config.addPrivacyModel(new KAnonymity(3));
+       config.addPrivacyModel(new KAnonymity(2));
        /*config.addPrivacyModel(new HierarchicalDistanceTCloseness("disease1", 0.2d, getHierarchyDisease()));
        config.addPrivacyModel(new RecursiveCLDiversity("disease2", 3d, 2));
        config.setMaxOutliers(0d);
@@ -157,39 +160,74 @@ public class AnonymizationController extends AnonymizationBase {
        
 /// from here        
        // Print info
-       System.out.println(" Just about to hit 'printResult()'");
        printResult(result, data);
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized19.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized21.csv", ';');
        System.out.println("Done!");
        
     // Process results
-       if (result.getGlobalOptimum() != null) {
+    /*   if (result.getGlobalOptimum() != null) {
            System.out.println(" - Transformed data:");
            Iterator<String[]> transformed = result.getOutput(false).iterator();
            while (transformed.hasNext()) {
                System.out.print("   ");
                System.out.println(Arrays.toString(transformed.next()));
            }
-}
+   		}*/
        
-    // Print results
-	       /*System.out.println(" - Transformed data:");
-	       print(result.getOutput(false).iterator());
-	
-	       // Print results
-	       System.out.println(" - Transformed research subset:");
-	       print(result.getOutput(false).getView().iterator());*/
-       // Process results
-       /*System.out.println(" - Transformed data:");
+//
+       ///////// allows access to the data's statistics
+       // Print input
+       System.out.println(" - Input data:");
+       Iterator<String[]> original = data.getHandle().iterator();
+       while (original.hasNext()) {
+           System.out.print("   ");
+           System.out.println(Arrays.toString(original.next()));
+       }
+
+       // Print results
+       System.out.println(" - Transformed data:");
        Iterator<String[]> transformed = result.getOutput(false).iterator();
        while (transformed.hasNext()) {
            System.out.print("   ");
            System.out.println(Arrays.toString(transformed.next()));
-       } 
-       */ 
+       }
+
+       // Print frequencies
+       StatisticsFrequencyDistribution distribution;
+       System.out.println(" - Distribution of attribute 'age' in input:");
+       distribution = data.getHandle().getStatistics().getFrequencyDistribution(0, false);
+       System.out.println("   " + Arrays.toString(distribution.values));
+       System.out.println("   " + Arrays.toString(distribution.frequency));
+
+       // Print frequencies
+       System.out.println(" - Distribution of attribute 'age' in output:");
+       distribution = result.getOutput(false).getStatistics().getFrequencyDistribution(0, true);
+       System.out.println("   " + Arrays.toString(distribution.values));
+       System.out.println("   " + Arrays.toString(distribution.frequency));
+
+       // Print contingency tables
+       StatisticsContingencyTable contingency;
+       System.out.println(" - Contingency of attribute 'gender' and 'zipcode' in input:");
+       contingency = data.getHandle().getStatistics().getContingencyTable(0, true, 2, true);
+       System.out.println("   " + Arrays.toString(contingency.values1));
+       System.out.println("   " + Arrays.toString(contingency.values2));
+       while (contingency.iterator.hasNext()) {
+           Entry e = contingency.iterator.next();
+           System.out.println("   [" + e.value1 + ", " + e.value2 + ", " + e.frequency + "]");
+       }
+
+       // Print contingency tables
+       System.out.println(" - Contingency of attribute 'gender' and 'zipcode' in output:");
+       contingency = result.getOutput(false).getStatistics().getContingencyTable(0, true, 2, true);
+       System.out.println("   " + Arrays.toString(contingency.values1));
+       System.out.println("   " + Arrays.toString(contingency.values2));
+       while (contingency.iterator.hasNext()) {
+           Entry e = contingency.iterator.next();
+           System.out.println("   [" + e.value1 + ", " + e.value2 + ", " + e.frequency + "]");
+       }
 /// to here seems to be a constant       
        
       return "anonymize";
