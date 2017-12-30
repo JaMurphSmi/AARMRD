@@ -48,20 +48,7 @@ public class AnonymizationController extends AnonymizationBase {
        //Data data = Data.create("src/main/resources/templates/data/medical_test_data.csv", StandardCharsets.UTF_8, ';');
        
 // Define public dataset
-	   DefaultData data = Data.create();
-       /*data.add("identifier", "name", "zip", "age", "nationality", "sen");
-       data.add("a", "Ailish", "47906", "35", "USA", "0");
-       data.add("b", "Bob", "47903", "59", "Canada", "1");
-       data.add("c", "Christine", "47906", "42", "USA", "1");
-       data.add("d", "Dirk", "47630", "18", "Brazil", "0");
-       data.add("e", "Eunice", "47630", "22", "Brazil", "0");
-       data.add("f", "Frank", "47633", "63", "Peru", "1");
-       data.add("g", "Gail", "48973", "33", "Spain", "0");
-       data.add("h", "Harry", "48972", "47", "Bulgaria", "1");
-       data.add("i", "Iris", "48970", "52", "France", "1");
-       data.add("j", "Steve", "47906", "42", "China", "1");
-       data.add("k", "Mickie", "48970", "22", "Russia", "0");*/
-	   
+	   DefaultData data = Data.create();	   
 	   data.add("zipcode", "disease1", "age", "disease2");
        data.add("47677", "gastric ulcer", "29", "gastric ulcer");
        data.add("47602", "gastritis", "22", "gastritis");
@@ -74,12 +61,6 @@ public class AnonymizationController extends AnonymizationBase {
        data.add("47607", "stomach cancer", "32", "stomach cancer");
 	   
 // Define research subset
-       ///// can supply a subset directly
-       //DefaultData subsetData = Data.create();
-       //subsetData.add("identifier", "name", "zip", "age", "nationality", "sen");
-       //subsetData.add("b", "Bob", "47903", "59", "Canada", "1");
-       //subsetData.add("c", "Christine", "47906", "42", "USA", "1");
-       
        ///// Define research subset by directly selecting specific indexes of that set
        //DataSubset subset = DataSubset.create(data, new HashSet<Integer>(Arrays.asList(1, 2, 5, 7, 8)));
        
@@ -87,17 +68,6 @@ public class AnonymizationController extends AnonymizationBase {
        //DataSelector selector = DataSelector.create(data).field("sen").equals("1");
        
        ///// complex subset selector -> does not work
-       /*DataSelector selector = DataSelector.create(data)
-               .begin()
-                   .field("identifier").equals("b")
-                   .and()
-                   .field("nationality").equals("Canada")
-               .end()
-               .or().field("identifier").equals("c")
-               .or().field("name").equals("Christine")
-               .or().equals("Frank")
-               .or().equals("Harry")
-               .or().equals("Iris");*/
 
        //DataSubset subset = DataSubset.create(data, selector);
        
@@ -208,7 +178,7 @@ public class AnonymizationController extends AnonymizationBase {
        ARXAnonymizer anonymizer = new ARXAnonymizer();
        ARXConfiguration config = ARXConfiguration.create();
        config.addPrivacyModel(new KAnonymity(3));
-       config.addPrivacyModel(new HierarchicalDistanceTCloseness("disease1", 0.6d, getHierarchyDisease()));
+       config.addPrivacyModel(new HierarchicalDistanceTCloseness("disease1", 0.2d, getHierarchyDisease()));
        config.addPrivacyModel(new RecursiveCLDiversity("disease2", 3d, 2));
        config.setMaxOutliers(0d);
        config.setQualityModel(Metric.createEntropyMetric());
@@ -241,16 +211,26 @@ public class AnonymizationController extends AnonymizationBase {
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized15.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized18.csv", ';');
        System.out.println("Done!");
        
+    // Process results
+       if (result.getGlobalOptimum() != null) {
+           System.out.println(" - Transformed data:");
+           Iterator<String[]> transformed = result.getOutput(false).iterator();
+           while (transformed.hasNext()) {
+               System.out.print("   ");
+               System.out.println(Arrays.toString(transformed.next()));
+           }
+}
+       
     // Print results
-	       System.out.println(" - Transformed data:");
+	       /*System.out.println(" - Transformed data:");
 	       print(result.getOutput(false).iterator());
 	
 	       // Print results
 	       System.out.println(" - Transformed research subset:");
-	       print(result.getOutput(false).getView().iterator());
+	       print(result.getOutput(false).getView().iterator());*/
        // Process results
        /*System.out.println(" - Transformed data:");
        Iterator<String[]> transformed = result.getOutput(false).iterator();
