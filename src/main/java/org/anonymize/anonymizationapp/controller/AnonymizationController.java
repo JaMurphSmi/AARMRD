@@ -48,17 +48,8 @@ public class AnonymizationController extends AnonymizationBase {
        //Data data = Data.create("src/main/resources/templates/data/medical_test_data.csv", StandardCharsets.UTF_8, ';');
        
 // Define public dataset
-	   DefaultData data = Data.create();	   
-	   data.add("zipcode", "disease1", "age", "disease2");
-       data.add("47677", "gastric ulcer", "29", "gastric ulcer");
-       data.add("47602", "gastritis", "22", "gastritis");
-       data.add("47678", "stomach cancer", "27", "stomach cancer");
-       data.add("47905", "gastritis", "43", "gastritis");
-       data.add("47909", "flu", "52", "flu");
-       data.add("47906", "bronchitis", "47", "bronchitis");
-       data.add("47605", "bronchitis", "30", "bronchitis");
-       data.add("47673", "pneumonia", "36", "pneumonia");
-       data.add("47607", "stomach cancer", "32", "stomach cancer");
+	   //DefaultData data = Data.create();	   
+	   Data data = getData();
 	   
 // Define research subset
        ///// Define research subset by directly selecting specific indexes of that set
@@ -98,68 +89,22 @@ public class AnonymizationController extends AnonymizationBase {
        //data.getDefinition().setAttributeType("phoneno", Hierarchy.create("src/main/resources/templates/hierarchy/test_phoneno.csv", StandardCharsets.UTF_8, ';'));
        
        DefaultHierarchy age = Hierarchy.create();
-       age.add("29", "<=40", "*");
-       age.add("22", "<=40", "*");
-       age.add("27", "<=40", "*");
-       age.add("43", ">40", "*");
-       age.add("52", ">40", "*");
-       age.add("47", ">40", "*");
-       age.add("30", "<=40", "*");
-       age.add("36", "<=40", "*");
-       age.add("32", "<=40", "*");
-
-       DefaultHierarchy disease = Hierarchy.create();
-       disease.add("flu",
-                   "respiratory infection",
-                   "vascular lung disease",
-                   "respiratory & digestive system disease");
-       disease.add("pneumonia",
-                   "respiratory infection",
-                   "vascular lung disease",
-                   "respiratory & digestive system disease");
-       disease.add("bronchitis",
-                   "respiratory infection",
-                   "vascular lung disease",
-                   "respiratory & digestive system disease");
-       disease.add("pulmonary edema",
-                   "vascular lung disease",
-                   "vascular lung disease",
-                   "respiratory & digestive system disease");
-       disease.add("pulmonary embolism",
-                   "vascular lung disease",
-                   "vascular lung disease",
-                   "respiratory & digestive system disease");
-       disease.add("gastric ulcer",
-                   "stomach disease",
-                   "digestive system disease",
-                   "respiratory & digestive system disease");
-       disease.add("stomach cancer",
-                   "stomach disease",
-                   "digestive system disease",
-                   "respiratory & digestive system disease");
-       disease.add("gastritis",
-                   "stomach disease",
-                   "digestive system disease",
-                   "respiratory & digestive system disease");
-       disease.add("colitis",
-                   "colon disease",
-                   "digestive system disease",
-                   "respiratory & digestive system disease");
-       disease.add("colon cancer",
-                   "colon disease",
-                   "digestive system disease",
-    		   	   "respiratory & digestive system disease");
-
+       age.add("34", "<50", "*");
+       age.add("45", "<50", "*");
+       age.add("66", ">=50", "*");
+       age.add("70", ">=50", "*");
+       
+       DefaultHierarchy gender = Hierarchy.create();
+       gender.add("male", "*");
+       gender.add("female", "*");
+       
        DefaultHierarchy zipcode = Hierarchy.create();
-       zipcode.add("47677", "4767*", "476**", "47***", "4****", "*****");
-       zipcode.add("47602", "4760*", "476**", "47***", "4****", "*****");
-       zipcode.add("47678", "4767*", "476**", "47***", "4****", "*****");
-       zipcode.add("47905", "4790*", "479**", "47***", "4****", "*****");
-       zipcode.add("47909", "4790*", "479**", "47***", "4****", "*****");
-       zipcode.add("47906", "4790*", "479**", "47***", "4****", "*****");
-       zipcode.add("47605", "4760*", "476**", "47***", "4****", "*****");
-       zipcode.add("47673", "4767*", "476**", "47***", "4****", "*****");
-       zipcode.add("47607", "4760*", "476**", "47***", "4****", "*****");
+       zipcode.add("81667", "8166*", "816**", "81***", "8****", "*****");
+       zipcode.add("81675", "8167*", "816**", "81***", "8****", "*****");
+       zipcode.add("81925", "8192*", "819**", "81***", "8****", "*****");
+       zipcode.add("81931", "8193*", "819**", "81***", "8****", "*****");
+       
+       
        //Hierarchy disease = Hierarchy.create("src/main/resources/templates/hierarchy/medical_test_disease.csv", StandardCharsets.UTF_8, ';');
        
        // set the minimal generalization height
@@ -170,18 +115,24 @@ public class AnonymizationController extends AnonymizationBase {
        
     // Define attribute types
        data.getDefinition().setAttributeType("age", age);
+       data.getDefinition().setAttributeType("gender", gender);
        data.getDefinition().setAttributeType("zipcode", zipcode);
-       data.getDefinition().setAttributeType("disease1", AttributeType.SENSITIVE_ATTRIBUTE);
-       data.getDefinition().setAttributeType("disease2", AttributeType.SENSITIVE_ATTRIBUTE);
-
+       
        // Create an instance of the anonymizer
        ARXAnonymizer anonymizer = new ARXAnonymizer();
        ARXConfiguration config = ARXConfiguration.create();
        config.addPrivacyModel(new KAnonymity(3));
-       config.addPrivacyModel(new HierarchicalDistanceTCloseness("disease1", 0.2d, getHierarchyDisease()));
+       /*config.addPrivacyModel(new HierarchicalDistanceTCloseness("disease1", 0.2d, getHierarchyDisease()));
        config.addPrivacyModel(new RecursiveCLDiversity("disease2", 3d, 2));
        config.setMaxOutliers(0d);
-       config.setQualityModel(Metric.createEntropyMetric());
+       config.setQualityModel(Metric.createEntropyMetric());*/
+       
+    // NDS-specific settings
+       config.setMaxOutliers(1d); // Recommended default: 1d
+       config.setAttributeWeight("age", 0.5d); // attribute weight
+       config.setAttributeWeight("gender", 0.3d); // attribute weight
+       config.setAttributeWeight("zipcode", 0.5d); // attribute weight
+       config.setQualityModel(Metric.createLossMetric(0.5d)); // suppression/generalization-factor
        
        // Execute the algorithm
        ARXResult result = anonymizer.anonymize(data, config);
@@ -191,8 +142,8 @@ public class AnonymizationController extends AnonymizationBase {
        print(data.getHandle().iterator());
 
        // Print input
-       System.out.println(" - Input research subset:");
-       print(data.getHandle().getView().iterator());
+       ////////System.out.println(" - Input research subset:");
+       ////////print(data.getHandle().getView().iterator());
        // Obtain a handle for the transformed data
        //DataHandle outHandle = result.getOutput(false);
        //implicitly done to both handle objects
@@ -206,12 +157,12 @@ public class AnonymizationController extends AnonymizationBase {
        
 /// from here        
        // Print info
-       System.out.print(" Just about to hit 'printResult()'");
+       System.out.println(" Just about to hit 'printResult()'");
        printResult(result, data);
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized18.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized19.csv", ';');
        System.out.println("Done!");
        
     // Process results
@@ -244,6 +195,18 @@ public class AnonymizationController extends AnonymizationBase {
       return "anonymize";
    }
    
+   private static Data getData() {
+       DefaultData data = Data.create();
+       data.add("age", "gender", "zipcode");
+       data.add("34", "male", "81667");
+       data.add("45", "female", "81675");
+       data.add("66", "male", "81925");
+       data.add("70", "female", "81931");
+       data.add("34", "female", "81931");
+       data.add("70", "male", "81931");
+       data.add("45", "male", "81931");
+       return data;
+   }
    private static Hierarchy getHierarchyDisease() {
        DefaultHierarchy disease = Hierarchy.create();
        disease.add("flu",
