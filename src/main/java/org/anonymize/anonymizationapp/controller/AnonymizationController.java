@@ -3,30 +3,33 @@ package org.anonymize.anonymizationapp.controller;
 
 // Importing ARX required modules, dependencies etc
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+//import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Date;
+//import java.util.HashSet;
 import java.util.Iterator;
 
 import org.deidentifier.arx.ARXAnonymizer;
 import org.deidentifier.arx.ARXConfiguration;
 import org.deidentifier.arx.ARXResult;
-import org.deidentifier.arx.AttributeType;
+//import org.deidentifier.arx.AttributeType;
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.AttributeType.Hierarchy.DefaultHierarchy;
 import org.deidentifier.arx.Data;
 import org.deidentifier.arx.Data.DefaultData;
 import org.deidentifier.arx.DataHandle;
-import org.deidentifier.arx.DataSelector;
-import org.deidentifier.arx.DataSubset;
+//import org.deidentifier.arx.DataSelector;
+//import org.deidentifier.arx.DataSubset;
 import org.deidentifier.arx.DataType;
+import org.deidentifier.arx.DataType.DataTypeDescription;
 import org.deidentifier.arx.aggregates.StatisticsContingencyTable;
 import org.deidentifier.arx.aggregates.StatisticsContingencyTable.Entry;
 import org.deidentifier.arx.aggregates.StatisticsFrequencyDistribution;
-import org.deidentifier.arx.criteria.DPresence;
-import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
+//import org.deidentifier.arx.criteria.DPresence;
+//import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.KAnonymity;
-import org.deidentifier.arx.criteria.RecursiveCLDiversity;
+//import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
 // ARX related stuff 
@@ -40,19 +43,96 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class AnonymizationController extends AnonymizationBase {
 
+   @SuppressWarnings("unused")
    @RequestMapping("/anonymize")
-   public String index(Model model) throws IOException {
+   public String index(Model model) throws IOException, ParseException {
 	   int anArray[] = {4,5,6,7,8,9,10};
 	   int secArray[];
 	   secArray = calcFigures(anArray);
 	   model.addAttribute("anonMessage", "This is where the anonymization will be placed");
 	   model.addAttribute("figures", secArray);
 	   
-       //Data data = Data.create("src/main/resources/templates/data/medical_test_data.csv", StandardCharsets.UTF_8, ';');
+       
+	   
+	   
+	   // 1. List all data types
+       for (DataTypeDescription<?> type : DataType.list()){
+           
+           // Print basic information
+           System.out.println(" - Label : " + type.getLabel());
+           System.out.println("   * Class: " + type.getWrappedClass());
+           System.out.println("   * Format: " + type.hasFormat());
+           if (type.hasFormat()){
+               System.out.println("   * Formats: " + type.getExampleFormats());
+           }
+           
+           // Create an instance without a format string
+           DataType<?> instance = type.newInstance();
+           
+           // Create an instance with format string
+           if (type.hasFormat() && !type.getExampleFormats().isEmpty()) {
+               instance = type.newInstance(type.getExampleFormats().get(0));
+           }
+       }
+       System.out.println("Outside of the advanced for loop");
+       // 2. Obtain specific data type
+       DataTypeDescription<Date> entry = DataType.list(Date.class);
+       System.out.println("got date type");
+       DataTypeDescription<String> entry1 = DataType.list(String.class);
+       System.out.println("got string type");
+       DataTypeDescription<Long> entry2 = DataType.list(Long.class);
+       System.out.println("got long type");
+       DataTypeDescription<Double> entry3 = DataType.list(Double.class);
+       System.out.println("got double type");
+       
+       // 3. Obtain data in specific formats
+       Data theData = getData();
+       System.out.println("got the data");
+       
+       
+       theData.getDefinition().setDataType("zip", DataType.createDecimal("#,##0"));
+       System.out.println("set the data type to decimal");
+       theData.getDefinition().setDataType("sen", DataType.createDate("dd.MM.yyyy"));
+       System.out.println("set the data type to date");
+       
+       DataHandle handle = theData.getHandle();
+       double value1 = handle.getDouble(2, 2);
+       Date value2 = handle.getDate(2, 5);
+
+       System.out.println("Double: "+ value1);
+       System.out.println("Date: "+ value2);
+
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+///////////// this is where anonymization begins	   
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+/// data set originally created below	   
+	   
+	   //Data data = Data.create("src/main/resources/templates/data/medical_test_data.csv", StandardCharsets.UTF_8, ';');
        
 // Define public dataset
 	   //DefaultData data = Data.create();	   
-	   Data data = getData();
+	   Data data = getTheData();
 	   
 // Define research subset
        ///// Define research subset by directly selecting specific indexes of that set
@@ -106,7 +186,6 @@ public class AnonymizationController extends AnonymizationBase {
        zipcode.add("81675", "8167*", "816**", "81***", "8****", "*****");
        zipcode.add("81925", "8192*", "819**", "81***", "8****", "*****");
        zipcode.add("81931", "8193*", "819**", "81***", "8****", "*****");
-       
        
        //Hierarchy disease = Hierarchy.create("src/main/resources/templates/hierarchy/medical_test_disease.csv", StandardCharsets.UTF_8, ';');
        
@@ -164,7 +243,7 @@ public class AnonymizationController extends AnonymizationBase {
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized21.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized22.csv", ';');
        System.out.println("Done!");
        
     // Process results
@@ -235,6 +314,21 @@ public class AnonymizationController extends AnonymizationBase {
    
    private static Data getData() {
        DefaultData data = Data.create();
+       data.add("identifier", "name", "zip", "age", "nationality", "sen");
+       data.add("a", "Alice", "47906", "35", "USA", "1.1.2013");
+       data.add("b", "Bob", "47903", "59", "Canada", "1.1.2013");
+       data.add("c", "Christine", "47906", "42", "USA", "1.1.2013");
+       data.add("d", "Dirk", "47630", "18", "Brazil", "1.1.2013");
+       data.add("e", "Eunice", "47630", "22", "Brazil", "1.1.2013");
+       data.add("f", "Frank", "47633", "63", "Peru", "1.1.2013");
+       data.add("g", "Gail", "48973", "33", "Spain", "1.1.2013");
+       data.add("h", "Harry", "48972", "47", "Bulgaria", "1.1.2013");
+       data.add("i", "Iris", "48970", "52", "France", "1.1.2013");
+       return data;
+   }
+   @SuppressWarnings("unused")
+   private static Data getTheData() {
+       DefaultData data = Data.create();
        data.add("age", "gender", "zipcode");
        data.add("34", "male", "81667");
        data.add("45", "female", "81675");
@@ -245,6 +339,7 @@ public class AnonymizationController extends AnonymizationBase {
        data.add("45", "male", "81931");
        return data;
    }
+   @SuppressWarnings("unused")
    private static Hierarchy getHierarchyDisease() {
        DefaultHierarchy disease = Hierarchy.create();
        disease.add("flu",
