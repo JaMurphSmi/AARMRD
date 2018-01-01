@@ -3,42 +3,56 @@ package org.anonymize.anonymizationapp.controller;
 
 // Importing ARX required modules, dependencies etc
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.text.ParseException;
-//import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
+//import java.util.Arrays;
 import java.util.Date;
-//import java.util.HashSet;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import org.deidentifier.arx.ARXAnonymizer;
 import org.deidentifier.arx.ARXConfiguration;
 import org.deidentifier.arx.ARXResult;
-//import org.deidentifier.arx.AttributeType;
+import org.deidentifier.arx.AttributeType;
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.AttributeType.Hierarchy.DefaultHierarchy;
 import org.deidentifier.arx.Data;
 import org.deidentifier.arx.Data.DefaultData;
 import org.deidentifier.arx.DataHandle;
-//import org.deidentifier.arx.DataSelector;
-//import org.deidentifier.arx.DataSubset;
+import org.deidentifier.arx.DataSelector;
+import org.deidentifier.arx.DataSubset;
 import org.deidentifier.arx.DataType;
 import org.deidentifier.arx.DataType.DataTypeDescription;
 import org.deidentifier.arx.aggregates.StatisticsContingencyTable;
 import org.deidentifier.arx.aggregates.StatisticsContingencyTable.Entry;
 import org.deidentifier.arx.aggregates.StatisticsFrequencyDistribution;
-//import org.deidentifier.arx.criteria.DPresence;
-//import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
+import org.deidentifier.arx.aggregates.HierarchyBuilder;
+import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
+import org.deidentifier.arx.aggregates.HierarchyBuilderGroupingBased.Level;
+import org.deidentifier.arx.aggregates.HierarchyBuilderIntervalBased;
+import org.deidentifier.arx.aggregates.HierarchyBuilderIntervalBased.Interval;
+import org.deidentifier.arx.aggregates.HierarchyBuilderIntervalBased.Range;
+import org.deidentifier.arx.aggregates.HierarchyBuilderOrderBased;
+import org.deidentifier.arx.aggregates.HierarchyBuilderRedactionBased;
+import org.deidentifier.arx.aggregates.HierarchyBuilderRedactionBased.Order;
+import org.deidentifier.arx.criteria.DPresence;
+import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.KAnonymity;
-//import org.deidentifier.arx.criteria.RecursiveCLDiversity;
+import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.metric.Metric;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
 // ARX related stuff 
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-//import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import cern.colt.Arrays;
 
 @Controller
 public class AnonymizationController extends AnonymizationBase {
@@ -217,7 +231,7 @@ public class AnonymizationController extends AnonymizationBase {
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized23.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized24.csv", ';');
        System.out.println("Done!");
 
        ///////// allows access to the data's statistics
@@ -272,6 +286,13 @@ public class AnonymizationController extends AnonymizationBase {
            Entry e = contingency.iterator.next();
            System.out.println("   [" + e.value1 + ", " + e.value2 + ", " + e.frequency + "]");
        }
+       
+       redactionBased();
+       intervalBased();
+       orderBased();
+       ldlCholesterol();
+       dates();
+       loadStore();
 /// to here seems to be a constant       
        
       return "anonymize";
@@ -360,11 +381,297 @@ public class AnonymizationController extends AnonymizationBase {
 	   return anArray;
    }
    
-   /*private static int[] calcFigures(int[] anArray)
-   {
-	   for (int aValue : anArray) {
-		    aValue = aValue*2;
-		}
-	   return anArray;
-   }*/ //enhanced for more used for viewing/assessing values within objects to shorten a list/array
+   /**
+    * Exemplifies the use of the order-based builder.
+    */
+   private static void dates() {
+
+   	String stringDateFormat = "yyyy-MM-dd HH:mm";
+   	
+   	DataType<Date> dateType = DataType.createDate(stringDateFormat);
+   	
+       // Create the builder
+       HierarchyBuilderOrderBased<Date> builder = HierarchyBuilderOrderBased.create(dateType, false);
+
+       // Define grouping fanouts
+       builder.getLevel(0).addGroup(10, dateType.createAggregate().createIntervalFunction());
+       builder.getLevel(1).addGroup(2, dateType.createAggregate().createIntervalFunction());
+
+       // Alternatively
+       // builder.setAggregateFunction(AggregateFunction.INTERVAL(DataType.INTEGER));
+       // builder.getLevel(0).addFanout(10);
+       // builder.getLevel(1).addFanout(2);
+       
+       System.out.println("---------------------");
+       System.out.println("ORDER-BASED DATE HIERARCHY");
+       System.out.println("---------------------");
+       System.out.println("");
+       System.out.println("SPECIFICATION");
+       
+       // Print specification
+       for (Level<Date> level : builder.getLevels()) {
+           System.out.println(level);
+       }
+       
+       // Print info about resulting groups
+       System.out.println("Resulting levels: "+Arrays.toString(builder.prepare(getExampleDateData(stringDateFormat))));
+       
+       System.out.println("");
+       System.out.println("RESULT");
+       
+       // Print resulting hierarchy
+       printArray(builder.build().getHierarchy());
+       System.out.println("");
+   }
+
+   /**
+    * Returns example data.
+    *
+    * @return
+    */
+   private static String[] getExampleData(){
+
+       String[] result = new String[100];
+       for (int i=0; i< result.length; i++){
+           result[i] = String.valueOf(i);
+       }
+       return result;
+   }
+
+   /**
+    * Returns example date data.
+    *
+    * @param stringFormat
+    * @return
+    */
+   private static String[] getExampleDateData(String stringFormat){
+
+   	SimpleDateFormat format = new SimpleDateFormat(stringFormat);
+   	
+       String[] result = new String[100];
+       for (int i=0; i< result.length; i++){
+       	
+       	Calendar date = GregorianCalendar.getInstance();
+       	date.add(Calendar.HOUR, i);
+       	
+           result[i] = format.format(date.getTime());
+       }
+       return result;
+   }
+
+   /**
+    * Returns example data.
+    *
+    * @return
+    */
+   private static String[] getExampleLDLData() {
+
+       String[] result = new String[100];
+       for (int i=0; i< result.length; i++){
+           result[i] = String.valueOf(Math.random() * 9.9d);
+       }
+       return result;
+   }
+   
+   /**
+    * Exemplifies the use of the interval-based builder.
+    */
+   private static void intervalBased() {
+
+
+       // Create the builder
+       HierarchyBuilderIntervalBased<Long> builder = HierarchyBuilderIntervalBased.create(
+                                                         DataType.INTEGER,
+                                                         new Range<Long>(0l,0l,Long.MIN_VALUE / 4),
+                                                         new Range<Long>(100l,100l,Long.MAX_VALUE / 4));
+       
+       // Define base intervals
+       builder.setAggregateFunction(DataType.INTEGER.createAggregate().createIntervalFunction(true, false));
+       builder.addInterval(0l, 20l);
+       builder.addInterval(20l, 33l);
+       
+       // Define grouping fanouts
+       builder.getLevel(0).addGroup(2);
+       builder.getLevel(1).addGroup(3);
+       
+
+       System.out.println("------------------------");
+       System.out.println("INTERVAL-BASED HIERARCHY");
+       System.out.println("------------------------");
+       System.out.println("");
+       System.out.println("SPECIFICATION");
+       
+       // Print specification
+       for (Interval<Long> interval : builder.getIntervals()){
+           System.out.println(interval);
+       }
+
+       // Print specification
+       for (Level<Long> level : builder.getLevels()) {
+           System.out.println(level);
+       }
+       
+       // Print info about resulting levels
+       System.out.println("Resulting levels: "+Arrays.toString(builder.prepare(getExampleData())));
+
+       System.out.println("");
+       System.out.println("RESULT");
+
+       // Print resulting hierarchy
+       printArray(builder.build().getHierarchy());
+       System.out.println("");
+   }
+
+   /**
+    * Exemplifies the use of the interval-based builder for LDL cholesterol
+    * in mmol/l.
+    */
+   private static void ldlCholesterol() {
+
+
+       // Create the builder
+       HierarchyBuilderIntervalBased<Double> builder = HierarchyBuilderIntervalBased.create(DataType.DECIMAL);
+       
+       // Define base intervals
+       builder.addInterval(0d, 1.8d, "very low");
+       builder.addInterval(1.8d, 2.6d, "low");
+       builder.addInterval(2.6d, 3.4d, "normal");
+       builder.addInterval(3.4d, 4.1d, "borderline high");
+       builder.addInterval(4.1d, 4.9d, "high");
+       builder.addInterval(4.9d, 10d, "very high");
+       
+       // Define grouping fanouts
+       builder.getLevel(0).addGroup(2, "low").addGroup(2, "normal").addGroup(2, "high");
+       builder.getLevel(1).addGroup(2, "low-normal").addGroup(1, "high");
+
+       System.out.println("--------------------------");
+       System.out.println("LDL-CHOLESTEROL HIERARCHY");
+       System.out.println("--------------------------");
+       System.out.println("");
+       System.out.println("SPECIFICATION");
+       
+       // Print specification
+       for (Interval<Double> interval : builder.getIntervals()){
+           System.out.println(interval);
+       }
+
+       // Print specification
+       for (Level<Double> level : builder.getLevels()) {
+           System.out.println(level);
+       }
+       
+       // Print info about resulting levels
+       System.out.println("Resulting levels: "+Arrays.toString(builder.prepare(getExampleLDLData())));
+       
+       System.out.println("");
+       System.out.println("RESULT");
+       
+       // Print resulting hierarchy
+       printArray(builder.build().getHierarchy());
+       System.out.println("");
+   }
+   
+   /**
+    * Shows how to load and store hierarchy specifications.
+    */
+   private static void loadStore() {
+       try {
+           HierarchyBuilderRedactionBased<?> builder = HierarchyBuilderRedactionBased.create(Order.RIGHT_TO_LEFT,
+                                                                                             Order.RIGHT_TO_LEFT,
+                                                                                             ' ', '*');
+           builder.save("test.ahs");
+           
+           HierarchyBuilder<?> loaded = HierarchyBuilder.create("test.ahs");
+           if (loaded.getType() == Type.REDACTION_BASED) {
+               
+               builder = (HierarchyBuilderRedactionBased<?>)loaded;
+               
+               System.out.println("-------------------------");
+               System.out.println("REDACTION-BASED HIERARCHY");
+               System.out.println("-------------------------");
+               System.out.println("");
+               System.out.println("SPECIFICATION");
+               
+               // Print info about resulting groups
+               System.out.println("Resulting levels: "+Arrays.toString(builder.prepare(getExampleData())));
+               
+               System.out.println("");
+               System.out.println("RESULT");
+               
+               // Print resulting hierarchy
+               printArray(builder.build().getHierarchy());
+               System.out.println("");
+           } else {
+               System.out.println("Incompatible type of builder");
+           }
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+   }
+   
+   /**
+    * Exemplifies the use of the order-based builder.
+    */
+   private static void orderBased() {
+
+       // Create the builder
+       HierarchyBuilderOrderBased<Long> builder = HierarchyBuilderOrderBased.create(DataType.INTEGER, false);
+
+       // Define grouping fanouts
+       builder.getLevel(0).addGroup(10, DataType.INTEGER.createAggregate().createIntervalFunction());
+       builder.getLevel(1).addGroup(2, DataType.INTEGER.createAggregate().createIntervalFunction());
+
+       // Alternatively
+       // builder.setAggregateFunction(AggregateFunction.INTERVAL(DataType.INTEGER));
+       // builder.getLevel(0).addFanout(10);
+       // builder.getLevel(1).addFanout(2);
+       
+       System.out.println("---------------------");
+       System.out.println("ORDER-BASED HIERARCHY");
+       System.out.println("---------------------");
+       System.out.println("");
+       System.out.println("SPECIFICATION");
+       
+       // Print specification
+       for (Level<Long> level : builder.getLevels()) {
+           System.out.println(level);
+       }
+       
+       // Print info about resulting groups
+       System.out.println("Resulting levels: "+Arrays.toString(builder.prepare(getExampleData())));
+       
+       System.out.println("");
+       System.out.println("RESULT");
+       
+       // Print resulting hierarchy
+       printArray(builder.build().getHierarchy());
+       System.out.println("");
+   }
+   
+   /**
+    * Exemplifies the use of the redaction-based builder.
+    */
+   private static void redactionBased() {
+
+       // Create the builder
+       HierarchyBuilderRedactionBased<?> builder = HierarchyBuilderRedactionBased.create(Order.RIGHT_TO_LEFT,
+                                                                                   Order.RIGHT_TO_LEFT,
+                                                                                   ' ', '*');
+
+       System.out.println("-------------------------");
+       System.out.println("REDACTION-BASED HIERARCHY");
+       System.out.println("-------------------------");
+       System.out.println("");
+       System.out.println("SPECIFICATION");
+       
+       // Print info about resulting groups
+       System.out.println("Resulting levels: "+Arrays.toString(builder.prepare(getExampleData())));
+       
+       System.out.println("");
+       System.out.println("RESULT");
+       
+       // Print resulting hierarchy
+       printArray(builder.build().getHierarchy());
+       System.out.println("");
+   }
 }
