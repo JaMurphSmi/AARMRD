@@ -29,6 +29,7 @@ import org.deidentifier.arx.DataType.DataTypeDescription;
 import org.deidentifier.arx.aggregates.StatisticsContingencyTable;
 import org.deidentifier.arx.aggregates.StatisticsContingencyTable.Entry;
 import org.deidentifier.arx.aggregates.StatisticsFrequencyDistribution;
+import org.deidentifier.arx.aggregates.AggregateFunction.AggregateFunctionBuilder;
 import org.deidentifier.arx.aggregates.HierarchyBuilder;
 import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
 import org.deidentifier.arx.aggregates.HierarchyBuilderGroupingBased.Level;
@@ -231,7 +232,7 @@ public class AnonymizationController extends AnonymizationBase {
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized25.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized26.csv", ';');
        System.out.println("Done!");
 
        ///////// allows access to the data's statistics
@@ -293,9 +294,28 @@ public class AnonymizationController extends AnonymizationBase {
        ldlCholesterol();
        dates();
        loadStore();
-/// to here seems to be a constant       
+/// to here seems to be a constant   
+       
+       aggregate(new String[]{"xaaa", "xxxbbb", "xxcccc"}, DataType.STRING);
+       aggregate(new String[]{"1", "2", "5", "11", "12", "3"}, DataType.STRING);
+       aggregate(new String[]{"1", "2", "5", "11", "12", "3"}, DataType.INTEGER);
        
       return "anonymize";
+   }
+   
+   private static void aggregate(String[] args, DataType<?> type){
+       
+       AggregateFunctionBuilder<?> builder = type.createAggregate();
+       System.out.println("Input: "+Arrays.toString(args) + " as "+type.getDescription().getLabel()+"s");
+       System.out.println(" - Set                         :"+builder.createSetFunction().aggregate(args));
+       System.out.println(" - Set of prefixes             :"+builder.createSetOfPrefixesFunction().aggregate(args));
+       System.out.println(" - Set of prefixes of length 2 :"+builder.createSetOfPrefixesFunction(2).aggregate(args));
+       System.out.println(" - Set of prefixes of length 3 :"+builder.createSetOfPrefixesFunction(3).aggregate(args));
+       System.out.println(" - Common prefix               :"+builder.createPrefixFunction().aggregate(args));
+       System.out.println(" - Common prefix with redaction:"+builder.createPrefixFunction('*').aggregate(args));
+       System.out.println(" - Bounds                      :"+builder.createBoundsFunction().aggregate(args));
+       System.out.println(" - Interval                    :"+builder.createIntervalFunction().aggregate(args));
+       System.out.println();
    }
    
    private static Data getData() {
