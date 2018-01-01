@@ -52,9 +52,6 @@ public class AnonymizationController extends AnonymizationBase {
 	   model.addAttribute("anonMessage", "This is where the anonymization will be placed");
 	   model.addAttribute("figures", secArray);
 	   
-       
-	   
-	   
 	   // 1. List all data types
        for (DataTypeDescription<?> type : DataType.list()){
            
@@ -101,29 +98,9 @@ public class AnonymizationController extends AnonymizationBase {
 
        System.out.println("Double: "+ value1);
        System.out.println("Date: "+ value2);
-
-	   
-	   
-	   
-	   
-	   
-	   
-	   
-	   
-	   
-	   
-	   
-	   
-	   
 	   
 	   
 ///////////// this is where anonymization begins	   
-	   
-	   
-	   
-	   
-	   
-	   
 	   
 	   
 /// data set originally created below	   
@@ -204,10 +181,7 @@ public class AnonymizationController extends AnonymizationBase {
        ARXAnonymizer anonymizer = new ARXAnonymizer();
        ARXConfiguration config = ARXConfiguration.create();
        config.addPrivacyModel(new KAnonymity(2));
-       /*config.addPrivacyModel(new HierarchicalDistanceTCloseness("disease1", 0.2d, getHierarchyDisease()));
-       config.addPrivacyModel(new RecursiveCLDiversity("disease2", 3d, 2));
-       config.setMaxOutliers(0d);
-       config.setQualityModel(Metric.createEntropyMetric());*/
+       
        
     // NDS-specific settings
        config.setMaxOutliers(1d); // Recommended default: 1d
@@ -243,20 +217,9 @@ public class AnonymizationController extends AnonymizationBase {
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized22.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized23.csv", ';');
        System.out.println("Done!");
-       
-    // Process results
-    /*   if (result.getGlobalOptimum() != null) {
-           System.out.println(" - Transformed data:");
-           Iterator<String[]> transformed = result.getOutput(false).iterator();
-           while (transformed.hasNext()) {
-               System.out.print("   ");
-               System.out.println(Arrays.toString(transformed.next()));
-           }
-   		}*/
-       
-//
+
        ///////// allows access to the data's statistics
        // Print input
        System.out.println(" - Input data:");
@@ -267,12 +230,14 @@ public class AnonymizationController extends AnonymizationBase {
        }
 
        // Print results
-       System.out.println(" - Transformed data:");
-       Iterator<String[]> transformed = result.getOutput(false).iterator();
-       while (transformed.hasNext()) {
-           System.out.print("   ");
-           System.out.println(Arrays.toString(transformed.next()));
-       }
+       if (result.getGlobalOptimum() != null) {
+           System.out.println(" - Transformed data:");
+           Iterator<String[]> transformed = result.getOutput(false).iterator();
+           while (transformed.hasNext()) {
+               System.out.print("   ");
+               System.out.println(Arrays.toString(transformed.next()));
+           }
+   		}
 
        // Print frequencies
        StatisticsFrequencyDistribution distribution;
