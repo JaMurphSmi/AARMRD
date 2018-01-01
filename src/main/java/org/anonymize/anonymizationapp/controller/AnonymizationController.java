@@ -231,7 +231,7 @@ public class AnonymizationController extends AnonymizationBase {
        
        // Write results to file
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized24.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized25.csv", ';');
        System.out.println("Done!");
 
        ///////// allows access to the data's statistics
@@ -431,7 +431,7 @@ public class AnonymizationController extends AnonymizationBase {
     */
    private static String[] getExampleData(){
 
-       String[] result = new String[100];
+       String[] result = new String[35];
        for (int i=0; i< result.length; i++){
            result[i] = String.valueOf(i);
        }
@@ -448,7 +448,7 @@ public class AnonymizationController extends AnonymizationBase {
 
    	SimpleDateFormat format = new SimpleDateFormat(stringFormat);
    	
-       String[] result = new String[100];
+       String[] result = new String[35];
        for (int i=0; i< result.length; i++){
        	
        	Calendar date = GregorianCalendar.getInstance();
@@ -466,7 +466,7 @@ public class AnonymizationController extends AnonymizationBase {
     */
    private static String[] getExampleLDLData() {
 
-       String[] result = new String[100];
+       String[] result = new String[35];
        for (int i=0; i< result.length; i++){
            result[i] = String.valueOf(Math.random() * 9.9d);
        }
