@@ -45,6 +45,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilderOrderBased;
 import org.deidentifier.arx.aggregates.HierarchyBuilderRedactionBased;
 import org.deidentifier.arx.aggregates.HierarchyBuilderRedactionBased.Order;
 import org.deidentifier.arx.criteria.DPresence;
+import org.deidentifier.arx.criteria.DistinctLDiversity;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.EntropyLDiversity;
@@ -95,41 +96,27 @@ public class AnonymizationController extends AnonymizationBase {
                instance = type.newInstance(type.getExampleFormats().get(0));
            }
        }
-       System.out.println("Outside of the advanced for loop");
        // 2. Obtain specific data type
        DataTypeDescription<Date> entry = DataType.list(Date.class);
-       System.out.println("got date type");
        DataTypeDescription<String> entry1 = DataType.list(String.class);
-       System.out.println("got string type");
        DataTypeDescription<Long> entry2 = DataType.list(Long.class);
-       System.out.println("got long type");
        DataTypeDescription<Double> entry3 = DataType.list(Double.class);
-       System.out.println("got double type");
        
-       // 3. Obtain data in specific formats
-       Data theData = getData();
-       System.out.println("got the data");
-       
+       // 3. Obtain data in specific formats	
+       Data theData = getData(); 
        
        theData.getDefinition().setDataType("zip", DataType.createDecimal("#,##0"));
-       System.out.println("set the data type to decimal");
        theData.getDefinition().setDataType("sen", DataType.createDate("dd.MM.yyyy"));
-       System.out.println("set the data type to date");
        
        DataHandle handle = theData.getHandle();
        double value1 = handle.getDouble(2, 2);
        Date value2 = handle.getDate(2, 5);
 
        System.out.println("Double: "+ value1);
-       System.out.println("Date: "+ value2);
-	   
+       System.out.println("Date: "+ value2);   
 	   
 ///////////// this is where anonymization begins	   
-	   
-	   
-/// data set originally created below	   
-	   
-	   //Data data = Data.create("src/main/resources/templates/data/medical_test_data.csv", StandardCharsets.UTF_8, ';');
+       //Data data = Data.create("src/main/resources/templates/data/medical_test_data.csv", StandardCharsets.UTF_8, ';');
        
 // Define public dataset
 	   //DefaultData data = Data.create();	   
@@ -142,8 +129,6 @@ public class AnonymizationController extends AnonymizationBase {
        ///// can create a subset through variability 
        //DataSelector selector = DataSelector.create(data).field("sen").equals("1");
        
-       ///// complex subset selector -> does not work
-
        //DataSubset subset = DataSubset.create(data, selector);
        
        // Obtain a handle
@@ -157,7 +142,7 @@ public class AnonymizationController extends AnonymizationBase {
 */
        
        
-// Define how field effects identifiability
+// Define how field effects identifiability, can be taken in variably from screen
        //data.getDefinition().setAttributeType("age", AttributeType.SENSITIVE_ATTRIBUTE);
        //data.getDefinition().setAttributeType("age", AttributeType.IDENTIFYING_ATTRIBUTE);
        //data.getDefinition().setAttributeType("gender", AttributeType.INSENSITIVE_ATTRIBUTE);
@@ -187,8 +172,6 @@ public class AnonymizationController extends AnonymizationBase {
        zipcode.add("81675", "8167*", "816**", "81***", "8****", "*****");
        zipcode.add("81925", "8192*", "819**", "81***", "8****", "*****");
        zipcode.add("81931", "8193*", "819**", "81***", "8****", "*****");
-       
-       //Hierarchy disease = Hierarchy.create("src/main/resources/templates/hierarchy/medical_test_disease.csv", StandardCharsets.UTF_8, ';');
        
        // set the minimal generalization height
        /*data.getDefinition().setMinimumGeneralization("zipcode", 3);
@@ -320,12 +303,60 @@ public class AnonymizationController extends AnonymizationBase {
        printResult(res, tData);
 //////////////////self-contained test
        // Write results to file
+       
+       Data moreData = getMoreData();
+       Hierarchy disease = getDisease();
+       Hierarchy zipecod = getZipcode();
+       Hierarchy agee = getAge();
+       
+       moreData.getDefinition().setAttributeType("zipcode", zipecod);
+       moreData.getDefinition().setAttributeType("disease", AttributeType.SENSITIVE_ATTRIBUTE);
+       moreData.getDefinition().setAttributeType("age", AttributeType.SENSITIVE_ATTRIBUTE);
+       
+    // Create an instance of the anonymizer
+       ARXAnonymizer anon = new ARXAnonymizer();
+       ARXConfiguration con = ARXConfiguration.create();
+       con.addPrivacyModel(new KAnonymity(5));
+       con.addPrivacyModel(new DistinctLDiversity("disease", 4));
+       con.addPrivacyModel(new DistinctLDiversity("age", 6));
+       con.setMaxOutliers(0.1d);
+       con.setQualityModel(Metric.createEntropyMetric());
+
+       // Now anonymize
+       ARXResult resu = anon.anonymize(moreData, con);
+
+       // Print info
+       printResult(resu, moreData);
+
+       // Process results
+       if (resu.isResultAvailable()) {
+           System.out.println(" - Transformed data for example 23 using distinct l diversity:");
+           Iterator<String[]> transformed = resu.getOutput(false).iterator();
+           while (transformed.hasNext()) {
+               System.out.print("   ");
+               System.out.println(Arrays.toString(transformed.next()));
+           }
+       }
+       
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized27.csv", ';');
+       resu.getOutput(false).save("src/main/resources/templates/output/test_anonymized28.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
    }
+   
+/**************************************************************************
+ * 
+ *    end of main method
+ * 
+ **************************************************************************/  
+   
+   
+   
+   
+   
+   
+   
    
    public static Data createData(final String dataset) throws IOException {
 
@@ -400,6 +431,49 @@ public class AnonymizationController extends AnonymizationBase {
        return data;
    }
    
+   private static Data getMoreData() {
+	   DefaultData data = Data.create();
+       data.add("zipcode", "age", "disease");
+       data.add("47677", "22", "gastric ulcer");
+       data.add("47602", "23", "gastritis");
+       data.add("47678", "24", "stomach cancer");
+       data.add("47605", "25", "bronchitis");
+       data.add("47607", "26", "pneumonia");
+       data.add("47673", "26", "pneumonia");
+       data.add("47905", "23", "gastritis");
+       data.add("47909", "27", "flu");
+       data.add("47906", "25", "bronchitis");
+       return data;
+   }
+   
+   private static Hierarchy getAge() {
+	   DefaultHierarchy age = Hierarchy.create();
+       age.add("29", "<=40", "*");
+       age.add("22", "<=40", "*");
+       age.add("27", "<=40", "*");
+       age.add("43", ">40", "*");
+       age.add("52", ">40", "*");
+       age.add("47", ">40", "*");
+       age.add("30", "<=40", "*");
+       age.add("36", "<=40", "*");
+       age.add("32", "<=40", "*");
+       return age;
+   }
+   
+   private static Hierarchy getZipcode() {
+	   DefaultHierarchy zipcode = Hierarchy.create();
+       zipcode.add("47677", "4767*", "476**", "47***", "4****", "*****");
+       zipcode.add("47602", "4760*", "476**", "47***", "4****", "*****");
+       zipcode.add("47678", "4767*", "476**", "47***", "4****", "*****");
+       zipcode.add("47905", "4790*", "479**", "47***", "4****", "*****");
+       zipcode.add("47909", "4790*", "479**", "47***", "4****", "*****");
+       zipcode.add("47906", "4790*", "479**", "47***", "4****", "*****");
+       zipcode.add("47605", "4760*", "476**", "47***", "4****", "*****");
+       zipcode.add("47673", "4767*", "476**", "47***", "4****", "*****");
+       zipcode.add("47607", "4760*", "476**", "47***", "4****", "*****");
+       return zipcode;
+   }
+   
    private static int[] calcFigures(int[] anArray)
    {
 	   for(int i = 0; i < anArray.length; ++i)
@@ -407,6 +481,51 @@ public class AnonymizationController extends AnonymizationBase {
 		   anArray[i] = anArray[i]*2;
 	   }
 	   return anArray;
+   }
+   
+   private static Hierarchy getDisease() {
+	   DefaultHierarchy disease = Hierarchy.create();
+       disease.add("flu",
+                   "respiratory infection",
+                   "vascular lung disease",
+                   "respiratory & digestive system disease");
+       disease.add("pneumonia",
+                   "respiratory infection",
+                   "vascular lung disease",
+                   "respiratory & digestive system disease");
+       disease.add("bronchitis",
+                   "respiratory infection",
+                   "vascular lung disease",
+                   "respiratory & digestive system disease");
+       disease.add("pulmonary edema",
+                   "vascular lung disease",
+                   "vascular lung disease",
+                   "respiratory & digestive system disease");
+       disease.add("pulmonary embolism",
+                   "vascular lung disease",
+                   "vascular lung disease",
+                   "respiratory & digestive system disease");
+       disease.add("gastric ulcer",
+                   "stomach disease",
+                   "digestive system disease",
+                   "respiratory & digestive system disease");
+       disease.add("stomach cancer",
+                   "stomach disease",
+                   "digestive system disease",
+                   "respiratory & digestive system disease");
+       disease.add("gastritis",
+                   "stomach disease",
+                   "digestive system disease",
+                   "respiratory & digestive system disease");
+       disease.add("colitis",
+                   "colon disease",
+                   "digestive system disease",
+                   "respiratory & digestive system disease");
+       disease.add("colon cancer",
+                   "colon disease",
+                   "digestive system disease",
+    		   		"respiratory & digestive system disease");
+	   return disease;
    }
    
    /**
