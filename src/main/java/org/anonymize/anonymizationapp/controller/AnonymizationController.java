@@ -1,8 +1,11 @@
 package org.anonymize.anonymizationapp.controller;
 
 
+import java.io.File;
+import java.io.FilenameFilter;
 // Importing ARX required modules, dependencies etc
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -12,6 +15,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.deidentifier.arx.ARXAnonymizer;
 import org.deidentifier.arx.ARXConfiguration;
@@ -42,8 +47,12 @@ import org.deidentifier.arx.aggregates.HierarchyBuilderRedactionBased.Order;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.KAnonymity;
+import org.deidentifier.arx.criteria.EntropyLDiversity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
+import org.deidentifier.arx.io.CSVHierarchyInput;
 import org.deidentifier.arx.metric.Metric;
+
+
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
 // ARX related stuff 
 
@@ -60,7 +69,7 @@ public class AnonymizationController extends AnonymizationBase {
 
    @SuppressWarnings("unused")
    @RequestMapping("/anonymize")
-   public String index(Model model) throws IOException, ParseException {
+   public String index(Model model) throws IOException, ParseException, SQLException, ClassNotFoundException {
 	   int anArray[] = {4,5,6,7,8,9,10};
 	   int secArray[];
 	   secArray = calcFigures(anArray);
@@ -229,11 +238,6 @@ public class AnonymizationController extends AnonymizationBase {
 /// from here        
        // Print info
        printResult(result, data);
-       
-       // Write results to file
-       System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized26.csv", ';');
-       System.out.println("Done!");
 
        ///////// allows access to the data's statistics
        // Print input
@@ -300,7 +304,57 @@ public class AnonymizationController extends AnonymizationBase {
        aggregate(new String[]{"1", "2", "5", "11", "12", "3"}, DataType.STRING);
        aggregate(new String[]{"1", "2", "5", "11", "12", "3"}, DataType.INTEGER);
        
+//////////////////self-contained test
+       Data tData = createData("adult");
+       tData.getDefinition().setAttributeType("occupation", AttributeType.SENSITIVE_ATTRIBUTE);
+       
+       ARXAnonymizer anonymize = new ARXAnonymizer();
+       ARXConfiguration conf = ARXConfiguration.create();
+       conf.addPrivacyModel(new EntropyLDiversity("occupation", 5));
+       conf.setMaxOutliers(0.04d);
+       conf.setQualityModel(Metric.createEntropyMetric());
+       
+       // Anonymize
+       ARXResult res = anonymize.anonymize(tData, conf);
+       System.out.println(" - Just after anonymizing using example 22...");
+       printResult(res, tData);
+//////////////////self-contained test
+       // Write results to file
+       System.out.print(" - Writing data...");
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized27.csv", ';');
+       System.out.println("Done!");
+       
       return "anonymize";
+   }
+   
+   public static Data createData(final String dataset) throws IOException {
+
+       Data data = Data.create("src/main/resources/templates/data/" + dataset + ".csv", StandardCharsets.UTF_8, ';');
+
+       // Read generalization hierarchies
+       FilenameFilter hierarchyFilter = new FilenameFilter() {
+           @Override
+           public boolean accept(File dir, String name) {
+               if (name.matches(dataset + "_hierarchy_(.)+.csv")) {
+                   return true;
+               } else {
+                   return false;
+               }
+           }
+       };
+       // Create definition
+       File testDir = new File("src/main/resources/templates/hierarchy/");
+       File[] genHierFiles = testDir.listFiles(hierarchyFilter);
+       Pattern pattern = Pattern.compile("_hierarchy_(.*?).csv");
+       for (File file : genHierFiles) {
+           Matcher matcher = pattern.matcher(file.getName());
+           if (matcher.find()) {
+               CSVHierarchyInput hier = new CSVHierarchyInput(file, StandardCharsets.UTF_8, ';');
+               String attributeName = matcher.group(1);
+               data.getDefinition().setAttributeType(attributeName, Hierarchy.create(hier.getHierarchy()));
+           }
+       }
+       return data;
    }
    
    private static void aggregate(String[] args, DataType<?> type){
@@ -332,7 +386,7 @@ public class AnonymizationController extends AnonymizationBase {
        data.add("i", "Iris", "48970", "52", "France", "1.1.2013");
        return data;
    }
-   @SuppressWarnings("unused")
+   
    private static Data getTheData() {
        DefaultData data = Data.create();
        data.add("age", "gender", "zipcode");
@@ -345,52 +399,6 @@ public class AnonymizationController extends AnonymizationBase {
        data.add("45", "male", "81931");
        return data;
    }
-   @SuppressWarnings("unused")
-   private static Hierarchy getHierarchyDisease() {
-       DefaultHierarchy disease = Hierarchy.create();
-       disease.add("flu",
-                   "respiratory infection",
-                   "vascular lung disease",
-                   "respiratory & digestive system disease");
-       disease.add("pneumonia",
-                   "respiratory infection",
-                   "vascular lung disease",
-                   "respiratory & digestive system disease");
-       disease.add("bronchitis",
-                   "respiratory infection",
-                   "vascular lung disease",
-                   "respiratory & digestive system disease");
-       disease.add("pulmonary edema",
-                   "vascular lung disease",
-                   "vascular lung disease",
-                   "respiratory & digestive system disease");
-       disease.add("pulmonary embolism",
-                   "vascular lung disease",
-                   "vascular lung disease",
-                   "respiratory & digestive system disease");
-       disease.add("gastric ulcer",
-                   "stomach disease",
-                   "digestive system disease",
-                   "respiratory & digestive system disease");
-       disease.add("stomach cancer",
-                   "stomach disease",
-                   "digestive system disease",
-                   "respiratory & digestive system disease");
-       disease.add("gastritis",
-                   "stomach disease",
-                   "digestive system disease",
-                   "respiratory & digestive system disease");
-       disease.add("colitis",
-                   "colon disease",
-                   "digestive system disease",
-                   "respiratory & digestive system disease");
-       disease.add("colon cancer",
-                   "colon disease",
-                   "digestive system disease",
-                   "respiratory & digestive system disease");
-       return disease;
-   }
-   
    
    private static int[] calcFigures(int[] anArray)
    {
