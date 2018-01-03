@@ -15,11 +15,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.deidentifier.arx.ARXAnonymizer;
 import org.deidentifier.arx.ARXConfiguration;
+import org.deidentifier.arx.ARXLattice.ARXNode;
 import org.deidentifier.arx.ARXResult;
 import org.deidentifier.arx.AttributeType;
 import org.deidentifier.arx.AttributeType.Hierarchy;
@@ -31,6 +33,7 @@ import org.deidentifier.arx.DataSelector;
 import org.deidentifier.arx.DataSubset;
 import org.deidentifier.arx.DataType;
 import org.deidentifier.arx.DataType.DataTypeDescription;
+import org.deidentifier.arx.DataType.DataTypeWithFormat;
 import org.deidentifier.arx.aggregates.StatisticsContingencyTable;
 import org.deidentifier.arx.aggregates.StatisticsContingencyTable.Entry;
 import org.deidentifier.arx.aggregates.StatisticsFrequencyDistribution;
@@ -52,11 +55,10 @@ import org.deidentifier.arx.criteria.EntropyLDiversity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.io.CSVHierarchyInput;
 import org.deidentifier.arx.metric.Metric;
-
-
+import org.deidentifier.arx.metric.v2.__MetricV2;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
 // ARX related stuff 
-
+import org.apache.commons.math3.util.Pair;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -179,15 +181,34 @@ public class AnonymizationController extends AnonymizationBase {
        data.getDefinition().setMinimumGeneralization("gender", 1);*/
        //data.getDefinition().setAttributeType("disease", AttributeType.SENSITIVE_ATTRIBUTE);
 /////this might be very very very important to look into 
-       HierarchyBuilderRedactionBased<?> builder1 = HierarchyBuilderRedactionBased.create(Order.RIGHT_TO_LEFT,
+       /*HierarchyBuilderRedactionBased<?> builder1 = HierarchyBuilderRedactionBased.create(Order.RIGHT_TO_LEFT,
                Order.RIGHT_TO_LEFT,
                ' ',
                '*');
        HierarchyBuilderRedactionBased<?> builder2 = HierarchyBuilderRedactionBased.create(Order.RIGHT_TO_LEFT,
                Order.RIGHT_TO_LEFT,
                ' ',
-    		   '*');
-       
+    		   '*');*/ // moving to some differing hierarchies generated on via supplied values
+	   
+	   HierarchyBuilderIntervalBased<Long> builder1 = HierarchyBuilderIntervalBased.create(
+               DataType.INTEGER,
+               new Range<Long>(0l,0l,0l),
+               new Range<Long>(99l,99l,99l));
+
+		// Define base intervals
+		builder1.setAggregateFunction(DataType.INTEGER.createAggregate().createIntervalFunction(true, false));
+		builder1.addInterval(0l, 20l);
+		builder1.addInterval(20l, 33l);
+		
+		// Define grouping fanouts
+		builder1.getLevel(0).addGroup(2);
+		builder1.getLevel(1).addGroup(3);
+		
+		HierarchyBuilderRedactionBased<?> builder2 = HierarchyBuilderRedactionBased.create(Order.RIGHT_TO_LEFT,
+		                                                Order.RIGHT_TO_LEFT,
+		                                                ' ',
+														'*');
+		builder2.setAlphabetSize(10, 5);
     // Define attribute types
        /*data.getDefinition().setAttributeType("age", age);  //commented out for example 24
        data.getDefinition().setAttributeType("gender", gender);
@@ -197,12 +218,21 @@ public class AnonymizationController extends AnonymizationBase {
        data.getDefinition().setAttributeType("gender", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
        data.getDefinition().setAttributeType("zipcode", builder2);
        
+       
        // Create an instance of the anonymizer
        ARXAnonymizer anonymizer = new ARXAnonymizer();
        ARXConfiguration config = ARXConfiguration.create();
        config.addPrivacyModel(new KAnonymity(3));
        config.setMaxOutliers(0d);
+       config.setQualityModel(__MetricV2.createLossMetric());
+       config.setSuppressionAlwaysEnabled(false);
        
+   // dynamically determine data types for dataset. Would be done using while, for?
+       System.out.println("Determining data types:");
+       determineDataType(data.getHandle(), 0);
+       determineDataType(data.getHandle(), 1);
+       determineDataType(data.getHandle(), 2);
+       //determineDataType(data.getHandle(), 3);
     // NDS-specific settings
        /*config.setMaxOutliers(1d); // Recommended default: 1d //commented for example 24
        config.setAttributeWeight("age", 0.5d); // attribute weight
@@ -216,6 +246,20 @@ public class AnonymizationController extends AnonymizationBase {
        // Print input
        System.out.println(" - Input data:");
        print(data.getHandle().iterator());
+       
+    // Process results
+       System.out.println(" - Example 25 ARXNode printing lattice:");
+       for (ARXNode[] level : result.getLattice().getLevels()) {
+           for (ARXNode node : level) {
+               Iterator<String[]> transformed = result.getOutput(node, false).iterator();
+               System.out.println("Transformation : "+Arrays.toString(node.getTransformation()));
+               System.out.println("InformationLoss: "+node.getHighestScore());
+               while (transformed.hasNext()) {
+                   System.out.print("   ");
+                   System.out.println(Arrays.toString(transformed.next()));
+               }
+           }
+       }
 
        // Print input
        ////////System.out.println(" - Input research subset:");
@@ -231,7 +275,7 @@ public class AnonymizationController extends AnonymizationBase {
        System.out.println("outHandle value of the field is " + outHandle.getValue(0, 0));
        */
        
-/// from here        
+/// from here  
        // Print info
        printResult(result, data);
 
@@ -352,7 +396,7 @@ public class AnonymizationController extends AnonymizationBase {
        }
        
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized29.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized30.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
@@ -370,7 +414,7 @@ public class AnonymizationController extends AnonymizationBase {
    
    
    
-   
+//take in file through variable means   
    public static Data createData(final String dataset) throws IOException {
 
        Data data = Data.create("src/main/resources/templates/data/" + dataset + ".csv", StandardCharsets.UTF_8, ';');
@@ -400,6 +444,30 @@ public class AnonymizationController extends AnonymizationBase {
        }
        return data;
    }
+   
+   /**
+    * Prints a list of matching data types
+    * @param handle
+    * @param column
+    */
+   private static void determineDataType(DataHandle handle, int column) {
+       System.out.println(" - Potential data types for attribute: "+handle.getAttributeName(column));
+       List<Pair<DataType<?>, Double>> types = handle.getMatchingDataTypes(column);
+
+       // Print entries sorted by match percentage
+       for (Pair<DataType<?>, Double> entry : types) {
+           System.out.print("   * ");
+           System.out.print(entry.getKey().getDescription().getLabel());
+           if (entry.getKey().getDescription().hasFormat()) {
+               System.out.print("[");
+               System.out.print(((DataTypeWithFormat) entry.getKey()).getFormat());
+               System.out.print("]");
+           }
+           System.out.print(": ");
+           System.out.println(entry.getValue());
+       }
+   }
+   
    
    private static void aggregate(String[] args, DataType<?> type){
        
@@ -591,7 +659,7 @@ public class AnonymizationController extends AnonymizationBase {
     */
    private static String[] getExampleData(){
 
-       String[] result = new String[35];
+       String[] result = new String[15];
        for (int i=0; i< result.length; i++){
            result[i] = String.valueOf(i);
        }
@@ -608,7 +676,7 @@ public class AnonymizationController extends AnonymizationBase {
 
    	SimpleDateFormat format = new SimpleDateFormat(stringFormat);
    	
-       String[] result = new String[35];
+       String[] result = new String[15];
        for (int i=0; i< result.length; i++){
        	
        	Calendar date = GregorianCalendar.getInstance();
@@ -626,7 +694,7 @@ public class AnonymizationController extends AnonymizationBase {
     */
    private static String[] getExampleLDLData() {
 
-       String[] result = new String[35];
+       String[] result = new String[15];
        for (int i=0; i< result.length; i++){
            result[i] = String.valueOf(Math.random() * 9.9d);
        }
