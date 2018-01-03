@@ -30,6 +30,7 @@ import org.deidentifier.arx.Data;
 import org.deidentifier.arx.Data.DefaultData;
 import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.DataSelector;
+import org.deidentifier.arx.DataSource;
 import org.deidentifier.arx.DataSubset;
 import org.deidentifier.arx.DataType;
 import org.deidentifier.arx.DataType.DataTypeDescription;
@@ -395,8 +396,33 @@ public class AnonymizationController extends AnonymizationBase {
            }
        }
        
+///////////////////////////////////////////////////// creating a data object from a data source object
+       
+       DataSource source = DataSource.createCSVSource("src/main/resources/templates/data/test.csv", StandardCharsets.UTF_8, ';', true);
+       source.addColumn("age", DataType.INTEGER, true);
+     
+       Data sourceData = Data.create(source);
+       
+       sourceData.getDefinition().setAttributeType("age", getMoreAge());
+       
+       // Print to console
+       print(sourceData.getHandle());
+       System.out.println("\n");
+       
+       // Anonymize
+       ARXAnonymizer anonymizerize = new ARXAnonymizer();
+       ARXConfiguration configu = ARXConfiguration.create();
+       configu.addPrivacyModel(new KAnonymity(3));
+       configu.setMaxOutliers(0d);
+       ARXResult resulting = anonymizerize.anonymize(sourceData, configu);
+       
+       // Print results
+       System.out.println("Output from example 28, finally, written to file number 31:");
+       print(resulting.getOutput(false));
+       
+       
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized30.csv", ';');
+       resulting.getOutput(false).save("src/main/resources/templates/output/test_anonymized31.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
@@ -527,6 +553,16 @@ public class AnonymizationController extends AnonymizationBase {
        return data;
    }
    
+   private static Hierarchy getMoreAge() {
+	   DefaultHierarchy age = Hierarchy.create();
+       age.add("34", "<50", "*");
+       age.add("45", "<50", "*");
+       age.add("66", ">=50", "*");
+       age.add("70", ">=50", "*");
+       age.add("99", ">=50", "*");
+       age.add("NULL", "NULL", "*");
+	   return age;
+   }
    private static Hierarchy getAge() {
 	   DefaultHierarchy age = Hierarchy.create();
        age.add("29", "<=40", "*");
