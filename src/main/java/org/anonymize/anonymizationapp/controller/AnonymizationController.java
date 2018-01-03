@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +41,7 @@ import org.deidentifier.arx.DataType.DataTypeWithFormat;
 import org.deidentifier.arx.aggregates.StatisticsContingencyTable;
 import org.deidentifier.arx.aggregates.StatisticsContingencyTable.Entry;
 import org.deidentifier.arx.aggregates.StatisticsFrequencyDistribution;
+import org.deidentifier.arx.aggregates.StatisticsSummary;
 import org.deidentifier.arx.aggregates.AggregateFunction.AggregateFunctionBuilder;
 import org.deidentifier.arx.aggregates.HierarchyBuilder;
 import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
@@ -432,6 +434,8 @@ public class AnonymizationController extends AnonymizationBase {
        print(resulting.getOutput(false));
        
 *///////////////////////////////////////////////////////////////////////////////////
+/*////////////////////////////////////////////////////////////
+  ///////////////////////////////////// EXAMPLE 29
        //example 29, using the same dataset as others(the varying datasets is actually quite annoying to follow
        Data dataFor29 = getTheData();
        
@@ -461,9 +465,71 @@ public class AnonymizationController extends AnonymizationBase {
        print(answer.getOutput());
        System.out.println("\n - Risk analysis:");
        analyzeData(answer.getOutput());
+//////////////////////////////////////////////////////////*/
+     ////////////////////////////////////// EXAMPLE 30
+       Data dataFor30 = getData30();
+       
+       // Print everything
+       System.out.println("***************************");
+       System.out.println("* Dumping the whole object*");
+       System.out.println("***************************");
+       System.out.println(dataFor30.getHandle().getStatistics().getSummaryStatistics(true));
+       
+       // Alter definition
+       dataFor30.getDefinition().setDataType("age", DataType.INTEGER);
+       dataFor30.getDefinition().setDataType("zipcode", DataType.DECIMAL);
+       dataFor30.getDefinition().setDataType("date", DataType.DATE);
+
+       // Print everything
+       System.out.println("");
+       System.out.println("***************************");
+       System.out.println("* Dumping the whole object*");
+       System.out.println("***************************");
+       System.out.println(dataFor30.getHandle().getStatistics().getSummaryStatistics(true));
+       
+       // Access individual measures
+       Map<String, StatisticsSummary<?>> statistics = dataFor30.getHandle().getStatistics().getSummaryStatistics(true);
+       
+       // For age
+       System.out.println("");
+       System.out.println("***************************");
+       System.out.println("* Individual statistics   *");
+       System.out.println("***************************");
+       StatisticsSummary<Long> statisticsAge = (StatisticsSummary<Long>)statistics.get("age");
+       if (statisticsAge.isGeometricMeanAvailable()) {
+           System.out.println("Geometric mean of age");
+           System.out.println(" - As double: " + statisticsAge.getGeometricMeanAsDouble());
+           System.out.println(" - As value : " + statisticsAge.getGeometricMeanAsValue());
+           System.out.println(" - As string: " + statisticsAge.getGeometricMeanAsString());
+       }
+       
+       // For date
+       System.out.println("");
+       System.out.println("***************************");
+       System.out.println("* Individual statistics   *");
+       System.out.println("***************************");
+       StatisticsSummary<Date> statisticsDate = (StatisticsSummary<Date>)statistics.get("date");
+       if (statisticsDate.isSampleVarianceAvailable()) {
+           System.out.println("Sample variance of date");
+           System.out.println(" - As double: " + statisticsDate.getSampleVarianceAsDouble());
+           System.out.println(" - As value : " + statisticsDate.getSampleVarianceAsValue());
+           System.out.println(" - As string: " + statisticsDate.getSampleVarianceAsString());
+       }
+       if (statisticsDate.isArithmeticMeanAvailable()) {
+           System.out.println("Arithmetic mean of date");
+           System.out.println(" - As double: " + statisticsDate.getArithmeticMeanAsDouble());
+           System.out.println(" - As value : " + statisticsDate.getArithmeticMeanAsValue());
+           System.out.println(" - As string: " + statisticsDate.getArithmeticMeanAsString());
+       }
+       if (statisticsDate.isRangeAvailable()) {
+           System.out.println("Range of date");
+           System.out.println(" - As double: " + statisticsDate.getRangeAsDouble());
+           System.out.println(" - As value : " + statisticsDate.getRangeAsValue());
+           System.out.println(" - As string: " + statisticsDate.getRangeAsString());
+       }
        
        System.out.print(" - Writing data...");
-       answer.getOutput(false).save("src/main/resources/templates/output/test_anonymized32.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized33.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
@@ -611,6 +677,19 @@ public class AnonymizationController extends AnonymizationBase {
        data.add("g", "Gail", "48973", "33", "Spain", "1.1.2013");
        data.add("h", "Harry", "48972", "47", "Bulgaria", "1.1.2013");
        data.add("i", "Iris", "48970", "52", "France", "1.1.2013");
+       return data;
+   }
+   
+   private static Data getData30() {
+	   DefaultData data = Data.create();
+       data.add("age", "gender", "zipcode", "date");
+       data.add("45", "female", "81675", "01.01.1982");
+       data.add("34", "male", "81667", "11.05.1982");
+       data.add("NULL", "male", "81925", "31.08.1982");
+       data.add("70", "female", "81931", "02.07.1982");
+       data.add("34", "female", null, "05.01.1982");
+       data.add("70", "male", "81931", "24.03.1982");
+       data.add("45", "male", "81931", "NULL");
        return data;
    }
    
