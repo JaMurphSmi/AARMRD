@@ -157,7 +157,7 @@ public class AnonymizationController extends AnonymizationBase {
        //data.getDefinition().setAttributeType("gender", Hierarchy.create("src/main/resources/templates/hierarchy/test_gender.csv", StandardCharsets.UTF_8, ';'));
        //data.getDefinition().setAttributeType("phoneno", Hierarchy.create("src/main/resources/templates/hierarchy/test_phoneno.csv", StandardCharsets.UTF_8, ';'));
        
-       DefaultHierarchy age = Hierarchy.create();
+       /*DefaultHierarchy age = Hierarchy.create(); //commented out for example 24
        age.add("34", "<50", "*");
        age.add("45", "<50", "*");
        age.add("66", ">=50", "*");
@@ -171,31 +171,44 @@ public class AnonymizationController extends AnonymizationBase {
        zipcode.add("81667", "8166*", "816**", "81***", "8****", "*****");
        zipcode.add("81675", "8167*", "816**", "81***", "8****", "*****");
        zipcode.add("81925", "8192*", "819**", "81***", "8****", "*****");
-       zipcode.add("81931", "8193*", "819**", "81***", "8****", "*****");
+       zipcode.add("81931", "8193*", "819**", "81***", "8****", "*****");*/
        
        // set the minimal generalization height
        /*data.getDefinition().setMinimumGeneralization("zipcode", 3);
        data.getDefinition().setMaximumGeneralization("zipcode", 3);
        data.getDefinition().setMinimumGeneralization("gender", 1);*/
        //data.getDefinition().setAttributeType("disease", AttributeType.SENSITIVE_ATTRIBUTE);
+/////this might be very very very important to look into 
+       HierarchyBuilderRedactionBased<?> builder1 = HierarchyBuilderRedactionBased.create(Order.RIGHT_TO_LEFT,
+               Order.RIGHT_TO_LEFT,
+               ' ',
+               '*');
+       HierarchyBuilderRedactionBased<?> builder2 = HierarchyBuilderRedactionBased.create(Order.RIGHT_TO_LEFT,
+               Order.RIGHT_TO_LEFT,
+               ' ',
+    		   '*');
        
     // Define attribute types
-       data.getDefinition().setAttributeType("age", age);
+       /*data.getDefinition().setAttributeType("age", age);  //commented out for example 24
        data.getDefinition().setAttributeType("gender", gender);
-       data.getDefinition().setAttributeType("zipcode", zipcode);
+       data.getDefinition().setAttributeType("zipcode", zipcode);*/
+       
+       data.getDefinition().setAttributeType("age", builder1);
+       data.getDefinition().setAttributeType("gender", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+       data.getDefinition().setAttributeType("zipcode", builder2);
        
        // Create an instance of the anonymizer
        ARXAnonymizer anonymizer = new ARXAnonymizer();
        ARXConfiguration config = ARXConfiguration.create();
-       config.addPrivacyModel(new KAnonymity(2));
-       
+       config.addPrivacyModel(new KAnonymity(3));
+       config.setMaxOutliers(0d);
        
     // NDS-specific settings
-       config.setMaxOutliers(1d); // Recommended default: 1d
+       /*config.setMaxOutliers(1d); // Recommended default: 1d //commented for example 24
        config.setAttributeWeight("age", 0.5d); // attribute weight
        config.setAttributeWeight("gender", 0.3d); // attribute weight
        config.setAttributeWeight("zipcode", 0.5d); // attribute weight
-       config.setQualityModel(Metric.createLossMetric(0.5d)); // suppression/generalization-factor
+       config.setQualityModel(Metric.createLossMetric(0.5d)); // suppression/generalization-factor*/
        
        // Execute the algorithm
        ARXResult result = anonymizer.anonymize(data, config);
@@ -339,7 +352,7 @@ public class AnonymizationController extends AnonymizationBase {
        }
        
        System.out.print(" - Writing data...");
-       resu.getOutput(false).save("src/main/resources/templates/output/test_anonymized28.csv", ';');
+       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized29.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
