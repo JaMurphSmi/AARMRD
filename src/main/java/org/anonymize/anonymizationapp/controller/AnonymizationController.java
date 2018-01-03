@@ -22,6 +22,8 @@ import java.util.regex.Pattern;
 import org.deidentifier.arx.ARXAnonymizer;
 import org.deidentifier.arx.ARXConfiguration;
 import org.deidentifier.arx.ARXLattice.ARXNode;
+import org.deidentifier.arx.ARXPopulationModel;
+import org.deidentifier.arx.ARXPopulationModel.Region;
 import org.deidentifier.arx.ARXResult;
 import org.deidentifier.arx.AttributeType;
 import org.deidentifier.arx.AttributeType.Hierarchy;
@@ -48,6 +50,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilderIntervalBased.Range;
 import org.deidentifier.arx.aggregates.HierarchyBuilderOrderBased;
 import org.deidentifier.arx.aggregates.HierarchyBuilderRedactionBased;
 import org.deidentifier.arx.aggregates.HierarchyBuilderRedactionBased.Order;
+import org.deidentifier.arx.criteria.AverageReidentificationRisk;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.DistinctLDiversity;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
@@ -57,6 +60,14 @@ import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.io.CSVHierarchyInput;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.v2.__MetricV2;
+import org.deidentifier.arx.risk.RiskEstimateBuilder;
+import org.deidentifier.arx.risk.RiskModelAttributes;
+import org.deidentifier.arx.risk.RiskModelAttributes.QuasiIdentifierRisk;
+import org.deidentifier.arx.risk.RiskModelHistogram;
+import org.deidentifier.arx.risk.RiskModelPopulationUniqueness;
+import org.deidentifier.arx.risk.RiskModelPopulationUniqueness.PopulationUniquenessModel;
+import org.deidentifier.arx.risk.RiskModelSampleRisks;
+import org.deidentifier.arx.risk.RiskModelSampleUniqueness;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
 // ARX related stuff 
 import org.apache.commons.math3.util.Pair;
@@ -396,10 +407,10 @@ public class AnonymizationController extends AnonymizationBase {
            }
        }
        
-///////////////////////////////////////////////////// creating a data object from a data source object
+/*///////////////////////////////////////////////////// creating a data object from a data source object example 28
        
        DataSource source = DataSource.createCSVSource("src/main/resources/templates/data/test.csv", StandardCharsets.UTF_8, ';', true);
-       source.addColumn("age", DataType.INTEGER, true);
+       source.addColumn("age", DataType.INTEGER, true);			//dataset csv noted above has been removed
      
        Data sourceData = Data.create(source);
        
@@ -420,9 +431,39 @@ public class AnonymizationController extends AnonymizationBase {
        System.out.println("Output from example 28, finally, written to file number 31:");
        print(resulting.getOutput(false));
        
+*///////////////////////////////////////////////////////////////////////////////////
+       //example 29, using the same dataset as others(the varying datasets is actually quite annoying to follow
+       Data dataFor29 = getTheData();
+       
+       dataFor29.getDefinition().setAttributeType("age", getAgeHier());
+       dataFor29.getDefinition().setAttributeType("gender", getGender());
+       dataFor29.getDefinition().setAttributeType("zipcode", getZip());
+       
+    // Perform risk analysis
+       System.out.println("\n - Input data");
+       print(data.getHandle());
+       System.out.println("\n - Quasi-identifiers sorted by risk:");
+       analyzeAttributes(data.getHandle());
+       System.out.println("\n - Risk analysis:");
+       analyzeData(data.getHandle());
+       
+       // Create an instance of the anonymizer
+       ARXAnonymizer anonymiz = new ARXAnonymizer();
+       ARXConfiguration configuration = ARXConfiguration.create();
+       configuration.addPrivacyModel(new AverageReidentificationRisk(0.5d));
+       configuration.setMaxOutliers(1d);
+
+       // Anonymize
+       ARXResult answer = anonymizer.anonymize(dataFor29, configuration);
+
+       // Perform risk analysis
+       System.out.println("\n - Output data");
+       print(answer.getOutput());
+       System.out.println("\n - Risk analysis:");
+       analyzeData(answer.getOutput());
        
        System.out.print(" - Writing data...");
-       resulting.getOutput(false).save("src/main/resources/templates/output/test_anonymized31.csv", ';');
+       answer.getOutput(false).save("src/main/resources/templates/output/test_anonymized32.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
@@ -470,6 +511,54 @@ public class AnonymizationController extends AnonymizationBase {
        }
        return data;
    }
+   
+   /**
+    * Perform risk analysis
+    * @param handle
+    */
+   private static void analyzeAttributes(DataHandle handle) {
+       ARXPopulationModel populationmodel = ARXPopulationModel.create(Region.USA);
+       RiskEstimateBuilder builder = handle.getRiskEstimator(populationmodel);
+       RiskModelAttributes riskmodel = builder.getAttributeRisks();
+       for (QuasiIdentifierRisk risk : riskmodel.getAttributeRisks()) {
+           System.out.println("   * Distinction: " + risk.getDistinction() + ", Separation: " + risk.getSeparation() + ", Identifier: " + risk.getIdentifier());
+       }
+   }
+       
+   /**
+    * Perform risk analysis
+    * @param handle
+    */
+   private static void analyzeData(DataHandle handle) {
+       
+       ARXPopulationModel populationmodel = ARXPopulationModel.create(Region.USA);
+       RiskEstimateBuilder builder = handle.getRiskEstimator(populationmodel);
+       RiskModelHistogram classes = builder.getEquivalenceClassModel();
+       RiskModelSampleRisks sampleReidentifiationRisk = builder.getSampleBasedReidentificationRisk();
+       RiskModelSampleUniqueness sampleUniqueness = builder.getSampleBasedUniquenessRisk();
+       RiskModelPopulationUniqueness populationUniqueness = builder.getPopulationBasedUniquenessRisk();
+       
+       int[] histogram = classes.getHistogram();
+       
+       System.out.println("   * Equivalence classes:");
+       System.out.println("     - Average size: " + classes.getAvgClassSize());
+       System.out.println("     - Num classes : " + classes.getNumClasses());
+       System.out.println("     - Histogram   :");
+       for (int i = 0; i < histogram.length; i += 2) {
+           System.out.println("        [Size: " + histogram[i] + ", count: " + histogram[i + 1] + "]");
+       }
+       System.out.println("   * Risk estimates:");
+       System.out.println("     - Sample-based measures");
+       System.out.println("       + Average risk     : " + sampleReidentifiationRisk.getAverageRisk());
+       System.out.println("       + Lowest risk      : " + sampleReidentifiationRisk.getLowestRisk());
+       System.out.println("       + Tuples affected  : " + sampleReidentifiationRisk.getFractionOfTuplesAffectedByLowestRisk());
+       System.out.println("       + Highest risk     : " + sampleReidentifiationRisk.getHighestRisk());
+       System.out.println("       + Tuples affected  : " + sampleReidentifiationRisk.getFractionOfTuplesAffectedByHighestRisk());
+       System.out.println("       + Sample uniqueness: " + sampleUniqueness.getFractionOfUniqueTuples());
+       System.out.println("     - Population-based measures");
+       System.out.println("       + Population unqiueness (Zayatz): " + populationUniqueness.getFractionOfUniqueTuples(PopulationUniquenessModel.ZAYATZ));
+   }
+
    
    /**
     * Prints a list of matching data types
@@ -553,6 +642,22 @@ public class AnonymizationController extends AnonymizationBase {
        return data;
    }
    
+   private static Hierarchy getGender() {
+	   DefaultHierarchy gender = Hierarchy.create();
+       gender.add("male", "*");
+       gender.add("female", "*");
+       return gender;
+   }
+   
+   private static Hierarchy getAgeHier() {
+	   DefaultHierarchy age = Hierarchy.create();
+	   age.add("34", "<50", "*");
+	   age.add("45", "<50", "*");
+	   age.add("66", ">=50", "*");
+	   age.add("70", ">=50", "*");
+	   return age;
+   }
+   
    private static Hierarchy getMoreAge() {
 	   DefaultHierarchy age = Hierarchy.create();
        age.add("34", "<50", "*");
@@ -575,6 +680,15 @@ public class AnonymizationController extends AnonymizationBase {
        age.add("36", "<=40", "*");
        age.add("32", "<=40", "*");
        return age;
+   }
+   
+   private static Hierarchy getZip() {
+	   DefaultHierarchy zipcode = Hierarchy.create();
+	   zipcode.add("81667", "8166*", "816**", "81***", "8****", "*****");
+       zipcode.add("81675", "8167*", "816**", "81***", "8****", "*****");
+       zipcode.add("81925", "8192*", "819**", "81***", "8****", "*****");
+       zipcode.add("81931", "8193*", "819**", "81***", "8****", "*****");
+	   return zipcode;
    }
    
    private static Hierarchy getZipcode() {
