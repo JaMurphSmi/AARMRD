@@ -529,7 +529,7 @@ public class AnonymizationController extends AnonymizationBase {
            System.out.println(" - As string: " + statisticsDate.getRangeAsString());
        }
        */
-       ////////////// EXAMPLE 31
+       ////////////// EXAMPLE 31, now 32
        Data dataFor31 = getData30();
        
        dataFor31.getDefinition().setDataType("age", DataType.INTEGER);
@@ -539,13 +539,29 @@ public class AnonymizationController extends AnonymizationBase {
        Hierarchy gend = getGender();
        
        Hierarchy zippie = getZippie();
+       // additions from example 33
+       /* *******************************
+        * Define attribute types
+        *********************************/
+       dataFor31.getDefinition().setAttributeType("age", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+       dataFor31.getDefinition().setAttributeType("gender", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+       dataFor31.getDefinition().setAttributeType("zipcode", AttributeType.INSENSITIVE_ATTRIBUTE);
+       dataFor31.getDefinition().setAttributeType("date", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+
+       /* *******************************
+        * Define transformation methods
+        *********************************/
        
-       dataFor31.getDefinition().setAttributeType("age", MicroAggregationFunction.createGeometricMean());
-       dataFor31.getDefinition().setAttributeType("gender", gend);
-       data.getDefinition().setAttributeType("zipcode", MicroAggregationFunction.createGeneralization());//added for 32! 
+       
+       
+       //dataFor31.getDefinition().setAttributeType("age", MicroAggregationFunction.createGeometricMean());
        //dataFor31.getDefinition().setAttributeType("zipcode", zippie);
-       dataFor31.getDefinition().setAttributeType("date", MicroAggregationFunction.createArithmeticMean());
-       
+       //dataFor31.getDefinition().setAttributeType("date", MicroAggregationFunction.createArithmeticMean());
+       //dataFor31.getDefinition().setAttributeType("zipcode", MicroAggregationFunction.createGeneralization());//added for 32! removed for 33       
+	   dataFor31.getDefinition().setMicroAggregationFunction("age", MicroAggregationFunction.createMode());
+	   dataFor31.getDefinition().setMicroAggregationFunction("date", MicroAggregationFunction.createMedian());
+	   dataFor31.getDefinition().setAttributeType("gender", gend);
+                   
        // Create an instance of the anonymizer
        ARXAnonymizer anonymi = new ARXAnonymizer();
        ARXConfiguration configure = ARXConfiguration.create();
@@ -567,7 +583,7 @@ public class AnonymizationController extends AnonymizationBase {
        }
        
        System.out.print(" - Writing data...");
-       outputs.getOutput(false).save("src/main/resources/templates/output/test_anonymized34.csv", ';');
+       outputs.getOutput(false).save("src/main/resources/templates/output/test_anonymized35.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
