@@ -32,6 +32,8 @@ import org.deidentifier.arx.AttributeType.Hierarchy.DefaultHierarchy;
 import org.deidentifier.arx.AttributeType.MicroAggregationFunction;
 import org.deidentifier.arx.Data;
 import org.deidentifier.arx.Data.DefaultData;
+import org.deidentifier.arx.DataGeneralizationScheme;
+import org.deidentifier.arx.DataGeneralizationScheme.GeneralizationDegree;
 import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.DataSelector;
 import org.deidentifier.arx.DataSource;
@@ -56,6 +58,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilderRedactionBased.Order;
 import org.deidentifier.arx.criteria.AverageReidentificationRisk;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.DistinctLDiversity;
+import org.deidentifier.arx.criteria.EDDifferentialPrivacy;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.EntropyLDiversity;
@@ -63,6 +66,7 @@ import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.io.CSVHierarchyInput;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.v2.__MetricV2;
+import org.deidentifier.arx.risk.HIPAAIdentifierMatch;
 import org.deidentifier.arx.risk.RiskEstimateBuilder;
 import org.deidentifier.arx.risk.RiskModelAttributes;
 import org.deidentifier.arx.risk.RiskModelAttributes.QuasiIdentifierRisk;
@@ -553,15 +557,21 @@ public class AnonymizationController extends AnonymizationBase {
         *********************************/
        
        
-       
+       //for 31
        //dataFor31.getDefinition().setAttributeType("age", MicroAggregationFunction.createGeometricMean());
        //dataFor31.getDefinition().setAttributeType("zipcode", zippie);
        //dataFor31.getDefinition().setAttributeType("date", MicroAggregationFunction.createArithmeticMean());
        //dataFor31.getDefinition().setAttributeType("zipcode", MicroAggregationFunction.createGeneralization());//added for 32! removed for 33       
-	   dataFor31.getDefinition().setMicroAggregationFunction("age", MicroAggregationFunction.createMode());
-	   dataFor31.getDefinition().setMicroAggregationFunction("date", MicroAggregationFunction.createMedian());
-	   dataFor31.getDefinition().setAttributeType("gender", gend);
-                   
+	   //for 34?
+       //dataFor31.getDefinition().setMicroAggregationFunction("age", MicroAggregationFunction.createMode());
+	   //dataFor31.getDefinition().setMicroAggregationFunction("date", MicroAggregationFunction.createMedian());
+	   //dataFor31.getDefinition().setAttributeType("gender", gend);
+       //for 36
+       dataFor31.getDefinition().setAttributeType("age", MicroAggregationFunction.createGeometricMean());
+       dataFor31.getDefinition().setAttributeType("gender", gend);
+       dataFor31.getDefinition().setAttributeType("zipcode", zippie);
+       dataFor31.getDefinition().setAttributeType("date", MicroAggregationFunction.createArithmeticMean());
+       
        // Create an instance of the anonymizer
        ARXAnonymizer anonymi = new ARXAnonymizer();
        ARXConfiguration configure = ARXConfiguration.create();
@@ -569,7 +579,11 @@ public class AnonymizationController extends AnonymizationBase {
        configure.setHeuristicSearchEnabled(true);
        configure.setHeuristicSearchTimeLimit(10);
        configure.addPrivacyModel(new KAnonymity(2));
-       configure.setMaxOutliers(0.5d);
+       //configure.setMaxOutliers(0.5d);
+       configure.setMaxOutliers(1d);
+       configure.setAttributeWeight("age", 100d);
+       configure.setUtilityBasedMicroaggregation(true);
+       configure.setQualityModel(Metric.createLossMetric());
 
        // Obtain result
        ARXResult outputs = anonymi.anonymize(dataFor31, configure);
@@ -585,8 +599,56 @@ public class AnonymizationController extends AnonymizationBase {
            System.out.println(Arrays.toString(transformed.next()));
        }
        
+       ///////////////////// EXAMPLE 35
+       /*Data.DefaultData dataFor35 = getData35();
+       
+       DataHandle handleFor35 = dataFor35.getHandle();
+       
+       HIPAAIdentifierMatch[] warnings = handleFor35.getRiskEstimator(ARXPopulationModel.create(Region.USA))
+                                               .getHIPAAIdentifiers();
+       System.out.println(" - HIPAAs Identified...");
+       printWarnings(warnings);*/
+       
+       /////////// EXAMPLE 36, 37
+       Data dataFor36 = getTheData();
+       
+       Hierarchy agie = getAgeHier();
+       Hierarchy gendie = getGender();
+       Hierarchy zips = getZip();
+       dataFor36.getDefinition().setAttributeType("age", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+       dataFor36.getDefinition().setAttributeType("gender", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+       dataFor36.getDefinition().setAttributeType("zipcode", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+       dataFor36.getDefinition().setHierarchy("age", agie);
+       dataFor36.getDefinition().setHierarchy("gender", gendie);
+       dataFor36.getDefinition().setHierarchy("zipcode", zips);
+
+       // Create an instance of the anonymizer
+       ARXAnonymizer anonymiza = new ARXAnonymizer();
+
+       // Create a differential privacy criterion
+       EDDifferentialPrivacy criterion = new EDDifferentialPrivacy(2d, 0.00001d,
+       DataGeneralizationScheme.create(dataFor36,GeneralizationDegree.MEDIUM));
+       
+       ARXConfiguration configie = ARXConfiguration.create();
+       configie.addPrivacyModel(criterion);
+       configie.setMaxOutliers(1d);
+       ARXResult for36 = anonymiza.anonymize(dataFor36, config);
+
+       // Access output
+       DataHandle optimal = for36.getOutput();
+
+       System.out.println(for36.isResultAvailable());
+
+       // Print input
+       System.out.println(" - Input data:");
+       printHandle(dataFor36.getHandle());
+
+       System.out.println(" - Result:");
+       printHandle(optimal);
+       //// EXAMPLE 37
+       
        System.out.print(" - Writing data...");
-       outputs.getOutput(false).save("src/main/resources/templates/output/test_anonymized36.csv", ';');
+       for36.getOutput(false).save("src/main/resources/templates/output/test_anonymized38.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
@@ -762,6 +824,30 @@ public class AnonymizationController extends AnonymizationBase {
        data.add("45", "male", "81931", "NULL");
        return data;
    }
+   ///////////////////// for example 35
+   private static Data.DefaultData getData35() {
+       Data.DefaultData data = Data.create();
+       data.add("first name", "age", "gender", "code", "birth", "email-address", "SSN", "Bank", "Vehicle", "URL", "IP", "phone");
+       data.add("Max", "34", "male", "81667", "2008-09-02", "", "123-45-6789", "GR16 0110 1250 0000 0001 2300 695", "", "http://demodomain.com", "8.8.8.8", "+49 1234566");
+       data.add("Max", "45", "female", "81675", "2008-09-02", "user@arx.org", "", "", "WDD 169 007-1J-236589", "", "2001:db8::1428:57ab", "");
+       data.add("Max", "66", "male", "89375", "2008-09-02", "demo@email.com", "", "", "", "", "", "");
+       data.add("Max", "70", "female", "81931", "2008-09-02", "", "", "", "", "", "", "");
+       data.add("Max", "34", "female", "81931", "2008-09-02", "", "", "", "", "", "", "");
+       data.add("Max", "90", "male", "81931", "2008-09-02", "", "", "", "", "", "", "");
+       data.add("Max", "45", "male", "81931", "2008-09-02", "", "", "", "", "", "", "");
+       return data;
+   }
+   
+   private static void printWarnings(HIPAAIdentifierMatch[] warnings) {
+       if (warnings.length == 0) {
+           System.out.println("No warnings");
+       } else {
+           for (HIPAAIdentifierMatch w : warnings) {
+               System.out.println(w.toString());
+           }
+       }
+   }
+   //////////////////////////// for example 35
 
    private static Data getTheData() {
        DefaultData data = Data.create();
