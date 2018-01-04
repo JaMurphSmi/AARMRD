@@ -29,6 +29,7 @@ import org.deidentifier.arx.ARXResult;
 import org.deidentifier.arx.AttributeType;
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.AttributeType.Hierarchy.DefaultHierarchy;
+import org.deidentifier.arx.AttributeType.MicroAggregationFunction;
 import org.deidentifier.arx.Data;
 import org.deidentifier.arx.Data.DefaultData;
 import org.deidentifier.arx.DataHandle;
@@ -467,7 +468,7 @@ public class AnonymizationController extends AnonymizationBase {
        analyzeData(answer.getOutput());
 //////////////////////////////////////////////////////////*/
      ////////////////////////////////////// EXAMPLE 30
-       Data dataFor30 = getData30();
+      /* Data dataFor30 = getData30();
        
        // Print everything
        System.out.println("***************************");
@@ -527,9 +528,45 @@ public class AnonymizationController extends AnonymizationBase {
            System.out.println(" - As value : " + statisticsDate.getRangeAsValue());
            System.out.println(" - As string: " + statisticsDate.getRangeAsString());
        }
+       */
+       ////////////// EXAMPLE 31
+       Data dataFor31 = getData30();
+       
+       dataFor31.getDefinition().setDataType("age", DataType.INTEGER);
+       dataFor31.getDefinition().setDataType("zipcode", DataType.DECIMAL);
+       dataFor31.getDefinition().setDataType("date", DataType.DATE);
+       
+       Hierarchy gend = getGender();
+       
+       Hierarchy zippie = getZippie();
+       
+       dataFor31.getDefinition().setAttributeType("age", MicroAggregationFunction.createGeometricMean());
+       dataFor31.getDefinition().setAttributeType("gender", gend);
+       dataFor31.getDefinition().setAttributeType("zipcode", zippie);
+       dataFor31.getDefinition().setAttributeType("date", MicroAggregationFunction.createArithmeticMean());
+       
+       // Create an instance of the anonymizer
+       ARXAnonymizer anonymi = new ARXAnonymizer();
+       ARXConfiguration configure = ARXConfiguration.create();
+       configure.addPrivacyModel(new KAnonymity(2));
+       configure.setMaxOutliers(0.5d);
+
+       // Obtain result
+       ARXResult outputs = anonymi.anonymize(dataFor31, configure);
+
+       // Print info
+       printResult(outputs, dataFor31);
+
+       // Process results
+       System.out.println(" - Transformed data for example 31:");
+       Iterator<String[]> transformed = outputs.getOutput(false).iterator();
+       while (transformed.hasNext()) {
+           System.out.print("   ");
+           System.out.println(Arrays.toString(transformed.next()));
+       }
        
        System.out.print(" - Writing data...");
-       result.getOutput(false).save("src/main/resources/templates/output/test_anonymized33.csv", ';');
+       outputs.getOutput(false).save("src/main/resources/templates/output/test_anonymized33.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
@@ -537,7 +574,20 @@ public class AnonymizationController extends AnonymizationBase {
    
 /**************************************************************************
  * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
  *    end of main method
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
  * 
  **************************************************************************/  
    
@@ -680,19 +730,19 @@ public class AnonymizationController extends AnonymizationBase {
        return data;
    }
    
-   private static Data getData30() {
+   private static Data getData30() { //also for example 31
 	   DefaultData data = Data.create();
        data.add("age", "gender", "zipcode", "date");
        data.add("45", "female", "81675", "01.01.1982");
        data.add("34", "male", "81667", "11.05.1982");
        data.add("NULL", "male", "81925", "31.08.1982");
        data.add("70", "female", "81931", "02.07.1982");
-       data.add("34", "female", null, "05.01.1982");
+       data.add("34", "female", "NULL", "05.01.1982");
        data.add("70", "male", "81931", "24.03.1982");
        data.add("45", "male", "81931", "NULL");
        return data;
    }
-   
+
    private static Data getTheData() {
        DefaultData data = Data.create();
        data.add("age", "gender", "zipcode");
@@ -781,6 +831,16 @@ public class AnonymizationController extends AnonymizationBase {
        zipcode.add("47605", "4760*", "476**", "47***", "4****", "*****");
        zipcode.add("47673", "4767*", "476**", "47***", "4****", "*****");
        zipcode.add("47607", "4760*", "476**", "47***", "4****", "*****");
+       return zipcode;
+   }
+   
+   private static Hierarchy getZippie() {
+	   DefaultHierarchy zipcode = Hierarchy.create();
+       zipcode.add("81667", "8166*", "816**", "81***", "8****", "*****");
+       zipcode.add("81675", "8167*", "816**", "81***", "8****", "*****");
+       zipcode.add("81925", "8192*", "819**", "81***", "8****", "*****");
+       zipcode.add("81931", "8193*", "819**", "81***", "8****", "*****");
+       zipcode.add("NULL", "NULL", "NULL", "NULL", "NULL", "*****");
        return zipcode;
    }
    
