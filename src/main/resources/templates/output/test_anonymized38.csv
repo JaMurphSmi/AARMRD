@@ -1,8 +1,9 @@
 age;gender;zipcode
-*;male;81***
-*;female;81***
-*;male;81***
-*;female;81***
-*;female;81***
-*;male;81***
-*;male;81***
+<50;male;81***
+<50;female;81***
+>=50;male;81***
+*;*;*
+*;*;*
+<50;female;81***
+>=50;male;81***
+<50;male;81***

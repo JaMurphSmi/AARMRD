@@ -63,6 +63,7 @@ import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.EntropyLDiversity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
+import org.deidentifier.arx.exceptions.RollbackRequiredException;
 import org.deidentifier.arx.io.CSVHierarchyInput;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.v2.__MetricV2;
@@ -647,8 +648,57 @@ public class AnonymizationController extends AnonymizationBase {
        printHandle(optimal);
        //// EXAMPLE 37
        
+       ////// EXAMPLE 38
+       Data dataFor38 = getData38();
+       
+       Hierarchy age38 = getAge38();
+       Hierarchy zip38 = getZip38();
+       Hierarchy gender38 = getGender();
+       
+       dataFor38.getDefinition().setAttributeType("age", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+       dataFor38.getDefinition().setAttributeType("gender", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+       dataFor38.getDefinition().setAttributeType("zipcode", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+       dataFor38.getDefinition().setHierarchy("age", age38);
+       dataFor38.getDefinition().setHierarchy("gender", gender38);
+       dataFor38.getDefinition().setHierarchy("zipcode", zip38);
+
+       // Create an instance of the anonymizer
+       ARXAnonymizer anonymizer38 = new ARXAnonymizer();
+
+       // Create a config which favors suppression over generalization
+       ARXConfiguration config38 = ARXConfiguration.create();
+       config38.addPrivacyModel(new KAnonymity(2));
+       config38.setMaxOutliers(1d);
+       config38.setQualityModel(Metric.createLossMetric(0.25d));
+
+       // Print input
+       System.out.println(" - Input data:");
+       printHandle(dataFor38.getHandle());
+
+       // Compute the result
+       ARXResult result38 = anonymizer38.anonymize(dataFor38, config38);
+       
+
+       // Print result of global recoding
+       DataHandle optimum38 = result38.getOutput();
+       System.out.println(" - Global recoding:");
+       printHandle(optimum38);
+
+       try {     
+           // Now apply local recoding to the result
+           result38.optimizeIterative(optimum38, 0.05d, 100, 0.05d);
+
+           // Print result of local recoding
+           System.out.println(" - Local recoding:");
+           printHandle(optimum38);
+           
+       } catch (RollbackRequiredException e) {
+           // This part is important to ensure that privacy is preserved, even in case of exceptions
+           optimum38 = result38.getOutput();
+       }
+       
        System.out.print(" - Writing data...");
-       for36.getOutput(false).save("src/main/resources/templates/output/test_anonymized38.csv", ';');
+       result38.getOutput(false).save("src/main/resources/templates/output/test_anonymized38.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
@@ -838,6 +888,20 @@ public class AnonymizationController extends AnonymizationBase {
        return data;
    }
    
+   private static Data.DefaultData getData38() {
+	   final DefaultData data = Data.create();
+	   data.add("age", "gender", "zipcode");
+	   data.add("34", "male", "81667");
+	   data.add("45", "female", "81675");
+	   data.add("66", "male", "81925");
+	   data.add("70", "female", "81931");
+	   data.add("73", "male", "92922");
+	   data.add("34", "female", "81931");
+	   data.add("70", "male", "81931");
+	   data.add("45", "male", "81931");
+	   return data;
+   }
+   
    private static void printWarnings(HIPAAIdentifierMatch[] warnings) {
        if (warnings.length == 0) {
            System.out.println("No warnings");
@@ -890,6 +954,16 @@ public class AnonymizationController extends AnonymizationBase {
 	   age.add("45", "<50", "*");
 	   age.add("66", ">=50", "*");
 	   age.add("70", ">=50", "*");
+	   return age;
+   }
+   
+   private static Hierarchy getAge38() {
+	   DefaultHierarchy age = Hierarchy.create();
+	   age.add("34", "<50", "*");
+	   age.add("45", "<50", "*");
+	   age.add("66", ">=50", "*");
+	   age.add("70", ">=50", "*");
+	   age.add("73", ">=50", "*");
 	   return age;
    }
    
@@ -948,6 +1022,17 @@ public class AnonymizationController extends AnonymizationBase {
        zipcode.add("81931", "8193*", "819**", "81***", "8****", "*****");
        zipcode.add("NULL", "NULL", "NULL", "NULL", "NULL", "*****");
        return zipcode;
+   }
+   
+   
+   private static Hierarchy getZip38() {
+	   final DefaultHierarchy zipcode = Hierarchy.create();
+	   zipcode.add("81667", "8166*", "816**", "81***", "8****", "*****");
+	   zipcode.add("81675", "8167*", "816**", "81***", "8****", "*****");
+	   zipcode.add("81925", "8192*", "819**", "81***", "8****", "*****");
+	   zipcode.add("81931", "8193*", "819**", "81***", "8****", "*****");
+	   zipcode.add("92922", "9292*", "929**", "92***", "9****", "*****");
+	   return zipcode;
    }
    
    private static int[] calcFigures(int[] anArray)
