@@ -542,7 +542,8 @@ public class AnonymizationController extends AnonymizationBase {
        
        dataFor31.getDefinition().setAttributeType("age", MicroAggregationFunction.createGeometricMean());
        dataFor31.getDefinition().setAttributeType("gender", gend);
-       dataFor31.getDefinition().setAttributeType("zipcode", zippie);
+       data.getDefinition().setAttributeType("zipcode", MicroAggregationFunction.createGeneralization());//added for 32! 
+       //dataFor31.getDefinition().setAttributeType("zipcode", zippie);
        dataFor31.getDefinition().setAttributeType("date", MicroAggregationFunction.createArithmeticMean());
        
        // Create an instance of the anonymizer
@@ -566,7 +567,7 @@ public class AnonymizationController extends AnonymizationBase {
        }
        
        System.out.print(" - Writing data...");
-       outputs.getOutput(false).save("src/main/resources/templates/output/test_anonymized33.csv", ';');
+       outputs.getOutput(false).save("src/main/resources/templates/output/test_anonymized34.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
