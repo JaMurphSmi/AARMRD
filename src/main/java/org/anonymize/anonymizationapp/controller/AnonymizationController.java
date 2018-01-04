@@ -565,6 +565,9 @@ public class AnonymizationController extends AnonymizationBase {
        // Create an instance of the anonymizer
        ARXAnonymizer anonymi = new ARXAnonymizer();
        ARXConfiguration configure = ARXConfiguration.create();
+       //adding heuristic search via example 34
+       configure.setHeuristicSearchEnabled(true);
+       configure.setHeuristicSearchTimeLimit(10);
        configure.addPrivacyModel(new KAnonymity(2));
        configure.setMaxOutliers(0.5d);
 
@@ -583,7 +586,7 @@ public class AnonymizationController extends AnonymizationBase {
        }
        
        System.out.print(" - Writing data...");
-       outputs.getOutput(false).save("src/main/resources/templates/output/test_anonymized35.csv", ';');
+       outputs.getOutput(false).save("src/main/resources/templates/output/test_anonymized36.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
