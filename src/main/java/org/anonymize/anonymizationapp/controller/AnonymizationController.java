@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import org.deidentifier.arx.ARXAnonymizer;
 import org.deidentifier.arx.ARXConfiguration;
+import org.deidentifier.arx.ARXCostBenefitConfiguration;
 import org.deidentifier.arx.ARXLattice.ARXNode;
 import org.deidentifier.arx.ARXLogisticRegressionConfiguration;
 import org.deidentifier.arx.ARXPopulationModel;
@@ -65,11 +66,14 @@ import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.Inclusion;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.KMap;
+import org.deidentifier.arx.criteria.ProfitabilityProsecutorNoAttack;
 import org.deidentifier.arx.criteria.EntropyLDiversity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.exceptions.RollbackRequiredException;
 import org.deidentifier.arx.io.CSVHierarchyInput;
 import org.deidentifier.arx.metric.Metric;
+import org.deidentifier.arx.metric.v2.MetricSDNMPublisherPayout;
+import org.deidentifier.arx.metric.v2.QualityMetadata;
 import org.deidentifier.arx.metric.v2.__MetricV2;
 import org.deidentifier.arx.risk.HIPAAIdentifierMatch;
 import org.deidentifier.arx.risk.RiskEstimateBuilder;
@@ -888,12 +892,46 @@ public class AnonymizationController extends AnonymizationBase {
        System.out.println("\n - Input data for 46");
        print(data46.getHandle());
 
-       System.out.println("\n - Quasi-identifiers with values (in percent):");
+       System.out.println("\n - Quasi-identifiers with values (in percent) for 46:");
        analyzeAttributes(data46.getHandle());
        
        System.out.print(" - Writing data...");
        //result45.getOutput(false).save("src/main/resources/templates/output/test_anonymized46.csv", ';');
        System.out.println("Done!");
+       
+       ///////////////////////////////////////////////////
+       // EXAMPLE 48 IS USEFUL
+       ///////////////////////////////////////////////////
+       
+       
+       
+       //////////////////////////////////////////
+       // EXAMPLE 49 HERE
+       //////////////////////////////////////////
+       
+       Data data49 = createData("adult");
+       
+       // Config from PLOS|ONE paper
+       solve(data49, ARXCostBenefitConfiguration.create()
+                                              .setAdversaryCost(4d)
+                                              .setAdversaryGain(300d)
+                                              .setPublisherLoss(300d)
+                                              .setPublisherBenefit(1200d));
+
+       // Fewer costs
+       solve(data49, ARXCostBenefitConfiguration.create()
+                                              .setAdversaryCost(2d)
+                                              .setAdversaryGain(600d)
+                                              .setPublisherLoss(300d)
+                                              .setPublisherBenefit(1200d));
+
+       // More costs, more gain
+       solve(data49, ARXCostBenefitConfiguration.create()
+                                              .setAdversaryCost(1d)
+                                              .setAdversaryGain(1200d)
+                                              .setPublisherLoss(300d)
+                                              .setPublisherBenefit(1200d));
+       
        
       return "anonymize";
    }
@@ -919,7 +957,45 @@ public class AnonymizationController extends AnonymizationBase {
    
    
    
-   
+   private static void solve(Data data, ARXCostBenefitConfiguration config) throws IOException {
+       
+       // Release
+       data.getHandle().release();
+       
+       // Configure
+       ARXConfiguration arxconfig = ARXConfiguration.create();
+       arxconfig.setCostBenefitConfiguration(config);
+       
+       // Create model for measuring publisher's benefit
+       MetricSDNMPublisherPayout maximizePublisherPayout = Metric.createPublisherPayoutMetric(false);
+       
+       // Create privacy model for the game-theoretic approach
+       ProfitabilityProsecutorNoAttack profitability = new ProfitabilityProsecutorNoAttack();
+       
+       // Configure ARX
+       arxconfig.setMaxOutliers(1d);
+       arxconfig.setQualityModel(maximizePublisherPayout);
+       arxconfig.addPrivacyModel(profitability);
+
+       // Anonymize
+       ARXAnonymizer anonymizer = new ARXAnonymizer();
+       ARXResult result = anonymizer.anonymize(data, arxconfig);
+       ARXNode node = result.getGlobalOptimum();
+       DataHandle handle = result.getOutput(node, false).getView();
+       
+       // Print stuff
+       System.out.println("Data: " + data.getHandle().getView().getNumRows() + " records with " + data.getDefinition().getQuasiIdentifyingAttributes().size() + " quasi-identifiers");
+       System.out.println(" - Configuration: " + config.toString());
+       System.out.println(" - Policies available: " + result.getLattice().getSize());
+       System.out.println(" - Solution: " + Arrays.toString(node.getTransformation()));
+       System.out.println("   * Optimal: " + result.getLattice().isComplete());
+       System.out.println("   * Time needed: " + result.getTime() + "[ms]");
+       for (QualityMetadata<?> metadata : node.getLowestScore().getMetadata()) {
+           System.out.println("   * " + metadata.getParameter() + ": " + metadata.getValue());
+       }
+       System.out.println("   * Suppressed records: " + handle.getStatistics().getEquivalenceClassStatistics().getNumberOfOutlyingTuples());
+
+   }
    
    
    
