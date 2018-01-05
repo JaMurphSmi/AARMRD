@@ -79,6 +79,7 @@ import org.deidentifier.arx.risk.RiskModelHistogram;
 import org.deidentifier.arx.risk.RiskModelPopulationUniqueness;
 import org.deidentifier.arx.risk.RiskModelPopulationUniqueness.PopulationUniquenessModel;
 import org.deidentifier.arx.risk.RiskModelSampleRisks;
+import org.deidentifier.arx.risk.RiskModelSampleSummary;
 import org.deidentifier.arx.risk.RiskModelSampleUniqueness;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
 // ARX related stuff 
@@ -894,10 +895,10 @@ public class AnonymizationController extends AnonymizationBase {
        }
    }
        
-   /**
+  /* /**
     * Perform risk analysis
     * @param handle
-    */
+    /
    private static void analyzeData(DataHandle handle) {
        
        ARXPopulationModel populationmodel = ARXPopulationModel.create(Region.USA);
@@ -927,7 +928,41 @@ public class AnonymizationController extends AnonymizationBase {
        System.out.println("     - Population-based measures");
        System.out.println("       + Population unqiueness (Zayatz): " + populationUniqueness.getFractionOfUniqueTuples(PopulationUniquenessModel.ZAYATZ));
    }
+   */
 
+   /**
+    * Perform risk analysis
+    * @param handle
+    */
+   private static void analyzeData(DataHandle handle) {
+       
+       double THRESHOLD = 0.5d;
+       
+       ARXPopulationModel populationmodel = ARXPopulationModel.create(Region.USA);
+       RiskEstimateBuilder builder = handle.getRiskEstimator(populationmodel);
+       RiskModelSampleSummary risks = builder.getSampleBasedRiskSummary(THRESHOLD);
+       
+       System.out.println(" * Baseline risk threshold: " + getPrecent(THRESHOLD));
+       System.out.println(" * Prosecutor attacker model");
+       System.out.println("   - Records at risk: " + getPrecent(risks.getProsecutorRisk().getRecordsAtRisk()));
+       System.out.println("   - Highest risk: " + getPrecent(risks.getProsecutorRisk().getHighestRisk()));
+       System.out.println("   - Success rate: " + getPrecent(risks.getProsecutorRisk().getSuccessRate()));
+       System.out.println(" * Journalist attacker model");
+       System.out.println("   - Records at risk: " + getPrecent(risks.getJournalistRisk().getRecordsAtRisk()));
+       System.out.println("   - Highest risk: " + getPrecent(risks.getJournalistRisk().getHighestRisk()));
+       System.out.println("   - Success rate: " + getPrecent(risks.getJournalistRisk().getSuccessRate()));
+       System.out.println(" * Marketer attacker model");
+       System.out.println("   - Success rate: " + getPrecent(risks.getMarketerRisk().getSuccessRate()));
+   }
+
+   /**
+    * Returns a formatted string
+    * @param value
+    * @return
+    */
+   private static String getPrecent(double value) {
+       return (int)(Math.round(value * 100)) + "%";
+   }
    
    /**
     * Prints a list of matching data types
