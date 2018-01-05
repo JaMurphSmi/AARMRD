@@ -82,6 +82,7 @@ import org.deidentifier.arx.risk.RiskModelSampleRisks;
 import org.deidentifier.arx.risk.RiskModelSampleSummary;
 import org.deidentifier.arx.risk.RiskModelSampleUniqueness;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
+import org.apache.commons.lang.StringUtils;
 // ARX related stuff 
 import org.apache.commons.math3.util.Pair;
 import org.springframework.stereotype.Controller;
@@ -876,8 +877,22 @@ public class AnonymizationController extends AnonymizationBase {
        System.out.println("  * Marketer re-identification risk: " + result45.getOutput().getRiskEstimator(populationmodel45).getSampleBasedReidentificationRisk().getEstimatedMarketerRisk());
 		*/
        
+       Data data46 = loadData();
+
+       // Flag every attribute as quasi identifier
+       for (int i = 0; i < data46.getHandle().getNumColumns(); i++) {
+           data46.getDefinition().setAttributeType(data46.getHandle().getAttributeName(i), AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+       }
+
+       // Perform risk analysis
+       System.out.println("\n - Input data for 46");
+       print(data46.getHandle());
+
+       System.out.println("\n - Quasi-identifiers with values (in percent):");
+       analyzeAttributes(data46.getHandle());
+       
        System.out.print(" - Writing data...");
-       result45.getOutput(false).save("src/main/resources/templates/output/test_anonymized46.csv", ';');
+       //result45.getOutput(false).save("src/main/resources/templates/output/test_anonymized46.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
@@ -941,17 +956,17 @@ public class AnonymizationController extends AnonymizationBase {
    }
    
    /**
-    * Perform risk analysis
+    * Perform risk analysis FROM EXAMPLE NOT 46
     * @param handle
     */
-   private static void analyzeAttributes(DataHandle handle) {
+  /* private static void analyzeAttributes(DataHandle handle) {
        ARXPopulationModel populationmodel = ARXPopulationModel.create(Region.USA);
        RiskEstimateBuilder builder = handle.getRiskEstimator(populationmodel);
        RiskModelAttributes riskmodel = builder.getAttributeRisks();
        for (QuasiIdentifierRisk risk : riskmodel.getAttributeRisks()) {
            System.out.println("   * Distinction: " + risk.getDistinction() + ", Separation: " + risk.getSeparation() + ", Identifier: " + risk.getIdentifier());
        }
-   }
+   }*/
        
   /* /**
     * Perform risk analysis
@@ -1021,6 +1036,64 @@ public class AnonymizationController extends AnonymizationBase {
    private static String getPrecent(double value) {
        return (int)(Math.round(value * 100)) + "%";
    }
+   
+   ///////// exaMPLE 46
+   private static void analyzeAttributes(DataHandle handle) {
+       ARXPopulationModel populationmodel = ARXPopulationModel.create(ARXPopulationModel.Region.USA);
+       RiskEstimateBuilder builder = handle.getRiskEstimator(populationmodel);
+       RiskModelAttributes riskmodel = builder.getAttributeRisks();
+
+       // output
+       printPrettyTable(riskmodel.getAttributeRisks());
+   }
+   
+   private static Data loadData() {
+       // Define data
+       Data.DefaultData data = Data.create();
+       data.add("age", "sex", "state");
+       data.add("20", "Female", "CA");
+       data.add("30", "Female", "CA");
+       data.add("40", "Female", "TX");
+       data.add("20", "Male", "NY");
+       data.add("40", "Male", "CA");
+       data.add("53", "Male", "CA");
+       data.add("76", "Male", "EU");
+       data.add("40", "Female", "AS");
+       data.add("32", "Female", "CA");
+       data.add("88", "Male", "CA");
+       data.add("48", "Female", "AS");
+       data.add("76", "Male", "UU");
+       return data;
+   }
+   
+   private static void printPrettyTable(RiskModelAttributes.QuasiIdentifierRisk[] quasiIdentifiers) {
+       
+       // get char count of longest quasi-identifier
+       int charCountLongestQi = quasiIdentifiers[quasiIdentifiers.length-1].getIdentifier().toString().length();
+
+       // make sure that there is enough space for the table header strings
+       charCountLongestQi = Math.max(charCountLongestQi, 12);
+
+       // calculate space needed
+       String leftAlignFormat = "| %-" + charCountLongestQi + "s | %13.2f | %12.2f |%n";
+
+       // add 2 spaces that are in the string above on the left and right side of the first pattern
+       charCountLongestQi += 2;
+
+       // subtract the char count of the column header string to calculate
+       // how many spaces we need for filling up to the right columnborder
+       int spacesAfterColumHeader = charCountLongestQi - 12;
+
+       System.out.format("+" + StringUtils.repeat("-", charCountLongestQi) + "+---------------+--------------+%n");
+       System.out.format("| Identifier " + StringUtils.repeat(" ", spacesAfterColumHeader) + "|   Distinction |   Separation |%n");
+       System.out.format("+" + StringUtils.repeat("-", charCountLongestQi) + "+---------------+--------------+%n");
+       for (RiskModelAttributes.QuasiIdentifierRisk quasiIdentifier : quasiIdentifiers) {
+           // print every Quasi-Identifier
+           System.out.format(leftAlignFormat, quasiIdentifier.getIdentifier(), quasiIdentifier.getDistinction() * 100, quasiIdentifier.getSeparation() * 100);
+       }
+       System.out.format("+" + StringUtils.repeat("-", charCountLongestQi) + "+---------------+--------------+%n");
+   	}
+   
    
    /**
     * Prints a list of matching data types
