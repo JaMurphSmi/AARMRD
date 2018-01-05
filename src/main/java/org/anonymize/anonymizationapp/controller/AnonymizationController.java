@@ -751,7 +751,7 @@ public class AnonymizationController extends AnonymizationBase {
        Hierarchy nation41 = getNation41();
     // Define research subset
        //DataSubset subset = DataSubset.create(data41, new HashSet<Integer>(Arrays.asList(1, 2, 5, 7, 8)));
-       DataSubset subset = DataSubset.create(data43, new HashSet<Integer>(Arrays.asList(1, 2, 5)));
+       //DataSubset subset = DataSubset.create(data43, new HashSet<Integer>(Arrays.asList(1, 2, 5)));
        
     // Set data attribute types, for example 41 and 42, commented out for 43
        /*data41.getDefinition().setAttributeType("identifier", AttributeType.IDENTIFYING_ATTRIBUTE);
@@ -846,7 +846,21 @@ public class AnonymizationController extends AnonymizationBase {
        ARXResult result45 = anonymizer45.anonymize(data43, config45);
 
        // Perform risk analysis
+       
        System.out.println("- Input data");
+       print(data43.getHandle());
+       System.out.print("\n- Records at 50% risk: " + data43.getHandle().getRiskEstimator(populationmodel45).getSampleBasedRiskDistribution().getFractionOfRecordsAtRisk(0.5d));
+       System.out.println("\n- Records at <=50% risk: " + data43.getHandle().getRiskEstimator(populationmodel45).getSampleBasedRiskDistribution().getFractionOfRecordsAtCumulativeRisk(0.5d));
+       
+       // Perform risk analysis
+       System.out.println("\n- Output data");
+       print(result45.getOutput());
+       System.out.print("\n- Records at 50% risk: " + result45.getOutput().getRiskEstimator(populationmodel45).getSampleBasedRiskDistribution().getFractionOfRecordsAtRisk(0.5d));
+       System.out.print("\n- Records at <=50% risk: " + result45.getOutput().getRiskEstimator(populationmodel45).getSampleBasedRiskDistribution().getFractionOfRecordsAtCumulativeRisk(0.5d));
+
+       
+       // EXAMPLE 45 risk models
+       /*System.out.println("- Input data");
        print(data43.getHandle());
        System.out.println("\n- Mixed risks");
        System.out.println("  * Prosecutor re-identification risk: " + data43.getHandle().getRiskEstimator(populationmodel45).getSampleBasedReidentificationRisk().getEstimatedProsecutorRisk());
@@ -860,10 +874,10 @@ public class AnonymizationController extends AnonymizationBase {
        System.out.println("  * Prosecutor re-identification risk: " + result45.getOutput().getRiskEstimator(populationmodel45).getSampleBasedReidentificationRisk().getEstimatedProsecutorRisk());
        System.out.println("  * Journalist re-identification risk: " + result45.getOutput().getRiskEstimator(populationmodel45).getSampleBasedReidentificationRisk().getEstimatedJournalistRisk());
        System.out.println("  * Marketer re-identification risk: " + result45.getOutput().getRiskEstimator(populationmodel45).getSampleBasedReidentificationRisk().getEstimatedMarketerRisk());
-
+		*/
        
        System.out.print(" - Writing data...");
-       result45.getOutput(false).save("src/main/resources/templates/output/test_anonymized44.csv", ';');
+       result45.getOutput(false).save("src/main/resources/templates/output/test_anonymized46.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
