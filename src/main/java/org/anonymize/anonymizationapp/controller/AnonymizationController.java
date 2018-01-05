@@ -62,6 +62,7 @@ import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.DistinctLDiversity;
 import org.deidentifier.arx.criteria.EDDifferentialPrivacy;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
+import org.deidentifier.arx.criteria.Inclusion;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.KMap;
 import org.deidentifier.arx.criteria.EntropyLDiversity;
@@ -738,16 +739,21 @@ public class AnonymizationController extends AnonymizationBase {
            optimum38 = result38.getOutput();
        }
 ///////////////////////////////// EXAMPLE 41
-       Data data41 = getData41();
+       //Data data41 = getData41();
+       // EXAMPLE 43
+       Data data43 = getData43(); 
        
-       Hierarchy zip41 = getZip41();
-       Hierarchy age41 = getAge41();
+       //Hierarchy zip41 = getZip41();
+       Hierarchy zip43 = getZip();
+       Hierarchy age43 = getAgeHier();
+       //Hierarchy age41 = getAge41();
        Hierarchy nation41 = getNation41();
     // Define research subset
-       DataSubset subset = DataSubset.create(data41, new HashSet<Integer>(Arrays.asList(1, 2, 5, 7, 8)));
+       //DataSubset subset = DataSubset.create(data41, new HashSet<Integer>(Arrays.asList(1, 2, 5, 7, 8)));
+       DataSubset subset = DataSubset.create(data43, new HashSet<Integer>(Arrays.asList(1, 2, 5)));
        
-    // Set data attribute types
-       data41.getDefinition().setAttributeType("identifier", AttributeType.IDENTIFYING_ATTRIBUTE);
+    // Set data attribute types, for example 41 and 42, commented out for 43
+       /*data41.getDefinition().setAttributeType("identifier", AttributeType.IDENTIFYING_ATTRIBUTE);
        data41.getDefinition().setAttributeType("name", AttributeType.IDENTIFYING_ATTRIBUTE);
        data41.getDefinition().setAttributeType("zip", zip41);
        data41.getDefinition().setAttributeType("age", age41);
@@ -784,11 +790,35 @@ public class AnonymizationController extends AnonymizationBase {
 
        // Print results
        System.out.println(" - Transformed research subset for 41 and 42:");
-       print(result41.getOutput(false).getView().iterator());
+       print(result41.getOutput(false).getView().iterator());*/
        
+       data43.getDefinition().setAttributeType("age", age43);
+       data43.getDefinition().setAttributeType("gender", gendie);
+       data43.getDefinition().setAttributeType("zipcode", zip43);
+       
+       ARXAnonymizer anonymizer43 = new ARXAnonymizer();
+       ARXConfiguration config43 = ARXConfiguration.create();
+       config43.addPrivacyModel(new Inclusion(subset));
+       config43.addPrivacyModel(new KAnonymity(2));
+       config43.setMaxOutliers(1d);
+
+       // Anonymize
+       ARXResult result43 = anonymizer43.anonymize(data43, config43);
+
+       // Perform risk analysis
+       System.out.println("\n - Input data");
+       print(data43.getHandle().getView());
+       System.out.println("\n - Risk analysis:");
+       analyzeData(data43.getHandle());
+       
+       // Perform risk analysis
+       System.out.println("\n - Output data");
+       print(result43.getOutput().getView());
+       System.out.println("\n - Risk analysis:");
+       analyzeData(result43.getOutput());
        
        System.out.print(" - Writing data...");
-       result41.getOutput(false).save("src/main/resources/templates/output/test_anonymized42.csv", ';');
+       result43.getOutput(false).save("src/main/resources/templates/output/test_anonymized43.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
@@ -991,6 +1021,19 @@ public class AnonymizationController extends AnonymizationBase {
 	   data.add("70", "male", "81931");
 	   data.add("45", "male", "81931");
 	   return data;
+   }
+   
+   private static Data.DefaultData getData43() {
+	   DefaultData data = Data.create();
+       data.add("age", "gender", "zipcode");
+       data.add("45", "female", "81675");
+       data.add("34", "male", "81667");
+       data.add("66", "male", "81925");
+       data.add("70", "female", "81931");
+       data.add("34", "female", "81931");
+       data.add("70", "male", "81931");
+       data.add("45", "male", "81931");
+       return data;
    }
    
    private static Data getData41() {
