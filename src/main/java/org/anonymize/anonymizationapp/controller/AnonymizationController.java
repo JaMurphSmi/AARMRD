@@ -797,7 +797,7 @@ public class AnonymizationController extends AnonymizationBase {
        data43.getDefinition().setAttributeType("gender", gendie);
        data43.getDefinition().setAttributeType("zipcode", zip43);
        
-       ARXAnonymizer anonymizer43 = new ARXAnonymizer();
+       /*ARXAnonymizer anonymizer43 = new ARXAnonymizer(); // EXAMPLE 43 does all of the risk statistics
        ARXConfiguration config43 = ARXConfiguration.create();
        config43.addPrivacyModel(new Inclusion(subset));
        config43.addPrivacyModel(new KAnonymity(2));
@@ -816,10 +816,25 @@ public class AnonymizationController extends AnonymizationBase {
        System.out.println("\n - Output data");
        print(result43.getOutput().getView());
        System.out.println("\n - Risk analysis:");
-       analyzeData(result43.getOutput());
+       analyzeData(result43.getOutput());*/
+       
+       ARXPopulationModel populationmodel44 = ARXPopulationModel.create(data.getHandle().getNumRows(), 0.01d);
+       
+       // Create an instance of the anonymizer
+       ARXAnonymizer anonymizer44 = new ARXAnonymizer();
+       ARXConfiguration config44 = ARXConfiguration.create();
+       config44.addPrivacyModel(new KMap(50, 0.1d, populationmodel44));
+       config44.setMaxOutliers(1d);
+       
+       // Anonymize
+       ARXResult result44 = anonymizer44.anonymize(data43, config44);
+       
+       // Perform risk analysis
+       System.out.println("- Output data");
+       print(result44.getOutput());
        
        System.out.print(" - Writing data...");
-       result43.getOutput(false).save("src/main/resources/templates/output/test_anonymized43.csv", ';');
+       result44.getOutput(false).save("src/main/resources/templates/output/test_anonymized44.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
