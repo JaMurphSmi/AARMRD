@@ -818,7 +818,8 @@ public class AnonymizationController extends AnonymizationBase {
        System.out.println("\n - Risk analysis:");
        analyzeData(result43.getOutput());*/
        
-       ARXPopulationModel populationmodel44 = ARXPopulationModel.create(data.getHandle().getNumRows(), 0.01d);
+       /////////////////////////// EXAMPLE 44 risk models
+       /*ARXPopulationModel populationmodel44 = ARXPopulationModel.create(data.getHandle().getNumRows(), 0.01d);
        
        // Create an instance of the anonymizer
        ARXAnonymizer anonymizer44 = new ARXAnonymizer();
@@ -831,10 +832,38 @@ public class AnonymizationController extends AnonymizationBase {
        
        // Perform risk analysis
        System.out.println("- Output data");
-       print(result44.getOutput());
+       print(result44.getOutput());*/
+       
+       ARXPopulationModel populationmodel45 = ARXPopulationModel.create(data43.getHandle().getNumRows(), 0.01d);
+       
+       // Create an instance of the anonymizer
+       ARXAnonymizer anonymizer45 = new ARXAnonymizer();
+       ARXConfiguration config45 = ARXConfiguration.create();
+       config45.addPrivacyModel(new KMap(5, 0.1d, populationmodel45));
+       config45.setMaxOutliers(1d);
+       
+       // Anonymize
+       ARXResult result45 = anonymizer45.anonymize(data43, config45);
+
+       // Perform risk analysis
+       System.out.println("- Input data");
+       print(data43.getHandle());
+       System.out.println("\n- Mixed risks");
+       System.out.println("  * Prosecutor re-identification risk: " + data43.getHandle().getRiskEstimator(populationmodel45).getSampleBasedReidentificationRisk().getEstimatedProsecutorRisk());
+       System.out.println("  * Journalist re-identification risk: " + data43.getHandle().getRiskEstimator(populationmodel45).getSampleBasedReidentificationRisk().getEstimatedJournalistRisk());
+       System.out.println("  * Marketer re-identification risk: " + data43.getHandle().getRiskEstimator(populationmodel45).getSampleBasedReidentificationRisk().getEstimatedMarketerRisk());
+       
+       // Perform risk analysis
+       System.out.println("- Output data");
+       print(result45.getOutput());
+       System.out.println("\n- Mixed risks");
+       System.out.println("  * Prosecutor re-identification risk: " + result45.getOutput().getRiskEstimator(populationmodel45).getSampleBasedReidentificationRisk().getEstimatedProsecutorRisk());
+       System.out.println("  * Journalist re-identification risk: " + result45.getOutput().getRiskEstimator(populationmodel45).getSampleBasedReidentificationRisk().getEstimatedJournalistRisk());
+       System.out.println("  * Marketer re-identification risk: " + result45.getOutput().getRiskEstimator(populationmodel45).getSampleBasedReidentificationRisk().getEstimatedMarketerRisk());
+
        
        System.out.print(" - Writing data...");
-       result44.getOutput(false).save("src/main/resources/templates/output/test_anonymized44.csv", ';');
+       result45.getOutput(false).save("src/main/resources/templates/output/test_anonymized44.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
