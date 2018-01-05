@@ -758,6 +758,9 @@ public class AnonymizationController extends AnonymizationBase {
        ARXAnonymizer anonymizer41 = new ARXAnonymizer();
        ARXConfiguration config41 = ARXConfiguration.create();
        config41.addPrivacyModel(new KMap(3, subset));
+       //////////// added for 42
+       config41.addPrivacyModel(new DPresence(1d / 2d, 2d / 3d, subset));
+       //////////// added for 42 ^
        config41.setMaxOutliers(1d);
        config41.setQualityModel(Metric.createLossMetric());
 
@@ -780,12 +783,12 @@ public class AnonymizationController extends AnonymizationBase {
        print(result41.getOutput(false).iterator());
 
        // Print results
-       System.out.println(" - Transformed research subset for 41:");
+       System.out.println(" - Transformed research subset for 41 and 42:");
        print(result41.getOutput(false).getView().iterator());
        
        
        System.out.print(" - Writing data...");
-       result41.getOutput(false).save("src/main/resources/templates/output/test_anonymized41.csv", ';');
+       result41.getOutput(false).save("src/main/resources/templates/output/test_anonymized42.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
