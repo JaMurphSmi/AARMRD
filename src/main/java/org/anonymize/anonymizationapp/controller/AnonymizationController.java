@@ -7,6 +7,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.text.ParseException;
@@ -62,6 +63,7 @@ import org.deidentifier.arx.criteria.DistinctLDiversity;
 import org.deidentifier.arx.criteria.EDDifferentialPrivacy;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.KAnonymity;
+import org.deidentifier.arx.criteria.KMap;
 import org.deidentifier.arx.criteria.EntropyLDiversity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.exceptions.RollbackRequiredException;
@@ -86,7 +88,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import cern.colt.Arrays;
+//import cern.colt.Arrays;
 
 @Controller
 public class AnonymizationController extends AnonymizationBase {
@@ -735,9 +737,55 @@ public class AnonymizationController extends AnonymizationBase {
            // This part is important to ensure that privacy is preserved, even in case of exceptions
            optimum38 = result38.getOutput();
        }
+///////////////////////////////// EXAMPLE 41
+       Data data41 = getData41();
+       
+       Hierarchy zip41 = getZip41();
+       Hierarchy age41 = getAge41();
+       Hierarchy nation41 = getNation41();
+    // Define research subset
+       DataSubset subset = DataSubset.create(data41, new HashSet<Integer>(Arrays.asList(1, 2, 5, 7, 8)));
+       
+    // Set data attribute types
+       data41.getDefinition().setAttributeType("identifier", AttributeType.IDENTIFYING_ATTRIBUTE);
+       data41.getDefinition().setAttributeType("name", AttributeType.IDENTIFYING_ATTRIBUTE);
+       data41.getDefinition().setAttributeType("zip", zip41);
+       data41.getDefinition().setAttributeType("age", age41);
+       data41.getDefinition().setAttributeType("nationality", nation41);
+       data41.getDefinition().setAttributeType("sen", AttributeType.INSENSITIVE_ATTRIBUTE);
+
+       // Create an instance of the anonymizer
+       ARXAnonymizer anonymizer41 = new ARXAnonymizer();
+       ARXConfiguration config41 = ARXConfiguration.create();
+       config41.addPrivacyModel(new KMap(3, subset));
+       config41.setMaxOutliers(1d);
+       config41.setQualityModel(Metric.createLossMetric());
+
+       // Now anonymize
+       ARXResult result41 = anonymizer41.anonymize(data41, config41);
+
+       // Print input
+       System.out.println(" - Input data:");
+       print(data41.getHandle().iterator());
+
+       // Print input
+       System.out.println(" - Input research subset for example 41:");
+       print(data41.getHandle().getView().iterator());
+
+       // Print info
+       printResult(result41, data41);
+
+       // Print results
+       System.out.println(" - Transformed data for example 41:");
+       print(result41.getOutput(false).iterator());
+
+       // Print results
+       System.out.println(" - Transformed research subset for 41:");
+       print(result41.getOutput(false).getView().iterator());
+       
        
        System.out.print(" - Writing data...");
-       result38.getOutput(false).save("src/main/resources/templates/output/test_anonymized41.csv", ';');
+       result41.getOutput(false).save("src/main/resources/templates/output/test_anonymized41.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
@@ -942,6 +990,21 @@ public class AnonymizationController extends AnonymizationBase {
 	   return data;
    }
    
+   private static Data getData41() {
+	   DefaultData data = Data.create();
+       data.add("identifier", "name", "zip", "age", "nationality", "sen");
+       data.add("a", "Alice", "47906", "35", "USA", "0");
+       data.add("b", "Bob", "47903", "59", "Canada", "1");
+       data.add("c", "Christine", "47906", "42", "USA", "1");
+       data.add("d", "Dirk", "47630", "18", "Brazil", "0");
+       data.add("e", "Eunice", "47630", "22", "Brazil", "0");
+       data.add("f", "Frank", "47633", "63", "Peru", "1");
+       data.add("g", "Gail", "48973", "33", "Spain", "0");
+       data.add("h", "Harry", "48972", "47", "Bulgaria", "1");
+       data.add("i", "Iris", "48970", "52", "France", "1");
+       return data;
+   }
+   
    private static void printWarnings(HIPAAIdentifierMatch[] warnings) {
        if (warnings.length == 0) {
            System.out.println("No warnings");
@@ -1017,6 +1080,7 @@ public class AnonymizationController extends AnonymizationBase {
        age.add("NULL", "NULL", "*");
 	   return age;
    }
+   
    private static Hierarchy getAge() {
 	   DefaultHierarchy age = Hierarchy.create();
        age.add("29", "<=40", "*");
@@ -1029,6 +1093,20 @@ public class AnonymizationController extends AnonymizationBase {
        age.add("36", "<=40", "*");
        age.add("32", "<=40", "*");
        return age;
+   }
+   
+   private static Hierarchy getAge41() {
+	   DefaultHierarchy age = Hierarchy.create();
+	   age.add("18", "1*", "<=40", "*");
+	   age.add("22", "2*", "<=40", "*");
+	   age.add("33", "3*", "<=40", "*");
+	   age.add("35", "3*", "<=40", "*");
+	   age.add("42", "4*", ">40", "*");
+	   age.add("47", "4*", ">40", "*");
+	   age.add("52", "5*", ">40", "*");
+	   age.add("59", "5*", ">40", "*");
+	   age.add("63", "6*", ">40", "*");
+	   return age;
    }
    
    private static Hierarchy getZip() {
@@ -1073,6 +1151,30 @@ public class AnonymizationController extends AnonymizationBase {
 	   zipcode.add("81931", "8193*", "819**", "81***", "8****", "*****");
 	   zipcode.add("92922", "9292*", "929**", "92***", "9****", "*****");
 	   return zipcode;
+   }
+   
+   private static Hierarchy getZip41() {
+	   DefaultHierarchy zip = Hierarchy.create();
+       zip.add("47630", "4763*", "476*", "47*", "4*", "*");
+       zip.add("47633", "4763*", "476*", "47*", "4*", "*");
+       zip.add("47903", "4790*", "479*", "47*", "4*", "*");
+       zip.add("47906", "4790*", "479*", "47*", "4*", "*");
+       zip.add("48970", "4897*", "489*", "48*", "4*", "*");
+       zip.add("48972", "4897*", "489*", "48*", "4*", "*");
+       zip.add("48973", "4897*", "489*", "48*", "4*", "*");
+       return zip;
+   }
+   
+   private static Hierarchy getNation41() {
+	   DefaultHierarchy nationality = Hierarchy.create();
+       nationality.add("Canada", "N. America", "America", "*");
+       nationality.add("USA", "N. America", "America", "*");
+       nationality.add("Peru", "S. America", "America", "*");
+       nationality.add("Brazil", "S. America", "America", "*");
+       nationality.add("Bulgaria", "E. Europe", "Europe", "*");
+       nationality.add("France", "W. Europe", "Europe", "*");
+       nationality.add("Spain", "W. Europe", "Europe", "*");
+       return nationality;
    }
    
    private static int[] calcFigures(int[] anArray)
