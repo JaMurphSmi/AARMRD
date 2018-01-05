@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import org.deidentifier.arx.ARXAnonymizer;
 import org.deidentifier.arx.ARXConfiguration;
 import org.deidentifier.arx.ARXLattice.ARXNode;
+import org.deidentifier.arx.ARXLogisticRegressionConfiguration;
 import org.deidentifier.arx.ARXPopulationModel;
 import org.deidentifier.arx.ARXPopulationModel.Region;
 import org.deidentifier.arx.ARXResult;
@@ -163,7 +164,6 @@ public class AnonymizationController extends AnonymizationBase {
        System.out.println("inHandle value of the field is " + inHandle.getValue(0, 0));
 */
        
-       
 // Define how field effects identifiability, can be taken in variably from screen
        //data.getDefinition().setAttributeType("age", AttributeType.SENSITIVE_ATTRIBUTE);
        //data.getDefinition().setAttributeType("age", AttributeType.IDENTIFYING_ATTRIBUTE);
@@ -178,22 +178,6 @@ public class AnonymizationController extends AnonymizationBase {
        //data.getDefinition().setAttributeType("age", Hierarchy.create("src/main/resources/templates/hierarchy/test_age.csv", StandardCharsets.UTF_8, ';'));
        //data.getDefinition().setAttributeType("gender", Hierarchy.create("src/main/resources/templates/hierarchy/test_gender.csv", StandardCharsets.UTF_8, ';'));
        //data.getDefinition().setAttributeType("phoneno", Hierarchy.create("src/main/resources/templates/hierarchy/test_phoneno.csv", StandardCharsets.UTF_8, ';'));
-       
-       /*DefaultHierarchy age = Hierarchy.create(); //commented out for example 24
-       age.add("34", "<50", "*");
-       age.add("45", "<50", "*");
-       age.add("66", ">=50", "*");
-       age.add("70", ">=50", "*");
-       
-       DefaultHierarchy gender = Hierarchy.create();
-       gender.add("male", "*");
-       gender.add("female", "*");
-       
-       DefaultHierarchy zipcode = Hierarchy.create();
-       zipcode.add("81667", "8166*", "816**", "81***", "8****", "*****");
-       zipcode.add("81675", "8167*", "816**", "81***", "8****", "*****");
-       zipcode.add("81925", "8192*", "819**", "81***", "8****", "*****");
-       zipcode.add("81931", "8193*", "819**", "81***", "8****", "*****");*/
        
        // set the minimal generalization height
        /*data.getDefinition().setMinimumGeneralization("zipcode", 3);
@@ -364,20 +348,47 @@ public class AnonymizationController extends AnonymizationBase {
        aggregate(new String[]{"1", "2", "5", "11", "12", "3"}, DataType.STRING);
        aggregate(new String[]{"1", "2", "5", "11", "12", "3"}, DataType.INTEGER);
        
-//////////////////self-contained test
+//////////////////self-contained test, now for EXAMPLE 39
+  /*     String[] features = new String[] {
+               "sex",
+               "age",
+               "race",
+               "marital-status",
+               "education",
+               "native-country",
+               "workclass",
+               "occupation",
+               "salary-class"
+       };
+
+       String clazz = "marital-status";
+
        Data tData = createData("adult");
-       tData.getDefinition().setAttributeType("occupation", AttributeType.SENSITIVE_ATTRIBUTE);
+       //tData.getDefinition().setAttributeType("occupation", AttributeType.SENSITIVE_ATTRIBUTE);
+       //example 39
+       tData.getDefinition().setAttributeType("marital-status", AttributeType.INSENSITIVE_ATTRIBUTE);
+       tData.getDefinition().setDataType("age", DataType.INTEGER);
+       
+       System.out.println("Input dataset for example 39");
+       System.out.println(tData.getHandle().getStatistics().getClassificationPerformance(features, clazz, ARXLogisticRegressionConfiguration.create()));
+       ///////////////////
        
        ARXAnonymizer anonymize = new ARXAnonymizer();
        ARXConfiguration conf = ARXConfiguration.create();
-       conf.addPrivacyModel(new EntropyLDiversity("occupation", 5));
-       conf.setMaxOutliers(0.04d);
-       conf.setQualityModel(Metric.createEntropyMetric());
+       //conf.addPrivacyModel(new EntropyLDiversity("occupation", 5));
+       conf.addPrivacyModel(new KAnonymity(5));
+       //conf.setMaxOutliers(0.04d);
+       conf.setMaxOutliers(1d);
+       conf.setQualityModel(Metric.createLossMetric());
+       //conf.setQualityModel(Metric.createEntropyMetric());
        
        // Anonymize
        ARXResult res = anonymize.anonymize(tData, conf);
        System.out.println(" - Just after anonymizing using example 22...");
-       printResult(res, tData);
+       //printResult(res, tData);
+       System.out.println("5-anonymous dataset for example 39");
+       System.out.println(res.getOutput().getStatistics().getClassificationPerformance(features, clazz, ARXLogisticRegressionConfiguration.create()));
+*/
 //////////////////self-contained test
        // Write results to file
        
@@ -610,7 +621,13 @@ public class AnonymizationController extends AnonymizationBase {
        System.out.println(" - HIPAAs Identified...");
        printWarnings(warnings);*/
        
-       /////////// EXAMPLE 36, 37
+       /////////// EXAMPLE 36, 37, 40
+       /*String[] features40 = new String[] { // EXAMPLE 40
+               "gender", "zipcode"
+       };
+       
+       String clazz40 = "age";*/
+       
        Data dataFor36 = getTheData();
        
        Hierarchy agie = getAgeHier();
@@ -622,7 +639,17 @@ public class AnonymizationController extends AnonymizationBase {
        dataFor36.getDefinition().setHierarchy("age", agie);
        dataFor36.getDefinition().setHierarchy("gender", gendie);
        dataFor36.getDefinition().setHierarchy("zipcode", zips);
+       
+       /*System.out.println("Input dataset");
 
+       Iterator<String[]> input = dataFor36.getHandle().iterator();
+       while (input.hasNext()) {
+           System.out.print("   ");
+           System.out.println(Arrays.toString(input.next()));
+       }*/
+
+       //System.out.println(dataFor36.getHandle().getStatistics().getClassificationPerformance(features40, clazz40, ARXLogisticRegressionConfiguration.create()));
+       
        // Create an instance of the anonymizer
        ARXAnonymizer anonymiza = new ARXAnonymizer();
 
@@ -631,9 +658,21 @@ public class AnonymizationController extends AnonymizationBase {
        DataGeneralizationScheme.create(dataFor36,GeneralizationDegree.MEDIUM));
        
        ARXConfiguration configie = ARXConfiguration.create();
+       //configie.addPrivacyModel(new KAnonymity(3));
        configie.addPrivacyModel(criterion);
        configie.setMaxOutliers(1d);
        ARXResult for36 = anonymiza.anonymize(dataFor36, config);
+       
+       /*System.out.println("3-anonymous dataset"); //for EXAMPLE 40
+
+       Iterator<String[]> transformersInDisguise = for36.getOutput().iterator();
+       while (transformersInDisguise.hasNext()) {
+           System.out.print("   ");
+           System.out.println(Arrays.toString(transformersInDisguise.next()));
+       }*/
+       
+      // System.out.println("EXAMPLE 40 CLASSIFICATION PERFORMANCE");
+      // System.out.println(for36.getOutput().getStatistics().getClassificationPerformance(features40, clazz40, ARXLogisticRegressionConfiguration.create()));    
 
        // Access output
        DataHandle optimal = for36.getOutput();
@@ -698,7 +737,7 @@ public class AnonymizationController extends AnonymizationBase {
        }
        
        System.out.print(" - Writing data...");
-       result38.getOutput(false).save("src/main/resources/templates/output/test_anonymized38.csv", ';');
+       result38.getOutput(false).save("src/main/resources/templates/output/test_anonymized41.csv", ';');
        System.out.println("Done!");
        
       return "anonymize";
@@ -729,7 +768,8 @@ public class AnonymizationController extends AnonymizationBase {
    
    
    
-//take in file through variable means   
+//take in file through variable means 
+   // used for EXAMPLE 39
    public static Data createData(final String dataset) throws IOException {
 
        Data data = Data.create("src/main/resources/templates/data/" + dataset + ".csv", StandardCharsets.UTF_8, ';');
@@ -911,7 +951,7 @@ public class AnonymizationController extends AnonymizationBase {
            }
        }
    }
-   //////////////////////////// for example 35
+   //////////////////////////// for example 35, 40
 
    private static Data getTheData() {
        DefaultData data = Data.create();
