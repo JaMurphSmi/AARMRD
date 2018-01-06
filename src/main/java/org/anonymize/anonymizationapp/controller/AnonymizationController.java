@@ -67,6 +67,7 @@ import org.deidentifier.arx.criteria.Inclusion;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.KMap;
 import org.deidentifier.arx.criteria.ProfitabilityJournalistNoAttack;
+import org.deidentifier.arx.criteria.ProfitabilityProsecutor;
 import org.deidentifier.arx.criteria.ProfitabilityProsecutorNoAttack;
 import org.deidentifier.arx.criteria.EntropyLDiversity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
@@ -1017,7 +1018,11 @@ public class AnonymizationController extends AnonymizationBase {
        MetricSDNMPublisherPayout maximizePublisherPayout = Metric.createPublisherPayoutMetric(false);
        
        // Create privacy model for the game-theoretic approach
-       ProfitabilityProsecutorNoAttack profitability = new ProfitabilityProsecutorNoAttack();
+       //		Here there can be several different privacy models
+       // EXAMPLE 50
+       //ProfitabilityProsecutorNoAttack profitability = new ProfitabilityProsecutorNoAttack();
+       // EXAMPLE 51
+       ProfitabilityProsecutor profitability = new ProfitabilityProsecutor();
        
        // Configure ARX
        arxconfig.setMaxOutliers(1d);
