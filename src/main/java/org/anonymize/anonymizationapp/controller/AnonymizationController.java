@@ -66,6 +66,7 @@ import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.Inclusion;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.KMap;
+import org.deidentifier.arx.criteria.ProfitabilityJournalist;
 import org.deidentifier.arx.criteria.ProfitabilityJournalistNoAttack;
 import org.deidentifier.arx.criteria.ProfitabilityProsecutor;
 import org.deidentifier.arx.criteria.ProfitabilityProsecutorNoAttack;
@@ -912,35 +913,35 @@ public class AnonymizationController extends AnonymizationBase {
        Data data49 = createData("adult");// used for EXAMPLE 49, 50, 51 
        
        // added through example 50, removed for EXAMPLE 51 to improve computation time
-       /*DataSubset subset = DataSubset.create(data49, DataSelector.create(data49).field("sex").equals("Male"));
+       DataSubset subset = DataSubset.create(data, DataSelector.create(data).field("sex").equals("Male"));
+        
+        // Config from PLOS|ONE paper
+        solve(data, ARXCostBenefitConfiguration.create()
+                                               .setAdversaryCost(4d)
+                                               .setAdversaryGain(300d)
+                                               .setPublisherLoss(300d)
+                                               .setPublisherBenefit(1200d), subset);
 
-    // Config from PLOS|ONE paper
-       solve(data49, ARXCostBenefitConfiguration.create()
-                                              .setAdversaryCost(4d)
-                                              .setAdversaryGain(300d)
-                                              .setPublisherLoss(300d)
-                                              .setPublisherBenefit(1200d), subset);
+        // Larger publisher loss
+        solve(data, ARXCostBenefitConfiguration.create()
+                                               .setAdversaryCost(4d)
+                                               .setAdversaryGain(300d)
+                                               .setPublisherLoss(600d)
+                                               .setPublisherBenefit(1200d), subset);
 
-       // Lower costs for the attacker
-       solve(data49, ARXCostBenefitConfiguration.create()
-                                              .setAdversaryCost(2d)
-                                              .setAdversaryGain(300d)
-                                              .setPublisherLoss(300d)
-                                              .setPublisherBenefit(1200d), subset);
+        // Even larger publisher loss
+        solve(data, ARXCostBenefitConfiguration.create()
+                                               .setAdversaryCost(4d)
+                                               .setAdversaryGain(300d)
+                                               .setPublisherLoss(1200d)
+                                               .setPublisherBenefit(1200d), subset);
 
-       // Lower costs and more gain for the attacker
-       solve(data49, ARXCostBenefitConfiguration.create()
-                                              .setAdversaryCost(2d)
-                                              .setAdversaryGain(600d)
-                                              .setPublisherLoss(300d)
-                                              .setPublisherBenefit(1200d), subset);
-
-       // Even more gain for the attacker
-       solve(data49, ARXCostBenefitConfiguration.create()
-                                              .setAdversaryCost(2d)
-                                              .setAdversaryGain(1200d)
-                                              .setPublisherLoss(300d)
-                                              .setPublisherBenefit(1200d), subset);*/
+        // Larger publisher loss and less adversary costs
+        solve(data, ARXCostBenefitConfiguration.create()
+                                               .setAdversaryCost(2d)
+                                               .setAdversaryGain(300d)
+                                               .setPublisherLoss(600d)
+											   .setPublisherBenefit(1200d), subset);
        
        // Config from PLOS|ONE paper
        solve(data, ARXCostBenefitConfiguration.create()
@@ -1063,7 +1064,9 @@ public class AnonymizationController extends AnonymizationBase {
        MetricSDNMPublisherPayout maximizePublisherPayout = Metric.createPublisherPayoutMetric(true);
        
        // Create privacy model for the game-theoretic approach
-       ProfitabilityJournalistNoAttack profitability = new ProfitabilityJournalistNoAttack(subset);
+       //EXAMPLE 49, 52
+       //ProfitabilityJournalistNoAttack profitability = new ProfitabilityJournalistNoAttack(subset);
+       ProfitabilityJournalist profitability = new ProfitabilityJournalist(subset);
        
        // Configure ARX
        arxconfig.setMaxOutliers(1d);
