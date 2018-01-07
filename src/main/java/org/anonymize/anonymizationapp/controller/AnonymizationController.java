@@ -1,6 +1,7 @@
 package org.anonymize.anonymizationapp.controller;
 
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FilenameFilter;
 // Importing ARX required modules, dependencies etc
@@ -12,6 +13,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.text.ParseException;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
 //import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -48,6 +50,7 @@ import org.deidentifier.arx.aggregates.StatisticsContingencyTable;
 import org.deidentifier.arx.aggregates.StatisticsContingencyTable.Entry;
 import org.deidentifier.arx.aggregates.StatisticsFrequencyDistribution;
 import org.deidentifier.arx.aggregates.StatisticsSummary;
+import org.deidentifier.arx.certificate.ARXCertificate;
 import org.deidentifier.arx.aggregates.AggregateFunction.AggregateFunctionBuilder;
 import org.deidentifier.arx.aggregates.HierarchyBuilder;
 import org.deidentifier.arx.aggregates.HierarchyBuilder.Type;
@@ -74,6 +77,7 @@ import org.deidentifier.arx.criteria.EntropyLDiversity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.exceptions.RollbackRequiredException;
 import org.deidentifier.arx.io.CSVHierarchyInput;
+import org.deidentifier.arx.io.CSVSyntax;
 import org.deidentifier.arx.metric.Metric;
 import org.deidentifier.arx.metric.v2.MetricSDNMPublisherPayout;
 import org.deidentifier.arx.metric.v2.QualityMetadata;
@@ -105,7 +109,7 @@ public class AnonymizationController extends AnonymizationBase {
 
    @SuppressWarnings("unused")
    @RequestMapping("/anonymize")
-   public String index(Model model) throws IOException, ParseException, SQLException, ClassNotFoundException {
+   public String index(Model model) throws IOException, ParseException, SQLException, ClassNotFoundException, NoSuchAlgorithmException {
 	   int anArray[] = {4,5,6,7,8,9,10};
 	   int secArray[];
 	   secArray = calcFigures(anArray);
@@ -910,74 +914,220 @@ public class AnonymizationController extends AnonymizationBase {
        // EXAMPLE 50 HERE
        //////////////////////////////////////////
        
-       Data data49 = createData("adult");// used for EXAMPLE 49, 50, 51 
+       /*Data data49 = createData("adult");// used for EXAMPLE 49, 50, 51 
        
        // added through example 50, removed for EXAMPLE 51 to improve computation time
-       DataSubset subset = DataSubset.create(data, DataSelector.create(data).field("sex").equals("Male"));
+       DataSubset subset = DataSubset.create(data49, DataSelector.create(data49).field("sex").equals("Male"));
         
         // Config from PLOS|ONE paper
-        solve(data, ARXCostBenefitConfiguration.create()
+        solve(data49, ARXCostBenefitConfiguration.create()
                                                .setAdversaryCost(4d)
                                                .setAdversaryGain(300d)
                                                .setPublisherLoss(300d)
                                                .setPublisherBenefit(1200d), subset);
 
         // Larger publisher loss
-        solve(data, ARXCostBenefitConfiguration.create()
+        solve(data49, ARXCostBenefitConfiguration.create()
                                                .setAdversaryCost(4d)
                                                .setAdversaryGain(300d)
                                                .setPublisherLoss(600d)
                                                .setPublisherBenefit(1200d), subset);
 
         // Even larger publisher loss
-        solve(data, ARXCostBenefitConfiguration.create()
+        solve(data49, ARXCostBenefitConfiguration.create()
                                                .setAdversaryCost(4d)
                                                .setAdversaryGain(300d)
                                                .setPublisherLoss(1200d)
                                                .setPublisherBenefit(1200d), subset);
 
         // Larger publisher loss and less adversary costs
-        solve(data, ARXCostBenefitConfiguration.create()
+        solve(data49, ARXCostBenefitConfiguration.create()
                                                .setAdversaryCost(2d)
                                                .setAdversaryGain(300d)
                                                .setPublisherLoss(600d)
-											   .setPublisherBenefit(1200d), subset);
+											   .setPublisherBenefit(1200d), subset); // */
        
        // Config from PLOS|ONE paper
-       solve(data, ARXCostBenefitConfiguration.create()
+       // From another example
+        /* solve(data49, ARXCostBenefitConfiguration.create()
                                               .setAdversaryCost(4d)
                                               .setAdversaryGain(300d)
                                               .setPublisherLoss(300d)
                                               .setPublisherBenefit(1200d));
 
        // Larger publisher loss
-       solve(data, ARXCostBenefitConfiguration.create()
+       solve(data49, ARXCostBenefitConfiguration.create()
                                               .setAdversaryCost(4d)
                                               .setAdversaryGain(300d)
                                               .setPublisherLoss(600d)
                                               .setPublisherBenefit(1200d));
 
        // Even larger publisher loss
-       solve(data, ARXCostBenefitConfiguration.create()
+       solve(data49, ARXCostBenefitConfiguration.create()
                                               .setAdversaryCost(4d)
                                               .setAdversaryGain(300d)
                                               .setPublisherLoss(1200d)
                                               .setPublisherBenefit(1200d));
 
        // Larger publisher loss and less adversary costs
-       solve(data, ARXCostBenefitConfiguration.create()
+       solve(data49, ARXCostBenefitConfiguration.create()
                                               .setAdversaryCost(2d)
                                               .setAdversaryGain(300d)
                                               .setPublisherLoss(600d)
                                               .setPublisherBenefit(1200d));
        
        // Config from PLOS|ONE paper but publisher loss and benefit changed with each other
-       solve(data, ARXCostBenefitConfiguration.create()
+       solve(data49, ARXCostBenefitConfiguration.create()
                                               .setAdversaryCost(4d)
                                               .setAdversaryGain(300d)
                                               .setPublisherLoss(1200d)
-                                              .setPublisherBenefit(300d));
+                                              .setPublisherBenefit(300d)); // */
+       
+       System.out.println("Just after the solve functions");
+       //////////////////////////////////////////////////// ARX EXAMPLE 53
+       /*
+       Data data53 = createData("adult");
+       
+       ARXAnonymizer anonymizer53 = new ARXAnonymizer();
+       ARXConfiguration config53 = ARXConfiguration.create();
+       config53.addPrivacyModel(new KAnonymity(5));
+       config53.setMaxOutliers(1d);
+       config53.setQualityModel(Metric.createLossMetric());
+       
+       ARXResult result53 = anonymizer53.anonymize(data53, config53);
 
+       //printResult(result53, data53);
+       System.out.println("Just after printResult 53");
+       // Create certificate
+       ARXCertificate certificate = ARXCertificate.create(data53.getHandle(), data53.getDefinition(),
+                                                         config53, result53, result53.getGlobalOptimum(), 
+                                                         result53.getOutput(),
+                                                         new CSVSyntax());
+
+       if(certificate == null)
+       {
+    	   System.out.println("certificate is null");
+       }
+       System.out.println("After creating the certificate thing");
+       File file = File.createTempFile("arx", ".pdf");
+       System.out.println("After creating the file");
+       certificate.save(file);
+       System.out.println("After saving the file");
+       
+       // Open
+       if (Desktop.isDesktopSupported()) {
+    	   System.out.println("Trying to open the file");
+           Desktop.getDesktop().open(file);
+           System.out.println("After opening the file");
+       }
+       */
+       //////////////////////////////////////////////////// ARX EXAMPLE 53
+
+       //////////////////////////////////////////////////// ARX EXAMPLE 54
+       /*
+       Data data54 = createData("adult");
+       
+       data54.getDefinition().setDataType("age", DataType.INTEGER);
+       data54.getDefinition().setMicroAggregationFunction("age", MicroAggregationFunction.createArithmeticMean());
+       
+       ARXAnonymizer anonymizer54 = new ARXAnonymizer();
+       ARXConfiguration config54 = ARXConfiguration.create();
+       config54.addPrivacyModel(new KAnonymity(5));
+       config54.setMaxOutliers(1d);
+       config54.setQualityModel(Metric.createLossMetric(0d));
+       
+       ARXResult result54 = anonymizer54.anonymize(data54, config54);
+       DataHandle output54 = result54.getOutput();
+       result54.optimizeIterativeFast(output54, 0.01d);
+       System.out.println("Done optimizing");
+
+       // Access statistics
+       StatisticsQuality utility = data54.getHandle().getStatistics().getQualityStatistics();
+       System.out.println("Input:");
+       System.out.println(" - Ambiguity: " + utility.getAmbiguity().getValue());
+       System.out.println(" - AECS: " + utility.getAverageClassSize().getValue());
+       System.out.println(" - Discernibility: " + utility.getDiscernibility().getValue());
+       System.out.println(" - Granularity: " + utility.getGranularity().getArithmeticMean(false));
+       System.out.println(" - Attribute-level SE: " + utility.getAttributeLevelSquaredError().getArithmeticMean(false));
+       System.out.println(" - KL-Divergence: " + utility.getKullbackLeiblerDivergence().getValue());
+       System.out.println(" - Non-Uniform Entropy: " + utility.getNonUniformEntropy().getArithmeticMean(false));
+       System.out.println(" - Precision: " + utility.getGeneralizationIntensity().getArithmeticMean(false));
+       System.out.println(" - Record-level SE: " + utility.getRecordLevelSquaredError().getValue());
+       
+       // Access statistics
+       utility = output54.getStatistics().getQualityStatistics();
+       System.out.println("Output:");
+       System.out.println(" - Ambiguity: " + utility.getAmbiguity().getValue());
+       System.out.println(" - AECS: " + utility.getAverageClassSize().getValue());
+       System.out.println(" - Discernibility: " + utility.getDiscernibility().getValue());
+       System.out.println(" - Granularity: " + utility.getGranularity().getArithmeticMean(false));
+       System.out.println(" - MSE: " + utility.getAttributeLevelSquaredError().getArithmeticMean(false));
+       System.out.println(" - KL-Divergence: " + utility.getKullbackLeiblerDivergence().getValue());
+       System.out.println(" - Non-Uniform Entropy: " + utility.getNonUniformEntropy().getArithmeticMean(false));
+       System.out.println(" - Precision: " + utility.getGeneralizationIntensity().getArithmeticMean(false));
+       System.out.println(" - SSE: " + utility.getRecordLevelSquaredError().getValue());
+       */
+       //////////////////////////////////////////////////// ARX EXAMPLE 54
+       
+       ////////////////////////////////////////////////////ARX EXAMPLE 55
+       Data data55 = getData38();
+       
+       Hierarchy age55 = getAge38();
+       
+       Hierarchy gend55 = getGender(); 
+       
+       Hierarchy zip55 = getZip38();
+       
+       data55.getDefinition().setAttributeType("age", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+       data55.getDefinition().setAttributeType("gender", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+       data55.getDefinition().setAttributeType("zipcode", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+       data55.getDefinition().setHierarchy("age", age55);
+       data55.getDefinition().setHierarchy("gender", gend55);
+       data55.getDefinition().setHierarchy("zipcode", zip55);
+
+       // Create an instance of the anonymizer
+       ARXAnonymizer anonymizer55 = new ARXAnonymizer();
+
+       // Define relative number of records to be generalized in each iteration
+       double oMin = 0.01d;
+       
+       // Define a parameter for the quality model which only considers generalization
+       double gsFactor = 0d;
+       
+       // Create a configuration
+       ARXConfiguration config55 = ARXConfiguration.create();
+       config55.addPrivacyModel(new KAnonymity(2));
+       config55.setMaxOutliers(1d - oMin);
+       config55.setQualityModel(Metric.createLossMetric(gsFactor));
+
+       // Print input
+       System.out.println(" - Input data:");
+       printHandle(data55.getHandle());
+
+       // Compute the result
+       ARXResult result55 = anonymizer55.anonymize(data55, config55);
+       
+
+       // Print result of global recoding
+       DataHandle optimum = result55.getOutput();
+       System.out.println(" - Global recoding for:");
+       printHandle(optimum);
+
+       try {
+           
+           // Now apply local recoding to the result
+           result55.optimizeIterativeFast(optimum, oMin);
+
+           // Print result of local recoding
+           System.out.println(" - Local recoding for 55:");
+           printHandle(optimum);
+           
+       } catch (RollbackRequiredException e) {
+           
+           // This part is important to ensure that privacy is preserved, even in case of exceptions
+           optimum = result55.getOutput();
+       }
+       
        System.out.print(" - Writing data...");
        //result45.getOutput(false).save("src/main/resources/templates/output/test_anonymized46.csv", ';');
        System.out.println("Done!");
