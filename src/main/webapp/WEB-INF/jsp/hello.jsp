@@ -16,8 +16,11 @@
   <h2>Your name is ${name}.</h2><br>
   This is an example of spring finally working on<br>
   a local Tomcat 8.5 server, built with Maven
+  <br><br>
+  Upload the file and hierarchies you want to use here
+  <br><br>
   <div class="form">
-    <form action="home" method="post" onsubmit="return validate()">
+    <form action="home" method="POST" onsubmit="return validate()">
       <table>
         <tr>
           <td>Continue to skeleton Homepage</td>
@@ -26,6 +29,7 @@
       </table>
     </form>
   </div>
-
 </body>
+<script>
+</script>
 </html>

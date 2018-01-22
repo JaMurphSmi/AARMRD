@@ -3,11 +3,13 @@ package org.anonymize.anonymizationapp.controller;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 // Importing ARX required modules, dependencies etc
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -22,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet;
 
 import org.deidentifier.arx.ARXAnonymizer;
 import org.deidentifier.arx.ARXConfiguration;
@@ -96,18 +101,35 @@ import org.anonymize.anonymizationapp.model.AnonymizationBase;
 import org.apache.commons.lang.StringUtils;
 // ARX related stuff 
 import org.apache.commons.math3.util.Pair;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 //import cern.colt.Arrays;
 
-@Controller
+@MultipartConfig
+@Controller											//implements
 public class AnonymizationController extends AnonymizationBase {
 
-   @SuppressWarnings("unused")
+	// attempting to handle file uploads successfully
+	@RequestMapping(value = "/uploadFiles", method = RequestMethod.POST)
+	public String submit(@RequestParam("testFile") MultipartFile file, Model model) {
+	    model.addAttribute("file", file);
+	return "fileTestPage";
+	}
+	
+	@SuppressWarnings("unused")
    @RequestMapping("/anonymize")
    public String index(Model model) throws IOException, ParseException, SQLException, ClassNotFoundException, NoSuchAlgorithmException {
 	   int anArray[] = {4,5,6,7,8,9,10};
@@ -115,6 +137,8 @@ public class AnonymizationController extends AnonymizationBase {
 	   secArray = calcFigures(anArray);
 	   model.addAttribute("anonMessage", "This is where the anonymization will be placed");
 	   model.addAttribute("figures", secArray);
+	   //////////////////////// added in this trying to find methods
+	  // DataSource source = DataSource.createExcelSource("data/test.xls", 0, true);
 	   
 	   // 1. List all data types
        for (DataTypeDescription<?> type : DataType.list()){

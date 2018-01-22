@@ -23,7 +23,7 @@ public class HelloController {
    @RequestMapping("/home")
    public String welcomeHome(Model model) {
 	   
-	   model.addAttribute("message", "This will be the home page");
+	   model.addAttribute("message", "This will be the home page where files are displayed for perusal");
 	   return "home";
    }
 }
