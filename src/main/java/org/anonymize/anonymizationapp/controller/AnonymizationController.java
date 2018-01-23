@@ -131,13 +131,15 @@ public class AnonymizationController extends AnonymizationBase {
 	    FileOutputStream fos = new FileOutputStream(convertedFile);
 	    fos.write(file.getBytes());
 	    fos.close();
+	    
+	    String name = convertedFile.getName();
 	    //after file converted to usable File type convert to ARX readable DataSource
 	    // arguments are the file itself, the index of the spreadsheet, and presence of header
 	    System.out.println("Before converting to DataSource");
 	    DataSource source = DataSource.createExcelSource(convertedFile, 0, true);
-	    source.addColumn("age", DataType.INTEGER, true);
 	    source.addColumn("gender", DataType.STRING, true);
 	    source.addColumn("zipcode", DataType.INTEGER, true);
+	    source.addColumn("age", DataType.INTEGER, true);
 	    //Cast to Data object using DataSource variable
 	    System.out.println("Before casting to Data type");
 	    Data sourceData = Data.create(source);
@@ -146,6 +148,7 @@ public class AnonymizationController extends AnonymizationBase {
 	    print(sourceData.getHandle().iterator());//proof of concept
 	    //throw into model object to attempt to display on jsp. Job for tomorrow ;)
 	    System.out.println("not expecting jsp to work for ages");
+	    model.addAttribute("fileName", name);
 	    model.addAttribute("file", convertedFile);
 	    model.addAttribute("data", sourceData);
 	return "fileTestPage";

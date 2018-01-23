@@ -14,7 +14,7 @@
 <table>
     <tr>
         <td>FileName?:</td>
-        <td>${file.getName}</td>
+        <td>${fileName}</td>
     </tr>
 </table>
   <div class="form">
