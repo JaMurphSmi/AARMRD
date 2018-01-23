@@ -145,10 +145,24 @@ public class AnonymizationController extends AnonymizationBase {
 	    Data sourceData = Data.create(source);
 	    //attempt to print data from the excel document
 	    System.out.println("Before the print for sourceData, may be definition error? Lack of explicitly 'add'ing columns");
-	    print(sourceData.getHandle().iterator());//proof of concept
+	    DataHandle handle = sourceData.getHandle();
+	    final Iterator<String[]> itHandle = handle.iterator();
+	    List<String> dataColumns = new ArrayList<String>();
+	    while(itHandle.hasNext()) {
+	    	dataColumns.add(Arrays.toString(itHandle.next()));
+	    }
+	    //print(itHandle);//proof of concept
+	    System.out.println("this is the data, or where it should beS");
+	    for(String data : dataColumns)
+	    {
+	    	System.out.println(data);
+	    }
+	    
 	    //throw into model object to attempt to display on jsp. Job for tomorrow ;)
 	    System.out.println("not expecting jsp to work for ages");
 	    model.addAttribute("fileName", name);
+	    model.addAttribute("itHandle", itHandle);
+	    model.addAttribute("dataCols", dataColumns);
 	    model.addAttribute("file", convertedFile);
 	    model.addAttribute("data", sourceData);
 	return "fileTestPage";
