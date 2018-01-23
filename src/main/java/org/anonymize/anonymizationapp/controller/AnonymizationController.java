@@ -133,11 +133,20 @@ public class AnonymizationController extends AnonymizationBase {
 	    fos.close();
 	    //after file converted to usable File type convert to ARX readable DataSource
 	    // arguments are the file itself, the index of the spreadsheet, and presence of header
+	    System.out.println("Before converting to DataSource");
 	    DataSource source = DataSource.createExcelSource(convertedFile, 0, true);
-	    //Cast to Data object using DataSource variable 
+	    source.addColumn("age", DataType.INTEGER, true);
+	    source.addColumn("gender", DataType.STRING, true);
+	    source.addColumn("zipcode", DataType.INTEGER, true);
+	    //Cast to Data object using DataSource variable
+	    System.out.println("Before casting to Data type");
 	    Data sourceData = Data.create(source);
+	    //attempt to print data from the excel document
+	    System.out.println("Before the print for sourceData, may be definition error? Lack of explicitly 'add'ing columns");
+	    print(sourceData.getHandle().iterator());//proof of concept
 	    //throw into model object to attempt to display on jsp. Job for tomorrow ;)
-	    model.addAttribute("file", file);
+	    System.out.println("not expecting jsp to work for ages");
+	    model.addAttribute("file", convertedFile);
 	    model.addAttribute("data", sourceData);
 	return "fileTestPage";
 	}
@@ -423,7 +432,6 @@ public class AnonymizationController extends AnonymizationBase {
        tData.getDefinition().setDataType("age", DataType.INTEGER);
        
        System.out.println("Input dataset for example 39");
-       System.out.println(tData.getHandle().getStatistics().getClassificationPerformance(features, clazz, ARXLogisticRegressionConfiguration.create()));
        ///////////////////
        
        ARXAnonymizer anonymize = new ARXAnonymizer();
