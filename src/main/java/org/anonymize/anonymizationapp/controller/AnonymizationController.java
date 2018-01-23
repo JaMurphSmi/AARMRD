@@ -124,8 +124,20 @@ public class AnonymizationController extends AnonymizationBase {
 
 	// attempting to handle file uploads successfully
 	@RequestMapping(value = "/uploadFiles", method = RequestMethod.POST)
-	public String submit(@RequestParam("testFile") MultipartFile file, Model model) {
+	public String submit(@RequestParam("testFile") MultipartFile file, Model model) throws IOException {
+		//attempting to cast multipartfile object to file(can be modularized later if successful) 
+		File convertedFile = new File(file.getOriginalFilename());
+	    convertedFile.createNewFile();
+	    FileOutputStream fos = new FileOutputStream(convertedFile);
+	    fos.write(file.getBytes());
+	    fos.close();
+	    //after file converted to usable File type convert to ARX readable DataSource
+	    DataSource source = DataSource.createExcelSource(convertedFile, 0, true);
+	    //Cast to Data object using DataSource variable 
+	    Data sourceData = Data.create(source);
+	    //throw into model object to attempt to display on jsp. Job for tomorrow ;)
 	    model.addAttribute("file", file);
+	    model.addAttribute("data", sourceData);
 	return "fileTestPage";
 	}
 	
