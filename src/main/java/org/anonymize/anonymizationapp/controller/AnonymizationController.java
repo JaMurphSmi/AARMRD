@@ -132,6 +132,7 @@ public class AnonymizationController extends AnonymizationBase {
 	    fos.write(file.getBytes());
 	    fos.close();
 	    //after file converted to usable File type convert to ARX readable DataSource
+	    // arguments are the file itself, the index of the spreadsheet, and presence of header
 	    DataSource source = DataSource.createExcelSource(convertedFile, 0, true);
 	    //Cast to Data object using DataSource variable 
 	    Data sourceData = Data.create(source);
