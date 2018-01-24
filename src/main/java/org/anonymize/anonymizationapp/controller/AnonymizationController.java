@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
 
 import org.deidentifier.arx.ARXAnonymizer;
 import org.deidentifier.arx.ARXConfiguration;
@@ -124,7 +125,7 @@ public class AnonymizationController extends AnonymizationBase {
 
 	// attempting to handle file uploads successfully
 	@RequestMapping(value = "/uploadFiles", method = RequestMethod.POST)
-	public String submit(@RequestParam("testFile") MultipartFile file, Model model) throws IOException {
+	public String submit(@RequestParam("testFile") MultipartFile file, Model model, HttpServletRequest request) throws IOException {
 		//attempting to cast multipartfile object to file(can be modularized later if successful) 
 		File convertedFile = new File(file.getOriginalFilename());
 	    convertedFile.createNewFile();
@@ -135,36 +136,32 @@ public class AnonymizationController extends AnonymizationBase {
 	    String name = convertedFile.getName();
 	    //after file converted to usable File type convert to ARX readable DataSource
 	    // arguments are the file itself, the index of the spreadsheet, and presence of header
-	    System.out.println("Before converting to DataSource");
 	    DataSource source = DataSource.createExcelSource(convertedFile, 0, true);
 	    source.addColumn("gender", DataType.STRING, true);
 	    source.addColumn("zipcode", DataType.INTEGER, true);
 	    source.addColumn("age", DataType.INTEGER, true);
 	    //Cast to Data object using DataSource variable
-	    System.out.println("Before casting to Data type");
 	    Data sourceData = Data.create(source);
 	    //attempt to print data from the excel document
-	    System.out.println("Before the print for sourceData, may be definition error? Lack of explicitly 'add'ing columns");
 	    DataHandle handle = sourceData.getHandle();
-	    final Iterator<String[]> itHandle = handle.iterator();
+	    Iterator<String[]> itHandle = handle.iterator();
 	    List<String> dataColumns = new ArrayList<String>();
+	    
 	    while(itHandle.hasNext()) {
-	    	dataColumns.add(Arrays.toString(itHandle.next()));
+	    	//System.out.println(Arrays.toString(itHandle.next()));//application executes so rapidly that this causes it to skip values?
+	    	dataColumns.add(Arrays.toString(itHandle.next()));//other possibility, calling .next() pushes to next item for next call?
 	    }
-	    //print(itHandle);//proof of concept
-	    System.out.println("this is the data, or where it should beS");
-	    for(String data : dataColumns)
-	    {
-	    	System.out.println(data);
-	    }
+	    print(itHandle);//proof of concept
 	    
 	    //throw into model object to attempt to display on jsp. Job for tomorrow ;)
-	    System.out.println("not expecting jsp to work for ages");
 	    model.addAttribute("fileName", name);
-	    model.addAttribute("itHandle", itHandle);
+	    //model.addAttribute("itHandle", itHandle);//refuses to show in the jsp
 	    model.addAttribute("dataCols", dataColumns);
 	    model.addAttribute("file", convertedFile);
 	    model.addAttribute("data", sourceData);
+	    
+	    request.setAttribute("itHandle", itHandle);
+	    
 	return "fileTestPage";
 	}
 	

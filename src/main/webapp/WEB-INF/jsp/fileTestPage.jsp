@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page import="java.util.Arrays" %>
+<%@ page import="java.util.Iterator" %>
 
 <!DOCTYPE html>
 <html>
@@ -12,18 +13,13 @@
 </head>
 <body>
   <h2>Submitted File</h2>
+<% Iterator<String[]> itHandle =  (Iterator<String[]>) pageContext.getRequest().getAttribute("itHandle"); %>
 <table>
-    <tr>
-        <td>FileName:</td>
-        <td>${fileName}</td>
-    </tr>
-    <c:forEach items="${dataCols}" var="col">
-    <tr>
-    	<td>
-        	${col}     
-        </td>
-    </tr>
-    </c:forEach>
+<% while(itHandle.hasNext()){ %>
+	<tr>
+		<c:out value="<% Arrays.toString(itHandle.next()); %>" />
+	</tr>
+<% } %>
 </table>
   <div class="form">
     <form action="home" method="post" onsubmit="return validate()">
