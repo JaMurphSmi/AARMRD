@@ -18,6 +18,9 @@
     	<div id="import">
 	  		<input type="file" id="testFile" name="testFile" title="This is a test file upload to prove concept" value="Get your data here" onmouseover="displayBasic()">
 	  	</div>
+	  	<div id="import">
+	  		<input type="file" id="testFile" name="testHier" title="This is a test file upload to prove concept" value="Get your data here" onmouseover="displayBasic()">
+	  	</div>
 	  	<input type="submit" value="Test Submit">
     </form>
     <form action="anonymize" method="post" enctype="multipart/file-data" onsubmit="return validate()">

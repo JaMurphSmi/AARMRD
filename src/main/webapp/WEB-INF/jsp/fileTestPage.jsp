@@ -13,13 +13,18 @@
 </head>
 <body>
   <h2>Submitted File</h2>
-<% Iterator<String[]> itHandle =  (Iterator<String[]>) pageContext.getRequest().getAttribute("itHandle"); %>
 <table>
-<% while(itHandle.hasNext()){ %>
-	<tr>
-		<c:out value="<% Arrays.toString(itHandle.next()); %>" />
-	</tr>
-<% } %>
+    <tr>
+        <td>FileName:</td>
+        <td>${fileName}</td>
+    </tr>
+    <c:forEach items="${dataCols}" var="col">
+    <tr>
+    	<td>
+        	${col}     
+        </td>
+    </tr>
+    </c:forEach>
 </table>
   <div class="form">
     <form action="home" method="post" onsubmit="return validate()">

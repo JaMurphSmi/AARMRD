@@ -125,42 +125,70 @@ public class AnonymizationController extends AnonymizationBase {
 
 	// attempting to handle file uploads successfully
 	@RequestMapping(value = "/uploadFiles", method = RequestMethod.POST)
-	public String submit(@RequestParam("testFile") MultipartFile file, Model model, HttpServletRequest request) throws IOException {
+	public String submit(@RequestParam("testFile") MultipartFile dataFile, MultipartFile[] hierFile, Model model) throws IOException {
 		//attempting to cast multipartfile object to file(can be modularized later if successful) 
-		File convertedFile = new File(file.getOriginalFilename());
+		File convertedFile = new File(dataFile.getOriginalFilename());
 	    convertedFile.createNewFile();
 	    FileOutputStream fos = new FileOutputStream(convertedFile);
-	    fos.write(file.getBytes());
+	    fos.write(dataFile.getBytes());
 	    fos.close();
+	    List<File> convertedHierFiles = new ArrayList<File>();
+	    List<String> hierNames = new ArrayList<String>();
+	    
+	    for(MultipartFile mulFile: hierFile) {//might be wrong, need to confirm
+	    	String fileName = mulFile.getOriginalFilename();
+	    	File convertedHierFile = new File(fileName);
+		    convertedFile.createNewFile();
+		    FileOutputStream fost = new FileOutputStream(convertedHierFile);
+		    fost.write(dataFile.getBytes());
+		    fost.close();
+		    convertedHierFiles.add(convertedHierFile);//add converted file to list
+		    hierNames.add(fileName);//
+	    }
+	    //not done yet
+	    //model.addAttribute("", arg1)
+	    model.addAttribute("hierNames", hierNames);
 	    
 	    String name = convertedFile.getName();
 	    //after file converted to usable File type convert to ARX readable DataSource
 	    // arguments are the file itself, the index of the spreadsheet, and presence of header
 	    DataSource source = DataSource.createExcelSource(convertedFile, 0, true);
-	    source.addColumn("gender", DataType.STRING, true);
-	    source.addColumn("zipcode", DataType.INTEGER, true);
-	    source.addColumn("age", DataType.INTEGER, true);
+	    // trying to make variable
+	    //source.addColumn("gender", DataType.STRING, true);
+	    //source.addColumn("zipcode", DataType.INTEGER, true);
+	    //source.addColumn("age", DataType.INTEGER, true);
 	    //Cast to Data object using DataSource variable
 	    Data sourceData = Data.create(source);
 	    //attempt to print data from the excel document
 	    DataHandle handle = sourceData.getHandle();
-	    Iterator<String[]> itHandle = handle.iterator();
-	    List<String> dataColumns = new ArrayList<String>();
+	    //determine types
+	    determineDataType(handle, 0);
+	    determineDataType(handle, 1);
+	    determineDataType(handle, 2);
 	    
-	    while(itHandle.hasNext()) {
-	    	//System.out.println(Arrays.toString(itHandle.next()));//application executes so rapidly that this causes it to skip values?
+	    Iterator<String[]> itHandle = handle.iterator();
+	    String[] colNames = itHandle.next();// assuming itHandle has next
+	    System.out.println("First One: " + colNames[0]);
+	    System.out.println("First One: " + colNames[1]);
+	    System.out.println("First One: " + colNames[2]);
+	    
+ 	    List<String> dataColumns = new ArrayList<String>();
+	    int count = 0;
+	    while((itHandle.hasNext()) && (count % 800 != 0)) {//application executes so rapidly that system.out.println() causes it to skip values?
 	    	dataColumns.add(Arrays.toString(itHandle.next()));//other possibility, calling .next() pushes to next item for next call?
+	    	++count;//to control size of the sample displayed to the user
 	    }
+	    
+	    
 	    print(itHandle);//proof of concept
 	    
 	    //throw into model object to attempt to display on jsp. Job for tomorrow ;)
 	    model.addAttribute("fileName", name);
-	    //model.addAttribute("itHandle", itHandle);//refuses to show in the jsp
 	    model.addAttribute("dataCols", dataColumns);
 	    model.addAttribute("file", convertedFile);
 	    model.addAttribute("data", sourceData);
 	    
-	    request.setAttribute("itHandle", itHandle);
+	    //request.setAttribute("itHandle", itHandle);
 	    
 	return "fileTestPage";
 	}
@@ -1335,6 +1363,39 @@ public class AnonymizationController extends AnonymizationBase {
        }
        return data;
    }
+
+   
+   public static Data createData(String dataName, File dataFile, File[] hierFiles) throws IOException {
+
+       Data data = Data.create("src/main/resources/templates/data/" + dataName + ".csv", StandardCharsets.UTF_8, ';');
+
+       // Read generalization hierarchies
+       FilenameFilter hierarchyFilter = new FilenameFilter() {
+           @Override
+           public boolean accept(File dir, String name) {
+               if (name.matches(dataName + "_hierarchy_(.)+.csv")) {
+                   return true;
+               } else {
+                   return false;
+               }
+           }
+       };
+       // Create definition
+       File testDir = new File("src/main/resources/templates/hierarchy/");
+       File[] genHierFiles = testDir.listFiles(hierarchyFilter);
+       Pattern pattern = Pattern.compile("_hierarchy_(.*?).csv");
+       for (File file : genHierFiles) {
+           Matcher matcher = pattern.matcher(file.getName());
+           if (matcher.find()) {
+               CSVHierarchyInput hier = new CSVHierarchyInput(file, StandardCharsets.UTF_8, ';');
+               String attributeName = matcher.group(1);
+               data.getDefinition().setAttributeType(attributeName, Hierarchy.create(hier.getHierarchy()));
+           }
+       }
+       return data;
+   }
+
+   
    
    /**
     * Perform risk analysis FROM EXAMPLE NOT 46
