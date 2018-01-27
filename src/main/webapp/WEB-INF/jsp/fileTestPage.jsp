@@ -18,19 +18,19 @@
         <td>Data FileName</td>
         <td>${fileName}</td>
     </tr>
-    <c:forEach items="${dataCols}" var="col">
+    <tr>File contents</tr>
+    <c:forEach items="${dataColumns}" var="row">
 	    <tr>
 		    <td>
-		       	${col}     
+		       	${row}     
 		    </td>
 	    </tr>
     </c:forEach>
-    
 </table>
 <table>
 	<tr>
 		<th>Hierarchy FileNames</th>
-	<tr>
+	</tr>
 	<c:forEach items="${hierNames}" var="hier">
 		<tr>
 			<td>
