@@ -15,16 +15,21 @@
   <h2>Submitted File</h2>
 <table>
     <tr>
-        <td>FileName:</td>
+        <td>Data FileName</td>
         <td>${fileName}</td>
     </tr>
-    <c:forEach items="${dataCols}" var="col">
-    <tr>
-    	<td>
-        	${col}     
-        </td>
-    </tr>
-    </c:forEach>
+</table>
+<table>
+	<tr>
+		<th>Hierarchy FileNames</th>
+	<tr>
+	<c:forEach items="${hierNames}" var="hier">
+		<tr>
+			<td>
+				${hier}
+			</td>
+		</tr>
+	</c:forEach>
 </table>
   <div class="form">
     <form action="home" method="post" onsubmit="return validate()">
