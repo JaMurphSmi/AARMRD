@@ -1,4 +1,5 @@
-# AnonProject
+# Application for the Anonymization of Relational Medical Research Data 
+# AARMRD Project
 
 author: Jake Murphy Smith
 
@@ -13,12 +14,19 @@ In the future it is also hoped to incorporate other anonymization suites to exte
 
 For best results
 
-Notes for input data file formats: 
-CSV: Please ensure the data contained within is separated by a semi-colon, ';' character and 	 	 	 distinguish lines via a carriage return
-	 Place the headings for your fields on the top of the file ie age;gender;postcode;phoneno 
-	 Then place all corresponding data rows beneath ie 35;male;84324;086143565
+----------------------------------------------------------------------------------------------------------------------------
+Notes for input data file formats:
+----------------------------------------------------------------------------------------------------------------------------.
+
+CSV: Please ensure the data contained within each line is separated by a semi-colon, ';' character. This is to avoid errors caused by comma ',' separated data affecting names and large numbers
+	 Please ensure that your dataset contains a header line defining the headings of your fields at the top of the file ie age;gender;postcode;phoneno
+Excel: No special conditions are imposed on an Excel file. Best results with a standard Excel Workbook .xlsx file.
 	 
+----------------------------------------------------------------------------------------------------------------------------
 Notes for hierarchy file formats:
-CSV: No heading is required for this data file, all that is required is your defined hierarchy, 	 	 separated by a ';' ie age hierarchy: 34;<50;<=65;*
-										  43;<50;<=65;*
-										  24;<30;<50;<=65;*
+----------------------------------------------------------------------------------------------------------------------------.	 
+
+The only format accepted currently is CSV
+CSV: Please name your file in the format of [your dataset file's name]_[field name].csv to make import as successful as possible
+No heading is required inside this data file, all that is required is your defined hierarchy, with values separated by a ';' ie age hierarchy: 34;<50;<=65;*
+										  
