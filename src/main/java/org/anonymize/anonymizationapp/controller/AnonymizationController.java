@@ -148,6 +148,17 @@ public class AnonymizationController extends AnonymizationBase {
 		    convertedHierFiles.add(convertedHierFile);//add converted file to list
 		    hierNames.add(fileName);//add file name to list for display
 	    }
+	    
+	    List<String> colNames = new ArrayList<String>();
+	    //parse through hierNames to determine colNames
+	    for(String hierName : hierNames) {
+	    	String[] tempArray = hierName.split("[\\_\\.]");//split by underscore and point
+	    	colNames.add(tempArray[1]);//name of column in index position 1 
+	    	//under naming convention  [dataset name]_[hierarchy name].[file extension]
+	    }
+	    for(String name : colNames) {
+	    System.out.println(name);
+	    }
 	    //not done yet
 	    // TODO : filenames, need column name parsed. ie test_age.xlsx parse 'age'
 	    //model.addAttribute("", arg1)
