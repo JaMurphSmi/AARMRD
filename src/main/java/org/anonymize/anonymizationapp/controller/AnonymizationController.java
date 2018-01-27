@@ -149,16 +149,21 @@ public class AnonymizationController extends AnonymizationBase {
 		    hierNames.add(fileName);//add file name to list for display
 	    }
 	    
-	    List<String> colNames = new ArrayList<String>();
+	    //used for testing purposes to proof splitting files by name
+	    
+	    //List<String> colNames = new ArrayList<String>();
 	    //parse through hierNames to determine colNames
-	    for(String hierName : hierNames) {
+	    /*for(String hierName : hierNames) {
 	    	String[] tempArray = hierName.split("[\\_\\.]");//split by underscore and point
 	    	colNames.add(tempArray[1]);//name of column in index position 1 
 	    	//under naming convention  [dataset name]_[hierarchy name].[file extension]
 	    }
 	    for(String name : colNames) {
 	    System.out.println(name);
-	    }
+	    }*/ 
+	    
+	    
+	    
 	    //not done yet
 	    // TODO : filenames, need column name parsed. ie test_age.xlsx parse 'age'
 	    //model.addAttribute("", arg1)
@@ -168,10 +173,9 @@ public class AnonymizationController extends AnonymizationBase {
 	    //after file converted to usable File type convert to ARX readable DataSource
 	    // arguments are the file itself, the index of the spreadsheet, and presence of header
 	    
-	    // not needed at the moment, for testing
-	    //DataSource source = DataSource.createExcelSource(convertedFile, 0, true);
-	    
-	    
+	    // testing to see if columns for data can be dynamically defined
+	    DataSource source = DataSource.createExcelSource(convertedFile, 0, true);
+
 
 	    ///**************** isolate to test making variable
 	    
@@ -181,46 +185,46 @@ public class AnonymizationController extends AnonymizationBase {
 	    //source.addColumn("age", DataType.INTEGER, true);
 
 	    ///**************** isolate to test making variable
-	    
-	    /*for(String hierName: hierNames) {
-	    	//will be used for parsing column names once hiernames are confirmed added to the list
+	    //create data columns dynamically
+	    for(String hierName: hierNames) {
+	    	String[] tempArray = hierName.split("[\\_\\.]");//split by underscore and point
+	    	source.addColumn(tempArray[1]);
+	    	//parsing column names from hierNames, adding to datasource object before casting
 	    }
-	    */
+	    
 	    ///**************** isolate to test making variable
 	    
 	 // not needed at the moment, for testing
 	    //Cast to Data object using DataSource variable
-	    //Data sourceData = Data.create(source);
+	    Data sourceData = Data.create(source);
 	    //attempt to print data from the excel document
-	   // DataHandle handle = sourceData.getHandle();
+	    DataHandle handle = sourceData.getHandle();
 	    //determine types
-	   // determineDataType(handle, 0);
-	   // determineDataType(handle, 1);
-	   // determineDataType(handle, 2);
+	    determineDataType(handle, 0);
+	    determineDataType(handle, 1);
+	    determineDataType(handle, 2);
 	    
-	   // Iterator<String[]> itHandle = handle.iterator();
-	   // String[] colNames = itHandle.next();// assuming itHandle has next
-	   // System.out.println("First One: " + colNames[0]);
-	   // System.out.println("First One: " + colNames[1]);
-	   // System.out.println("First One: " + colNames[2]);
+	    Iterator<String[]> itHandle = handle.iterator();
+	    String[] colNames = itHandle.next();// assuming itHandle has next
+	    System.out.println("First One: " + colNames[0]);
+	    System.out.println("First One: " + colNames[1]);
+	    System.out.println("First One: " + colNames[2]);
 	    
- 	    //List<String> dataColumns = new ArrayList<String>();
-	    //int count = 0;
-	    /*while((itHandle.hasNext()) && (count % 800 != 0)) {//application executes so rapidly that system.out.println() causes it to skip values?
+ 	    List<String> dataColumns = new ArrayList<String>();
+	    int count = 0;
+	    while((itHandle.hasNext()) && (count % 800 != 0)) {//application executes so rapidly that system.out.println() causes it to skip values?
 	    	dataColumns.add(Arrays.toString(itHandle.next()));//other possibility, calling .next() pushes to next item for next call?
 	    	++count;//to control size of the sample displayed to the user
-	    }*/
+	    }
 	    
 	    
 	   // print(itHandle);//proof of concept
 	    
 	    //throw into model object to attempt to display on jsp. Job for tomorrow ;)
 	    model.addAttribute("fileName", name);
-	   // model.addAttribute("dataCols", dataColumns);
+	    model.addAttribute("dataCols", dataColumns);
 	   // model.addAttribute("file", convertedFile);
 	   // model.addAttribute("data", sourceData);
-	    
-	    //request.setAttribute("itHandle", itHandle);
 	    
 	return "fileTestPage";
 	}

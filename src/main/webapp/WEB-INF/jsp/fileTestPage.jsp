@@ -18,6 +18,14 @@
         <td>Data FileName</td>
         <td>${fileName}</td>
     </tr>
+    <c:forEach items="${dataCols}" var="col">
+	    <tr>
+		    <td>
+		       	${col}     
+		    </td>
+	    </tr>
+    </c:forEach>
+    
 </table>
 <table>
 	<tr>
