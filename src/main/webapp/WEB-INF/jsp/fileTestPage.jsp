@@ -19,7 +19,7 @@
         <td>${fileName}</td>
     </tr>
     <tr>File contents</tr>
-    <c:forEach items="${dataColumns}" var="row">
+    <c:forEach items="${dataRows}" var="row">
 	    <tr>
 		    <td>
 		       	${row}     

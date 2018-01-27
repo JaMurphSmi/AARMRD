@@ -203,15 +203,15 @@ public class AnonymizationController extends AnonymizationBase {
 	    determineDataType(handle, 2);
 	    
 	    Iterator<String[]> itHandle = handle.iterator();
-	    String[] colNames = itHandle.next();// assuming itHandle has next///does have next
+	    /*String[] colNames = itHandle.next();// assuming itHandle has next///does have next
 	    System.out.println("First One: " + colNames[0]);
-	    System.out.println("Second One: " + colNames[1]);
-	    System.out.println("Third One: " + colNames[2]);
+	    System.out.println("Second One: " + colNames[1]);	//commented out to investigate if .next means no return
+	    System.out.println("Third One: " + colNames[2]);*/
 	    
- 	    List<String> dataColumns = new ArrayList<String>();
+ 	    List<String> dataRows = new ArrayList<String>();
 	    int count = 1;// initialize count to 1 as condition below was instantly breaking the loop
 	    while((itHandle.hasNext()) && (count % 801 != 0)) {
-	    	dataColumns.add(Arrays.toString(itHandle.next()));
+	    	dataRows.add(Arrays.toString(itHandle.next()));
 	    	++count;//to control size of the sample displayed to the user onscreen
 	    }
 	   
@@ -219,7 +219,7 @@ public class AnonymizationController extends AnonymizationBase {
 	    
 	    //throw into model object to attempt to display on jsp. Job for tomorrow ;)
 	    model.addAttribute("fileName", name);
-	    model.addAttribute("dataColumns", dataColumns);
+	    model.addAttribute("dataRows", dataRows);
 	   // model.addAttribute("file", convertedFile);
 	   // model.addAttribute("data", sourceData);
 	    
