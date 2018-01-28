@@ -125,7 +125,9 @@ public class AnonymizationController extends AnonymizationBase {
 
 	// attempting to handle file uploads successfully
 	@RequestMapping(value = "/uploadFiles", method = RequestMethod.POST)
-	public String submit(@RequestParam("testFile") MultipartFile dataFile,@RequestParam("testHier") MultipartFile[] hierFile, Model model) throws IOException {
+	public String submit(@RequestParam("testFile") MultipartFile dataFile,
+			@RequestParam("testHier") MultipartFile[] hierFile, 
+			@RequestParam("kAnonymity") int kAnon, Model model) throws IOException {
 		//attempting to cast multipartfile object to file(can be modularized later if successful) 
 		File convertedFile = new File(dataFile.getOriginalFilename());
 	    convertedFile.createNewFile();
@@ -149,59 +151,52 @@ public class AnonymizationController extends AnonymizationBase {
 		    hierNames.add(fileName);//add file name to list for display
 	    }
 	    
-	    //used for testing purposes to proof splitting files by name
-	    
-	    //List<String> colNames = new ArrayList<String>();
-	    //parse through hierNames to determine colNames
-	    /*for(String hierName : hierNames) {
-	    	String[] tempArray = hierName.split("[\\_\\.]");//split by underscore and point
-	    	colNames.add(tempArray[1]);//name of column in index position 1 
-	    	//under naming convention  [dataset name]_[hierarchy name].[file extension]
-	    }
-	    for(String name : colNames) {
-	    System.out.println(name);
-	    }*/ 
-	    
-	    
-	    
-	    //not done yet
-	    // TODO : filenames, need column name parsed. ie test_age.xlsx parse 'age'
-	    //model.addAttribute("", arg1)
 	    model.addAttribute("hierNames", hierNames);//add hierarchy names to model to prove uploading multiple hier files
 	    
 	    String name = convertedFile.getName();
-	    //after file converted to usable File type convert to ARX readable DataSource
-	    // arguments are the file itself, the index of the spreadsheet, and presence of header
 	    
+	    // arguments are the file itself, the index of the spreadsheet, and presence of header
 	    // testing to see if columns for data can be dynamically defined
 	    DataSource source = DataSource.createExcelSource(convertedFile, 0, true);
 
 
 	    ///**************** isolate to test making variable
 	    
-	    // trying to make variable
-	    //source.addColumn("age", DataType.INTEGER, true);
-
-	    ///**************** isolate to test making variable
 	    //create data columns dynamically
+	    List<String> columnNames = new ArrayList<String>();//needed to redefine column names after datatypes IDed
 	    for(String hierName: hierNames) {
 	    	String[] tempArray = hierName.split("[\\_\\.]");//split by underscore and point
-	    	source.addColumn(tempArray[1]);
-	    	//parsing column names from hierNames, adding to datasource object before casting
-	    }
+	    	columnNames.add(tempArray[1]);
+	    	source.addColumn(tempArray[1]);//columns must be defined to cast
+	    }//variable column definition successful
 	    
 	    ///**************** isolate to test making variable
 	    
-	    // not needed at the moment, for testing
+	    // must be a Data object to obtain a handle via ARX implementation
 	    //Cast successful
-	    Data sourceData = Data.create(source);
+	    Data sourceData = Data.create(source);//needs to be done as handle is argument for determineDataType method
 	    //attempt to print data from the excel document
-	    DataHandle handle = sourceData.getHandle();
+	    DataHandle handle = sourceData.getHandle();// handle acquired
 	    //determine types
-	    determineDataType(handle, 0);
-	    determineDataType(handle, 1);
-	    determineDataType(handle, 2);
+	    //List<DataType<?>> typeList = new ArrayList<DataType<?>>();
+	    List<Object> typeList = new ArrayList<Object>();
 	    
+	    //attempting to make the dataType definition variable
+	    for(int i = 0; i < columnNames.size(); i++) {//size should be 3 for current example, therefore less than 2
+	    	typeList.add(determineDataType(handle, i));//can add defining columns to this section if successful
+	    }
+	    
+	    for(Object thing : typeList) {
+	    	System.out.println(thing.getClass());//could definitely be wrong
+	    }
+	    
+	    //DataType<?> first = determineDataType(handle, 0);// the number is the column in the data
+	    //DataType<?> second = determineDataType(handle, 1);//will be assessed in the same order as the columns are declared
+	    //DataType<?> third = determineDataType(handle, 2);//put into advanced for loop once making fully variable
+	    
+	    
+	    
+	    //dataTypes assessed
 	    Iterator<String[]> itHandle = handle.iterator();
 	    /*String[] colNames = itHandle.next();// assuming itHandle has next///does have next
 	    System.out.println("First One: " + colNames[0]);
@@ -214,6 +209,10 @@ public class AnonymizationController extends AnonymizationBase {
 	    	dataRows.add(Arrays.toString(itHandle.next()));
 	    	++count;//to control size of the sample displayed to the user onscreen
 	    }
+	    
+	  //data.getDefinition().setDataType("zipcode", DataType.DECIMAL);
+	  //data.getDefinition().setAttributeType("age", Hierarchy.create("src/main/resources/templates/hierarchy/test_age.csv", StandardCharsets.UTF_8, ';'));
+
 	   
 	   // print(itHandle);//proof of concept
 	    
@@ -310,7 +309,7 @@ public class AnonymizationController extends AnonymizationBase {
        //data.getDefinition().setDataType("age", DataType.DECIMAL);
        //data.getDefinition().setDataType("gender", DataType.STRING);
        //data.getDefinition().setDataType("zipcode", DataType.DECIMAL);
-       
+	   
 // Define input hierarchy files
        //data.getDefinition().setAttributeType("age", Hierarchy.create("src/main/resources/templates/hierarchy/test_age.csv", StandardCharsets.UTF_8, ';'));
        //data.getDefinition().setAttributeType("gender", Hierarchy.create("src/main/resources/templates/hierarchy/test_gender.csv", StandardCharsets.UTF_8, ';'));
@@ -1575,7 +1574,7 @@ public class AnonymizationController extends AnonymizationBase {
     * @param handle
     * @param column
     */
-   private static void determineDataType(DataHandle handle, int column) {
+   private static DataType<?> determineDataType(DataHandle handle, int column) {
        System.out.println(" - Potential data types for attribute: "+handle.getAttributeName(column));
        List<Pair<DataType<?>, Double>> types = handle.getMatchingDataTypes(column);
 
@@ -1591,7 +1590,7 @@ public class AnonymizationController extends AnonymizationBase {
            System.out.print(": ");
            System.out.println(entry.getValue());
        }
-       //return  //first identified is usually the correct data type
+       return types.get(0).getKey(); //first identified is usually the correct data type
    }
    
    

@@ -16,10 +16,13 @@
   <div class="form">
     <form action="uploadFiles" method="post" enctype="multipart/form-data" onsubmit="return validate()">
     	<div id="import">
-	  		<input type="file" id="testFile" name="testFile" title="This is a test file upload to prove concept" value="Get your data here" onmouseover="displayBasic()">
+	  		<input type="file" id="testFile" name="testFile" title="This is a test file upload to prove concept" value="Put your data here" onmouseover="displayBasic()">
 	  	</div>
 	  	<div id="import">
-	  		<input type="file" id="testFile" name="testHier" title="This is a test file upload to prove concept" value="Get your data here" multiple="multiple" onmouseover="displayBasic()">
+	  		<input type="file" id="testFile" name="testHier" title="This is a test file upload to prove concept" value="Put your hierarchies here" multiple="multiple" onmouseover="displayBasic()">
+	  	</div>
+	  	<div id="import">
+	  		<input type="number" id="kAnonymity" name="kAnonymity" title="Take in variable k - Anonymity diversity" value="value for k-Anonymity" onmouseover="displayBasic()">
 	  	</div>
 	  	<input type="submit" value="Test Submit">
     </form>
