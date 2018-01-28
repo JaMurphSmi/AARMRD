@@ -158,6 +158,7 @@ public class AnonymizationController extends AnonymizationBase {
 	    // arguments are the file itself, the index of the spreadsheet, and presence of header
 	    // testing to see if columns for data can be dynamically defined
 	    DataSource source = DataSource.createExcelSource(convertedFile, 0, true);
+	    DataSource updatedSource = DataSource.createExcelSource(convertedFile, 0, true);
 
 
 	    ///**************** isolate to test making variable
@@ -167,7 +168,7 @@ public class AnonymizationController extends AnonymizationBase {
 	    for(String hierName: hierNames) {
 	    	String[] tempArray = hierName.split("[\\_\\.]");//split by underscore and point
 	    	columnNames.add(tempArray[1]);
-	    	source.addColumn(tempArray[1]);//columns must be defined to cast
+	    	source.addColumn(tempArray[1]);//columns must be defined to cast, to assess column types
 	    }//variable column definition successful
 	    
 	    ///**************** isolate to test making variable
@@ -177,27 +178,31 @@ public class AnonymizationController extends AnonymizationBase {
 	    Data sourceData = Data.create(source);//needs to be done as handle is argument for determineDataType method
 	    //attempt to print data from the excel document
 	    DataHandle handle = sourceData.getHandle();// handle acquired
-	    //determine types
 	    //List<DataType<?>> typeList = new ArrayList<DataType<?>>();
 	    List<Object> typeList = new ArrayList<Object>();
 	    
+	    int i = 0;
 	    //attempting to make the dataType definition variable
-	    for(int i = 0; i < columnNames.size(); i++) {//size should be 3 for current example, therefore less than 2
+	    for(String col : columnNames) {//size should be 3 for current example, therefore less than 2
 	    	typeList.add(determineDataType(handle, i));//can add defining columns to this section if successful
+	    	updatedSource.addColumn(col, determineDataType(handle, i));
+	    	++i;
 	    }
+	    			// may need to update another DataSource and create a new data object?
+	    Data newSourceData = Data.create(updatedSource);//hopefully casting to an updated source with column types determined
 	    
-	    for(Object thing : typeList) {
+	    /*for(Object thing : typeList) {
 	    	System.out.println(thing.getClass());//could definitely be wrong
-	    }
+	    }*/
 	    
 	    //DataType<?> first = determineDataType(handle, 0);// the number is the column in the data
 	    //DataType<?> second = determineDataType(handle, 1);//will be assessed in the same order as the columns are declared
 	    //DataType<?> third = determineDataType(handle, 2);//put into advanced for loop once making fully variable
 	    
-	    
+	    DataHandle handle1 = newSourceData.getHandle();
 	    
 	    //dataTypes assessed
-	    Iterator<String[]> itHandle = handle.iterator();
+	    Iterator<String[]> itHandle = handle1.iterator();
 	    /*String[] colNames = itHandle.next();// assuming itHandle has next///does have next
 	    System.out.println("First One: " + colNames[0]);
 	    System.out.println("Second One: " + colNames[1]);	//commented out to investigate if .next means no return
