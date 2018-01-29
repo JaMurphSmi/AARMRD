@@ -157,46 +157,36 @@ public class AnonymizationController extends AnonymizationBase {
 	    String name = convertedFile.getName();
 	    
 	    // arguments are the file itself, the index of the spreadsheet, and presence of header
-	    // testing to see if columns for data can be dynamically defined
 	    DataSource source = DataSource.createExcelSource(convertedFile, 0, true);
-	    
-	    //-------------------------> attempting new method of declaring data types
-	    //DataSource updatedSource = DataSource.createExcelSource(convertedFile, 0, true);
 
-
-	    ///**************** isolate to test making variable
 	    
-	    int hierCount = 0;//to track place in the convertedFiles list
+	    int hierCount = 0;//to track pos in the convertedFiles list
 	    
 	    //create data columns dynamically
 	    List<String> columnNames = new ArrayList<String>();//needed to redefine column names after datatypes IDed
 	    for(String hierName: hierNames) {
 	    	String[] tempArray = hierName.split("[\\_\\.]");//split by underscore and point
 	    	columnNames.add(tempArray[1]);
-	    	source.addColumn(tempArray[1]);//columns must be defined to cast, to assess column types	
-	    }//variable column definition successful
-	    
-	    ///**************** isolate to test making variable
+	    	source.addColumn(tempArray[1]);//columns must be defined to cast to type Data, and to assess column types	
+	    }
 	    
 	    // must be a Data object to obtain a handle via ARX implementation
 	    //Cast successful
 	    Data sourceData = Data.create(source);//needs to be done as handle is argument for determineDataType method
-	    //attempt to print data from the excel document
 	    DataHandle handle = sourceData.getHandle();// handle acquired
-	    //List<DataType<?>> typeList = new ArrayList<DataType<?>>();
+	    //List<DataType<?>> typeList = new ArrayList<DataType<?>>();//this was correct, but not needed
 	    List<Object> typeList = new ArrayList<Object>();
 	    
 	    int i = 0;
 	    //attempting to make the dataType definition variable
-	    for(String col : columnNames) {//should make each hierarchy individually, no list?
-	    	System.out.println("Inside the hierarchy definition for");
-	       	typeList.add(determineDataType(handle, i));//can add defining columns to this section if successful
-	    	sourceData.getDefinition().setDataType(col, determineDataType(handle, i));//using DataDefinition methods to access dataTypes
-	    	System.out.println("before hierarchy parse");
-	    	sourceData.getDefinition().setAttributeType(col, (Hierarchy.create(convertedHierFiles.get(i) , StandardCharsets.UTF_8, ';')));//create the hierarchy file);//also take opportunity to assign hierarchies, will always be in order as order defined by hierarchy input orde
-	    	System.out.println("after hierarchy parse");
-	    	//hierarchy objects created and added to data definition
-	    	++i;
+	    for(String col : columnNames) {
+	       	typeList.add(determineDataType(handle, i));//added defining columns
+	    	
+	       	sourceData.getDefinition().setDataType(col, determineDataType(handle, i));//using DataDefinition methods to access dataTypes
+	    	
+	       	sourceData.getDefinition().setAttributeType(col, (Hierarchy.create(convertedHierFiles.get(i) , StandardCharsets.UTF_8, ';')));//assign hierarchies, always in order defined by hierarchy input
+	    	
+	       	++i;//hierarchy objects created and added to data definition
 	    }
 	     
 	    //dataTypes assessed
