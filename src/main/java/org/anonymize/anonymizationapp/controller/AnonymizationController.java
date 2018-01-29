@@ -138,14 +138,15 @@ public class AnonymizationController extends AnonymizationBase {
 	    //defining hierarchy files and names
 	    List<File> convertedHierFiles = new ArrayList<File>();
 	    List<String> hierNames = new ArrayList<String>();
+	    List<Hierarchy> hierarchies = new ArrayList<Hierarchy>();//list to hold the created hierarchy objects
 	    
 	    //converting multipart hierarchy files to File objects
 	    for(MultipartFile mulFile: hierFile) {//might be wrong, need to confirm
 	    	String fileName = mulFile.getOriginalFilename();
 	    	File convertedHierFile = new File(fileName);
-		    convertedFile.createNewFile();
+		    convertedHierFile.createNewFile();
 		    FileOutputStream fost = new FileOutputStream(convertedHierFile);
-		    fost.write(dataFile.getBytes());
+		    fost.write(mulFile.getBytes());
 		    fost.close();
 		    convertedHierFiles.add(convertedHierFile);//add converted file to list
 		    hierNames.add(fileName);//add file name to list for display
@@ -158,17 +159,21 @@ public class AnonymizationController extends AnonymizationBase {
 	    // arguments are the file itself, the index of the spreadsheet, and presence of header
 	    // testing to see if columns for data can be dynamically defined
 	    DataSource source = DataSource.createExcelSource(convertedFile, 0, true);
-	    DataSource updatedSource = DataSource.createExcelSource(convertedFile, 0, true);
+	    
+	    //-------------------------> attempting new method of declaring data types
+	    //DataSource updatedSource = DataSource.createExcelSource(convertedFile, 0, true);
 
 
 	    ///**************** isolate to test making variable
+	    
+	    int hierCount = 0;//to track place in the convertedFiles list
 	    
 	    //create data columns dynamically
 	    List<String> columnNames = new ArrayList<String>();//needed to redefine column names after datatypes IDed
 	    for(String hierName: hierNames) {
 	    	String[] tempArray = hierName.split("[\\_\\.]");//split by underscore and point
 	    	columnNames.add(tempArray[1]);
-	    	source.addColumn(tempArray[1]);//columns must be defined to cast, to assess column types
+	    	source.addColumn(tempArray[1]);//columns must be defined to cast, to assess column types	
 	    }//variable column definition successful
 	    
 	    ///**************** isolate to test making variable
@@ -183,30 +188,19 @@ public class AnonymizationController extends AnonymizationBase {
 	    
 	    int i = 0;
 	    //attempting to make the dataType definition variable
-	    for(String col : columnNames) {//size should be 3 for current example, therefore less than 2
-	    	typeList.add(determineDataType(handle, i));//can add defining columns to this section if successful
-	    	updatedSource.addColumn(col, determineDataType(handle, i));
+	    for(String col : columnNames) {//should make each hierarchy individually, no list?
+	    	System.out.println("Inside the hierarchy definition for");
+	       	typeList.add(determineDataType(handle, i));//can add defining columns to this section if successful
+	    	sourceData.getDefinition().setDataType(col, determineDataType(handle, i));//using DataDefinition methods to access dataTypes
+	    	System.out.println("before hierarchy parse");
+	    	sourceData.getDefinition().setAttributeType(col, (Hierarchy.create(convertedHierFiles.get(i) , StandardCharsets.UTF_8, ';')));//create the hierarchy file);//also take opportunity to assign hierarchies, will always be in order as order defined by hierarchy input orde
+	    	System.out.println("after hierarchy parse");
+	    	//hierarchy objects created and added to data definition
 	    	++i;
 	    }
-	    			// may need to update another DataSource and create a new data object?
-	    Data newSourceData = Data.create(updatedSource);//hopefully casting to an updated source with column types determined
-	    
-	    /*for(Object thing : typeList) {
-	    	System.out.println(thing.getClass());//could definitely be wrong
-	    }*/
-	    
-	    //DataType<?> first = determineDataType(handle, 0);// the number is the column in the data
-	    //DataType<?> second = determineDataType(handle, 1);//will be assessed in the same order as the columns are declared
-	    //DataType<?> third = determineDataType(handle, 2);//put into advanced for loop once making fully variable
-	    
-	    DataHandle handle1 = newSourceData.getHandle();
-	    
+	     
 	    //dataTypes assessed
-	    Iterator<String[]> itHandle = handle1.iterator();
-	    /*String[] colNames = itHandle.next();// assuming itHandle has next///does have next
-	    System.out.println("First One: " + colNames[0]);
-	    System.out.println("Second One: " + colNames[1]);	//commented out to investigate if .next means no return
-	    System.out.println("Third One: " + colNames[2]);*/
+	    Iterator<String[]> itHandle = handle.iterator();
 	    
  	    List<String> dataRows = new ArrayList<String>();
 	    int count = 1;// initialize count to 1 as condition below was instantly breaking the loop
@@ -214,12 +208,7 @@ public class AnonymizationController extends AnonymizationBase {
 	    	dataRows.add(Arrays.toString(itHandle.next()));
 	    	++count;//to control size of the sample displayed to the user onscreen
 	    }
-	    
-	  //data.getDefinition().setDataType("zipcode", DataType.DECIMAL);
-	  //data.getDefinition().setAttributeType("age", Hierarchy.create("src/main/resources/templates/hierarchy/test_age.csv", StandardCharsets.UTF_8, ';'));
-
-	   
-	   // print(itHandle);//proof of concept
+	    //data.getDefinition().setAttributeType("age", Hierarchy.create("/test_age.csv", StandardCharsets.UTF_8, ';'));
 	    
 	    //throw into model object to attempt to display on jsp. Job for tomorrow ;)
 	    model.addAttribute("fileName", name);
