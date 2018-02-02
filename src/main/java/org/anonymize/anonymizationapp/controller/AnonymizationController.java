@@ -133,28 +133,24 @@ public class AnonymizationController extends AnonymizationBase {
 			@RequestParam("kAnony") int kAnon, Model model) throws IOException, ParseException, SQLException, ClassNotFoundException, NoSuchAlgorithmException {
 		
 		
-		///////////////// Creating the datasource object
+		///////////////// Creating the data object
 				
 		//attempting to cast multipartfile object to file(can be modularized later if successful)
 		//prepare dataset name
 		String datasetfile = dataFile.getOriginalFilename();
 		String[] datSetName = datasetfile.split("\\.");
 		String dataset = datSetName[0];//format is [dataset name].[extension]
+		String extension = datSetName[1];
 		// save the dataset to the project hierarchy(lol)
-		File convertedDataFile = new File("src/main/resources/templates/data/" + dataset + ".csv"); //for saving
+		File convertedDataFile = new File("src/main/resources/templates/data/" + dataset + "." + extension); //for saving
 		convertedDataFile.createNewFile();
 		FileOutputStream fos = new FileOutputStream(convertedDataFile);
 		fos.write(dataFile.getBytes());
 		fos.close();
 		
-		//System.out.println("before creating the data");
-		//failed attempts, the file methods do not succeed
 		//Data source = Data.create(convertedDataFile, Charset.defaultCharset(), ';');
 		//Data source = Data.create("src/main/resources/templates/data/" + dataset + ".csv", Charsets.UTF_8, ';');
-		
-		//new method, attempting to save files in interal file system, and access via createData()
-		//needs to be called after hierarchy files are planted
-		
+
 		//////////////////// finished doing stuff for Data
 		
 		////////////////////creating the hierarchies
@@ -178,7 +174,7 @@ public class AnonymizationController extends AnonymizationBase {
 		}
 		
 		System.out.println("before creating the data");
-		Data source = createData(dataset);//hopefully this way works 
+		Data source = createData(dataset, extension);//hopefully this way works 
 		System.out.println("after creating the data");
 		DataHandle handle = source.getHandle();//acquiring data handle
 		
@@ -187,7 +183,7 @@ public class AnonymizationController extends AnonymizationBase {
 		String headerRow = Arrays.toString(itHandle.next());//get the header of the dataset to display in bold
 		String[] header = headerRow.split("[\\[\\],]");
 		
-		model.addAttribute("header", header);
+		model.addAttribute("headerRow", header);//only need to get the header once as it will do for the resulting dataset also
 		
 		while(itHandle.hasNext()) {
 			String row = Arrays.toString(itHandle.next());
@@ -217,11 +213,16 @@ public class AnonymizationController extends AnonymizationBase {
 
         ARXResult result = anonymizer.anonymize(source, anonConfiguration);
         
-        List<String> anonyRows = new ArrayList<String>();
+        List<String[]> anonyRows = new ArrayList<String[]>();
         Iterator<String[]> transformed = result.getOutput(false).iterator();
         
+        headerRow = Arrays.toString(transformed.next());
+        header = headerRow.split("[\\[\\],]");//repeat to remove fields row from the data, for display purposes
+        
         while(transformed.hasNext()) {//format stuff for display onscreen
-			anonyRows.add(Arrays.toString(transformed.next()));
+        	String row = Arrays.toString(transformed.next());//view only the data, not the fields
+        	String[] data = row.split("[\\[\\],]");
+        	anonyRows.add(data);
 		}
         
         printResult(result, source);
@@ -1380,9 +1381,9 @@ public class AnonymizationController extends AnonymizationBase {
    
 //take in file through variable means 
    // used for EXAMPLE 39
-   public static Data createData(final String dataset) throws IOException {
+   public static Data createData(final String dataset, final String extension) throws IOException {
 
-       Data data = Data.create("src/main/resources/templates/data/" + dataset + ".csv", StandardCharsets.UTF_8, ';');
+       Data data = Data.create("src/main/resources/templates/data/" + dataset + "." + extension, StandardCharsets.UTF_8, ';');
 
        // Read generalization hierarchies
        FilenameFilter hierarchyFilter = new FilenameFilter() {
@@ -1395,7 +1396,7 @@ public class AnonymizationController extends AnonymizationBase {
                }
            }
        };
-       // Create definition
+       // Create definition, hierarchies will always be .csv
        File testDir = new File("src/main/resources/templates/hierarchy/");
        File[] genHierFiles = testDir.listFiles(hierarchyFilter);
        Pattern pattern = Pattern.compile("_hierarchy_(.*?).csv");

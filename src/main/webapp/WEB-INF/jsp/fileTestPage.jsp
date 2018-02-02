@@ -25,7 +25,7 @@
 </table>
 <table>
 	<tr>
-		<c:forEach items="${header}" var="head">
+		<c:forEach items="${headerRow}" var="head">
 			<th>
 				${head}
 			</th>
@@ -60,13 +60,19 @@
 <div>
 <table>
 	<tr>
-		<th>Anonymized Data</th>
+		<c:forEach items="${headerRow}" var="head">
+			<th>
+				${head}
+			</th>
+		</c:forEach>
 	</tr>
-	<c:forEach items="${anonyRows}" var="anony">
+	<c:forEach items="${anonyRows}" var="anonyRow">
 		<tr>
-			<td>
-				${anony}
-			</td>
+			<c:forEach items="${anonyRow}" var="anony">
+				<td>
+					${anony}
+				</td>
+			</c:forEach>
 		</tr>
 	</c:forEach>
 </table>
