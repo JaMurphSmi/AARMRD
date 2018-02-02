@@ -184,20 +184,21 @@ public class AnonymizationController extends AnonymizationBase {
 		String[] header = headerRow.split("[\\[\\],]");
 		
 		model.addAttribute("headerRow", header);//only need to get the header once as it will do for the resulting dataset also
-		
-		while(itHandle.hasNext()) {
+		int i = 1;
+		while((itHandle.hasNext()) && (i % 801 != 0)) {
 			String row = Arrays.toString(itHandle.next());
 			String[] data = row.split("[\\[\\],]");
 			dataRows.add(data);
+			++i;
 		}
 		
-		int i = 0;
+		i = 0;
 		//converting multipart hierarchy files to File objects
 		for(String hierName : hierNames){
-		source.getDefinition().setAttributeType(hierName, AttributeType.IDENTIFYING_ATTRIBUTE);
-		//source.getDefinition().setAttributeType(hierName, hier);
-		source.getDefinition().setDataType(hierName, determineDataType(handle, i));
-		++i;
+			source.getDefinition().setAttributeType(hierName, AttributeType.IDENTIFYING_ATTRIBUTE);
+			
+			source.getDefinition().setDataType(hierName, determineDataType(handle, i));
+			++i;
 		}
 		
 		source.getDefinition().setAttributeType("age", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
@@ -215,14 +216,14 @@ public class AnonymizationController extends AnonymizationBase {
         
         List<String[]> anonyRows = new ArrayList<String[]>();
         Iterator<String[]> transformed = result.getOutput(false).iterator();
-        
+        i = 1;
         headerRow = Arrays.toString(transformed.next());
         header = headerRow.split("[\\[\\],]");//repeat to remove fields row from the data, for display purposes
-        
-        while(transformed.hasNext()) {//format stuff for display onscreen
+        while((transformed.hasNext()) && (i % 801 != 0)) {//format stuff for display onscreen
         	String row = Arrays.toString(transformed.next());//view only the data, not the fields
         	String[] data = row.split("[\\[\\],]");
         	anonyRows.add(data);
+        	++i;
 		}
         
         printResult(result, source);
