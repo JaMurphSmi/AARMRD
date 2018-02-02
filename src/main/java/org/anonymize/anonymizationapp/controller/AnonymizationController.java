@@ -3,6 +3,7 @@ package org.anonymize.anonymizationapp.controller;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 // Importing ARX required modules, dependencies etc
@@ -14,6 +15,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.text.ParseException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 //import java.util.Arrays;
@@ -99,6 +101,7 @@ import org.deidentifier.arx.risk.RiskModelSampleRisks;
 import org.deidentifier.arx.risk.RiskModelSampleSummary;
 import org.deidentifier.arx.risk.RiskModelSampleUniqueness;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
 // ARX related stuff 
 import org.apache.commons.math3.util.Pair;
@@ -126,88 +129,115 @@ public class AnonymizationController extends AnonymizationBase {
 	// attempting to handle file uploads successfully
 	@RequestMapping(value = "/uploadFiles", method = RequestMethod.POST)
 	public String submit(@RequestParam("testFile") MultipartFile dataFile,
-			@RequestParam("testHier") MultipartFile[] hierFile, 
-			@RequestParam("kAnonymity") int kAnon, Model model) throws IOException {
-		//attempting to cast multipartfile object to file(can be modularized later if successful) 
-		File convertedFile = new File(dataFile.getOriginalFilename());
-	    convertedFile.createNewFile();
-	    FileOutputStream fos = new FileOutputStream(convertedFile);
-	    fos.write(dataFile.getBytes());
-	    fos.close();
-	    
-	    //defining hierarchy files and names
-	    List<File> convertedHierFiles = new ArrayList<File>();
-	    List<String> hierNames = new ArrayList<String>();
-	    List<Hierarchy> hierarchies = new ArrayList<Hierarchy>();//list to hold the created hierarchy objects
-	    
-	    //converting multipart hierarchy files to File objects
-	    for(MultipartFile mulFile: hierFile) {//might be wrong, need to confirm
-	    	String fileName = mulFile.getOriginalFilename();
-	    	File convertedHierFile = new File(fileName);
-		    convertedHierFile.createNewFile();
-		    FileOutputStream fost = new FileOutputStream(convertedHierFile);
-		    fost.write(mulFile.getBytes());
-		    fost.close();
-		    convertedHierFiles.add(convertedHierFile);//add converted file to list
-		    hierNames.add(fileName);//add file name to list for display
-	    }
-	    
-	    model.addAttribute("hierNames", hierNames);//add hierarchy names to model to prove uploading multiple hier files
-	    
-	    String name = convertedFile.getName();
-	    
-	    // arguments are the file itself, the index of the spreadsheet, and presence of header
-	    DataSource source = DataSource.createExcelSource(convertedFile, 0, true);
+			@RequestParam("testHier") MultipartFile[] hierFiles, 
+			@RequestParam("kAnony") int kAnon, Model model) throws IOException, ParseException, SQLException, ClassNotFoundException, NoSuchAlgorithmException {
+		
+		
+		///////////////// Creating the datasource object
+				
+		//attempting to cast multipartfile object to file(can be modularized later if successful)
+		//prepare dataset name
+		String datasetfile = dataFile.getOriginalFilename();
+		String[] datSetName = datasetfile.split("\\.");
+		String dataset = datSetName[0];//format is [dataset name].[extension]
+		// save the dataset to the project hierarchy(lol)
+		File convertedDataFile = new File("src/main/resources/templates/data/" + dataset + ".csv"); //for saving
+		convertedDataFile.createNewFile();
+		FileOutputStream fos = new FileOutputStream(convertedDataFile);
+		fos.write(dataFile.getBytes());
+		fos.close();
+		
+		//System.out.println("before creating the data");
+		//failed attempts, the file methods do not succeed
+		//Data source = Data.create(convertedDataFile, Charset.defaultCharset(), ';');
+		//Data source = Data.create("src/main/resources/templates/data/" + dataset + ".csv", Charsets.UTF_8, ';');
+		
+		//new method, attempting to save files in interal file system, and access via createData()
+		//needs to be called after hierarchy files are planted
+		
+		//////////////////// finished doing stuff for Data
+		
+		////////////////////creating the hierarchies
+			    
+		//defining hierarchy files and names
+		List<String> hierNames = new ArrayList<String>();//for hierarchy names to display
+		//List<Hierarchy> hierarchies = new ArrayList<Hierarchy>();//list to hold the created hierarchy objects
+		
+		for(MultipartFile mulFile: hierFiles) {
+		String fileName = mulFile.getOriginalFilename();
+		File convertedHierFile = new File("src/main/resources/templates/hierarchy/" + fileName);
+		
+		convertedHierFile.createNewFile();
+		
+		FileOutputStream fost = new FileOutputStream(convertedHierFile);
+		fost.write(mulFile.getBytes());
+		fost.close();//works
+		
+		String[] tempArray = fileName.split("[\\_\\.]");//split by underscore and dot		  0         1         2
+		hierNames.add(tempArray[2]);//add file name to list for display reasons further on [dataset]_hierarchy_[column]
+		}
+		
+		System.out.println("before creating the data");
+		Data source = createData(dataset);//hopefully this way works 
+		System.out.println("after creating the data");
+		DataHandle handle = source.getHandle();//acquiring data handle
+		
+		Iterator<String[]> itHandle = handle.iterator();
+		List<String[]> dataRows = new ArrayList<String[]>();
+		String headerRow = Arrays.toString(itHandle.next());//get the header of the dataset to display in bold
+		String[] header = headerRow.split("[\\[\\],]");
+		
+		model.addAttribute("header", header);
+		
+		while(itHandle.hasNext()) {
+			String row = Arrays.toString(itHandle.next());
+			String[] data = row.split("[\\[\\],]");
+			dataRows.add(data);
+		}
+		
+		int i = 0;
+		//converting multipart hierarchy files to File objects
+		for(String hierName : hierNames){
+		source.getDefinition().setAttributeType(hierName, AttributeType.IDENTIFYING_ATTRIBUTE);
+		//source.getDefinition().setAttributeType(hierName, hier);
+		source.getDefinition().setDataType(hierName, determineDataType(handle, i));
+		++i;
+		}
+		
+		source.getDefinition().setAttributeType("age", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+		source.getDefinition().setAttributeType("zipcode", AttributeType.INSENSITIVE_ATTRIBUTE);
+		
+	    // Create an instance of the anonymizer
+        ARXAnonymizer anonymizer = new ARXAnonymizer();//create object
+        ARXConfiguration anonConfiguration = ARXConfiguration.create();//defining the privacy model
+        System.out.println("value of kAnon is : " + kAnon);
+        anonConfiguration.addPrivacyModel(new KAnonymity(kAnon));//add privacy model, with supplied severity
+        //config.addPrivacyModel(new KAnonymity(2));//create k anonymity model with the anonymity value
+        anonConfiguration.setMaxOutliers(0d);
 
-	    
-	    int hierCount = 0;//to track pos in the convertedFiles list
-	    
-	    //create data columns dynamically
-	    List<String> columnNames = new ArrayList<String>();//needed to redefine column names after datatypes IDed
-	    for(String hierName: hierNames) {
-	    	String[] tempArray = hierName.split("[\\_\\.]");//split by underscore and point
-	    	columnNames.add(tempArray[1]);
-	    	source.addColumn(tempArray[1]);//columns must be defined to cast to type Data, and to assess column types	
-	    }
-	    
-	    // must be a Data object to obtain a handle via ARX implementation
-	    //Cast successful
-	    Data sourceData = Data.create(source);//needs to be done as handle is argument for determineDataType method
-	    DataHandle handle = sourceData.getHandle();// handle acquired
-	    //List<DataType<?>> typeList = new ArrayList<DataType<?>>();//this was correct, but not needed
-	    List<Object> typeList = new ArrayList<Object>();
-	    
-	    int i = 0;
-	    //attempting to make the dataType definition variable
-	    for(String col : columnNames) {
-	       	typeList.add(determineDataType(handle, i));//added defining columns
-	    	
-	       	sourceData.getDefinition().setDataType(col, determineDataType(handle, i));//using DataDefinition methods to access dataTypes
-	    	
-	       	sourceData.getDefinition().setAttributeType(col, (Hierarchy.create(convertedHierFiles.get(i) , StandardCharsets.UTF_8, ';')));//assign hierarchies, always in order defined by hierarchy input
-	    	
-	       	++i;//hierarchy objects created and added to data definition
-	    }
-	     
-	    //dataTypes assessed
-	    Iterator<String[]> itHandle = handle.iterator();
-	    
- 	    List<String> dataRows = new ArrayList<String>();
-	    int count = 1;// initialize count to 1 as condition below was instantly breaking the loop
-	    while((itHandle.hasNext()) && (count % 801 != 0)) {
-	    	dataRows.add(Arrays.toString(itHandle.next()));
-	    	++count;//to control size of the sample displayed to the user onscreen
-	    }
-	    //data.getDefinition().setAttributeType("age", Hierarchy.create("/test_age.csv", StandardCharsets.UTF_8, ';'));
-	    
-	    //throw into model object to attempt to display on jsp. Job for tomorrow ;)
-	    model.addAttribute("fileName", name);
+        ARXResult result = anonymizer.anonymize(source, anonConfiguration);
+        
+        List<String> anonyRows = new ArrayList<String>();
+        Iterator<String[]> transformed = result.getOutput(false).iterator();
+        
+        while(transformed.hasNext()) {//format stuff for display onscreen
+			anonyRows.add(Arrays.toString(transformed.next()));
+		}
+        
+        printResult(result, source);
+        
+		//throw into model for display
+        model.addAttribute("hierNames", hierNames);//add hierarchy names to model to prove uploading multiple hier files
+        // model.addAttribute("fileName", name);
 	    model.addAttribute("dataRows", dataRows);
+	    model.addAttribute("anonyRows", anonyRows);
 	   // model.addAttribute("file", convertedFile);
 	   // model.addAttribute("data", sourceData);
 	    
 	return "fileTestPage";
 	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////// THIS IS WHERE THE VARIABLE INPUT TEST ENDS
 	
 	@SuppressWarnings("unused")
    @RequestMapping("/anonymize")
@@ -1379,39 +1409,6 @@ public class AnonymizationController extends AnonymizationBase {
        }
        return data;
    }
-
-   
-   public static Data createData(String dataName, File dataFile, File[] hierFiles) throws IOException {
-
-       Data data = Data.create("src/main/resources/templates/data/" + dataName + ".csv", StandardCharsets.UTF_8, ';');
-
-       // Read generalization hierarchies
-       FilenameFilter hierarchyFilter = new FilenameFilter() {
-           @Override
-           public boolean accept(File dir, String name) {
-               if (name.matches(dataName + "_hierarchy_(.)+.csv")) {
-                   return true;
-               } else {
-                   return false;
-               }
-           }
-       };
-       // Create definition
-       File testDir = new File("src/main/resources/templates/hierarchy/");
-       File[] genHierFiles = testDir.listFiles(hierarchyFilter);
-       Pattern pattern = Pattern.compile("_hierarchy_(.*?).csv");
-       for (File file : genHierFiles) {
-           Matcher matcher = pattern.matcher(file.getName());
-           if (matcher.find()) {
-               CSVHierarchyInput hier = new CSVHierarchyInput(file, StandardCharsets.UTF_8, ';');
-               String attributeName = matcher.group(1);
-               data.getDefinition().setAttributeType(attributeName, Hierarchy.create(hier.getHierarchy()));
-           }
-       }
-       return data;
-   }
-
-   
    
    /**
     * Perform risk analysis FROM EXAMPLE NOT 46
@@ -1559,21 +1556,21 @@ public class AnonymizationController extends AnonymizationBase {
     * @param column
     */
    private static DataType<?> determineDataType(DataHandle handle, int column) {
-       System.out.println(" - Potential data types for attribute: "+handle.getAttributeName(column));
+       //System.out.println(" - Potential data types for attribute: "+handle.getAttributeName(column));
        List<Pair<DataType<?>, Double>> types = handle.getMatchingDataTypes(column);
 
        // Print entries sorted by match percentage
-       for (Pair<DataType<?>, Double> entry : types) {
-           System.out.print("   * ");
-           System.out.print(entry.getKey().getDescription().getLabel());
-           if (entry.getKey().getDescription().hasFormat()) {
-               System.out.print("[");
-               System.out.print(((DataTypeWithFormat) entry.getKey()).getFormat());
-               System.out.print("]");
-           }
-           System.out.print(": ");
-           System.out.println(entry.getValue());
-       }
+       //for (Pair<DataType<?>, Double> entry : types) {
+           //System.out.print("   * ");
+           //System.out.print(entry.getKey().getDescription().getLabel());
+           //if (entry.getKey().getDescription().hasFormat()) {
+           //    System.out.print("[");
+           //    System.out.print(((DataTypeWithFormat) entry.getKey()).getFormat());
+           //    System.out.print("]");
+           //}
+           //System.out.print(": ");
+           //System.out.println(entry.getValue());
+       //}
        return types.get(0).getKey(); //first identified is usually the correct data type
    }
    

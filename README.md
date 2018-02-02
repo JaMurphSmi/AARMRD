@@ -17,16 +17,17 @@ For best results
 Notes for input data file formats:
 ----------------------------------------------------------------------------------------------------------------------------.
 
-CSV: Please ensure the data contained within each line is separated by a semi-colon, ';' character. This is to avoid errors caused by comma ',' separated data affecting names and large numbers  
-	 Please ensure that your dataset contains a header line defining the headings of your fields at the top of the file ie age;gender;postcode;phoneno  
+CSV: Please ensure the data contained within each line is separated by a semi-colon, ';' character. This is to avoid errors caused by comma ',' separated data affecting names and large numbers.  
+Protip: Most programs will save csv files delimited by a comma, it is recommended to use notepad or other such text editor that provides a 'replace all' function to rectify this  
+	 Please ensure that your dataset contains a header line defining the headings of your fields at the top of the file ie age;gender;postcode;phoneno;salary  
 	   
-Excel: No special conditions are imposed on an Excel file. Best results with a standard Excel Workbook .xlsx file.
+Excel: No special conditions other than header are imposed on an Excel file. Best results with a standard Excel Workbook .xlsx file.
 	 
 ----------------------------------------------------------------------------------------------------------------------------
 Notes for hierarchy file formats:
 ----------------------------------------------------------------------------------------------------------------------------.	 
 
 The only format accepted currently is CSV  
-CSV: Please name your file in the format of [your dataset file's name]_[field name].csv to make import as successful as possible  
+CSV: Please name your file in the format of [your dataset file's name]_hierarchy_[field name].csv to make import as successful as possible  
 No heading is required inside this data file, all that is required is your defined hierarchy, with values separated by a ';' ie age hierarchy: 34;<50;<=65;*
 										  

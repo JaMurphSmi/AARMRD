@@ -22,7 +22,7 @@
 	  		<input type="file" id="testFile" name="testHier" title="This is a test file upload to prove concept" value="Put your hierarchies here" multiple="multiple" onmouseover="displayBasic()">
 	  	</div>
 	  	<div id="import">
-	  		<input type="number" id="kAnonymity" name="kAnonymity" title="Take in variable k - Anonymity diversity" value="value for k-Anonymity" onmouseover="displayBasic()">
+	  		<input type="number" id="kAnony" name="kAnony" title="Take in variable k - Anonymity diversity" value="value for k-Anonymity" onmouseover="displayBasic()">
 	  	</div>
 	  	<input type="submit" value="Test Submit">
     </form>
