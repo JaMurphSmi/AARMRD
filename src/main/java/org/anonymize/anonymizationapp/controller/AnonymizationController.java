@@ -1385,7 +1385,7 @@ public class AnonymizationController extends AnonymizationBase {
    public static Data createData(final String dataset, final String extension) throws IOException {
 
 	   Data data = DefaultData.create();//create empty object with full scope to satisfy errors
-       if(extension == "csv") {
+       if(extension == "csv") {//to handle csv and excel files
     	   data = Data.create("src/main/resources/templates/data/" + dataset + "." + extension, StandardCharsets.UTF_8, ';');
        }
        else if(extension == "xls" || extension == "xlsx") {
