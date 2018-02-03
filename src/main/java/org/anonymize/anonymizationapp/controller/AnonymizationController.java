@@ -1384,8 +1384,14 @@ public class AnonymizationController extends AnonymizationBase {
    // used for EXAMPLE 39
    public static Data createData(final String dataset, final String extension) throws IOException {
 
-       Data data = Data.create("src/main/resources/templates/data/" + dataset + "." + extension, StandardCharsets.UTF_8, ';');
-
+	   Data data = DefaultData.create();//create empty object with full scope to satisfy errors
+       if(extension == "csv") {
+    	   data = Data.create("src/main/resources/templates/data/" + dataset + "." + extension, StandardCharsets.UTF_8, ';');
+       }
+       else if(extension == "xls" || extension == "xlsx") {
+    	   DataSource dataExcel = DataSource.createExcelSource("src/main/resources/templates/data/" + dataset + "." + extension, 0, true);
+    	   data = Data.create(dataExcel);
+       }
        // Read generalization hierarchies
        FilenameFilter hierarchyFilter = new FilenameFilter() {
            @Override
