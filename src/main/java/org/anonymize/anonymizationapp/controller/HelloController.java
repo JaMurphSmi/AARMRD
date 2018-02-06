@@ -93,10 +93,17 @@ public class HelloController extends AnonymizationBase {
 		Iterator<String[]> itHandle = handle.iterator();
 		List<String[]> dataRows = new ArrayList<String[]>();
 		String headerRow = Arrays.toString(itHandle.next());//get the header of the dataset to display in bold
-		String[] header = headerRow.split("[\\[\\],]");
-		
+		System.out.println(">" + headerRow + "<");
+		String[] headerTemp = headerRow.split("[\\[\\],]");
+		String[] header = new String[headerTemp.length - 1];
+		for(int i = 0; i < headerTemp.length - 1; i++) {
+			header[i] = headerTemp[i+1].trim();
+		}//shift all values 
+		model.addAttribute("headerData", headerTemp);
 		model.addAttribute("headerRow", header);//only need to get the header once as it will do for the resulting dataset also
-		
+		for (String bit : header) {
+			System.out.println(bit + ",");//testing if random space at the start
+		}
 		int i = 1;
 		while((itHandle.hasNext()) && (i % 801 != 0)) {
 			String row = Arrays.toString(itHandle.next());
@@ -110,6 +117,9 @@ public class HelloController extends AnonymizationBase {
 		AnonymizationObject anonForm = new AnonymizationObject(source, header);//constant for an individual user
 		//////// use header row to allow user to set individual algorithms for each field
 		String[] models = {"k-anonymity","l-diversity","t-closeness","δ-presence"};
+		for (String mod : models) {
+			System.out.println(mod + ",");//testing if models in array
+		}
 		
 		model.addAttribute("anonForm", anonForm);
 		model.addAttribute("source", source);
@@ -119,9 +129,8 @@ public class HelloController extends AnonymizationBase {
 	    return "setAnonDetails";
    }
    
-// method used to create the data object
    public Data createData(final String dataset, final String extension) throws IOException {
-	   System.out.println(extension);
+
 	   Data data = DefaultData.create();//create empty object with full scope to satisfy errors
        if(extension.equals("csv")) {//to handle csv and excel files
     	   data = Data.create("src/main/resources/templates/data/" + dataset + "." + extension, StandardCharsets.UTF_8, ';');

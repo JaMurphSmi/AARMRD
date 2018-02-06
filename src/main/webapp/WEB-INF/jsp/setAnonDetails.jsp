@@ -11,7 +11,7 @@
 <title>Spring Boot</title>
 </head>
 <body>
-  <img src="src/main/resources/AARMRD-v2.png">
+  <img src="${pageContext.request.contextPath}/resources/AARMRD-v2.png"/>
   <h1>Anonymization application Homepage</h1>
   <hr>
 
@@ -34,7 +34,7 @@
 		<div>
 			<table>
 				<tr>
-					<c:forEach items="${headerRow}" var="head">
+					<c:forEach items="${headerData}" var="head">
 						<th>
 							${head}
 						</th>
@@ -53,11 +53,11 @@
 		</div>
 		<div>
 			<c:forEach items="${headerRow}" var="head" varStatus="fieldNumber">
-			${head} :  
+			${head}:  
 				<form:select path="${modelsChosen[fieldNumber.index]}">
 						<form:option value="">- - NONE - -</form:option>
-					<c:forEach items="models" var="aModel">
-						<form:option value="${aModel}">${aModel}</form:option>
+					<c:forEach items="${models}" var="algo">
+						<form:option value="${algo}">${algo}</form:option>
 					</c:forEach>
 				</form:select>
 				&nbsp&nbspValue for algorithm: <form:input type="number" path="${valuesForModels[fieldNumber.index]}"/>
@@ -66,9 +66,7 @@
 		</div>
 	</form:form>
 <script>
-function displayBasic() {
-    document.getElementById("hierFile").style.color = "green";
-}
+
 </script>
 </body>
 </html>

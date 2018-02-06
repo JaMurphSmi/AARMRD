@@ -17,10 +17,10 @@ public abstract class DataAspects{
 	public Data createData(final String dataset, final String extension) throws IOException {
 
 		   Data data = DefaultData.create();//create empty object with full scope to satisfy errors
-	       if(extension == "csv") {//to handle csv and excel files
+	       if(extension.equals("csv")) {//to handle csv and excel files
 	    	   data = Data.create("src/main/resources/templates/data/" + dataset + "." + extension, StandardCharsets.UTF_8, ';');
 	       }
-	       else if(extension == "xls" || extension == "xlsx") {
+	       else if(extension.equals("xls") || extension.equals("xlsx")) {
 	    	   DataSource dataExcel = DataSource.createExcelSource("src/main/resources/templates/data/" + dataset + "." + extension, 0, true);
 	    	   data = Data.create(dataExcel);
 	       }
