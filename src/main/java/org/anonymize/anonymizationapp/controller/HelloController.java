@@ -12,6 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 
 import org.deidentifier.arx.Data;
 import org.deidentifier.arx.DataHandle;

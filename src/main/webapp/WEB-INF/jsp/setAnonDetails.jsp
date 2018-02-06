@@ -11,7 +11,7 @@
 <title>Spring Boot</title>
 </head>
 <body>
-  <img src="${pageContext.request.contextPath}AARMRD-v2.png"/>
+  <img src="img/AARMRD-v2.png"/>
   <h1>AARMRD Homepage</h1>
   <hr>
 
