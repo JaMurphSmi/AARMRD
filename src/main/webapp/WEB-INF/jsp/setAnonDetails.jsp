@@ -11,7 +11,7 @@
 <title>Spring Boot</title>
 </head>
 <body>
-  <img src="img/AARMRD-v2.png"/>
+  <div style="z-index: 10;position: absolute;right: 50;top: 0;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
   <h1>AARMRD Homepage</h1>
   <hr>
 
