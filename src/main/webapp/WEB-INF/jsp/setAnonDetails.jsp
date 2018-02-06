@@ -11,13 +11,11 @@
 <title>Spring Boot</title>
 </head>
 <body>
-  <img src="${pageContext.request.contextPath}/resources/AARMRD-v2.png"/>
-  <h1>Anonymization application Homepage</h1>
+  <img src="${pageContext.request.contextPath}AARMRD-v2.png"/>
+  <h1>AARMRD Homepage</h1>
   <hr>
 
   <h2></h2><br>
-  There's nothing here atm, but hopefully this will have<br>
-  the components needed to do my first anonymization at some point!
 	  <div>
 	  <h2>Submitted File</h2>
 	 <div>
