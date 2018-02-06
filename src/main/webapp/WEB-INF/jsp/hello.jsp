@@ -10,6 +10,7 @@
 <title>Spring Boot</title>
 </head>
 <body>
+  <img src="src/main/resources/AARMRD-v2.png">
   <h1>Anonymization application Implementation</h1>
   <hr>
 

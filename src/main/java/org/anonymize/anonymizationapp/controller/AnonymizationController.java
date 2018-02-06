@@ -101,10 +101,12 @@ import org.deidentifier.arx.risk.RiskModelSampleRisks;
 import org.deidentifier.arx.risk.RiskModelSampleSummary;
 import org.deidentifier.arx.risk.RiskModelSampleUniqueness;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
+import org.anonymize.anonymizationapp.model.AnonymizationObject;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
 // ARX related stuff 
 import org.apache.commons.math3.util.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -114,11 +116,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+
+import org.anonymize.anonymizationapp.util.DataAspects;
+
 
 //import cern.colt.Arrays;
 
@@ -126,73 +132,30 @@ import org.springframework.web.multipart.MultipartFile;
 @Controller											//implements
 public class AnonymizationController extends AnonymizationBase {
 
+	DataAspects dataAspectsHelper;
+	
 	// attempting to handle file uploads successfully
-	@RequestMapping(value = "/uploadFiles", method = RequestMethod.POST)
-	public String submit(@RequestParam("testFile") MultipartFile dataFile,
-			@RequestParam("testHier") MultipartFile[] hierFiles, 
-			@RequestParam("kAnony") int kAnon, Model model) throws IOException, ParseException, SQLException, ClassNotFoundException, NoSuchAlgorithmException {
+	@RequestMapping(value = "/anonymizeData", method = RequestMethod.POST)
+	public String detailAnonymizations(@ModelAttribute("anonForm") AnonymizationObject anonForm,
+			@RequestParam("dataRows") List<String[]> dataRows,
+			Model model) throws IOException, ParseException, SQLException, ClassNotFoundException, NoSuchAlgorithmException {
 		
-		
-		///////////////// Creating the data object
-				
-		//attempting to cast multipartfile object to file(can be modularized later if successful)
-		//prepare dataset name
-		String datasetfile = dataFile.getOriginalFilename();
-		String[] datSetName = datasetfile.split("\\.");
-		String dataset = datSetName[0];//format is [dataset name].[extension]
-		String extension = datSetName[1];
-		// save the dataset to the project hierarchy(lol)
-		File convertedDataFile = new File("src/main/resources/templates/data/" + dataset + "." + extension); //for saving
-		convertedDataFile.createNewFile();
-		FileOutputStream fos = new FileOutputStream(convertedDataFile);
-		fos.write(dataFile.getBytes());
-		fos.close();
-		
-		//Data source = Data.create(convertedDataFile, Charset.defaultCharset(), ';');
-		//Data source = Data.create("src/main/resources/templates/data/" + dataset + ".csv", Charsets.UTF_8, ';');
-
-		//////////////////// finished doing stuff for Data
-		
-		////////////////////creating the hierarchies
-			    
-		//defining hierarchy files and names
-		List<String> hierNames = new ArrayList<String>();//for hierarchy names to display
-		//List<Hierarchy> hierarchies = new ArrayList<Hierarchy>();//list to hold the created hierarchy objects
-		
-		for(MultipartFile mulFile: hierFiles) {
-		String fileName = mulFile.getOriginalFilename();
-		File convertedHierFile = new File("src/main/resources/templates/hierarchy/" + fileName);
-		
-		convertedHierFile.createNewFile();
-		
-		FileOutputStream fost = new FileOutputStream(convertedHierFile);
-		fost.write(mulFile.getBytes());
-		fost.close();//works
-		
-		String[] tempArray = fileName.split("[\\_\\.]");//split by underscore and dot		  0         1         2
-		hierNames.add(tempArray[2]);//add file name to list for display reasons further on [dataset]_hierarchy_[column]
+		Data source = anonForm.getTheSourceData();
+		String[] theModels = anonForm.getModelsChosen();
+		String[] headerRow = anonForm.getTheHeaderRow();
+		int[] valuesForModels = anonForm.getValuesForModels();
+		String header = "";
+		System.out.println("Attempting proof of concept");
+		for(String aModel : theModels) {
+			System.out.println("The model is: " + aModel);
 		}
-		
-		System.out.println("before creating the data");
-		Data source = createData(dataset, extension);//hopefully this way works 
-		System.out.println("after creating the data");
-		DataHandle handle = source.getHandle();//acquiring data handle
-		
-		Iterator<String[]> itHandle = handle.iterator();
-		List<String[]> dataRows = new ArrayList<String[]>();
-		String headerRow = Arrays.toString(itHandle.next());//get the header of the dataset to display in bold
-		String[] header = headerRow.split("[\\[\\],]");
-		
-		model.addAttribute("headerRow", header);//only need to get the header once as it will do for the resulting dataset also
-		int i = 1;
-		while((itHandle.hasNext()) && (i % 801 != 0)) {
-			String row = Arrays.toString(itHandle.next());
-			String[] data = row.split("[\\[\\],]");
-			dataRows.add(data);
-			++i;
+		System.out.println("After printing the selected models");
+		for(int aValue : valuesForModels) {
+			System.out.println("The value is: " + aValue);
 		}
+		System.out.println("Possibly proved concept?");
 		
-		i = 0;
+		/*int i = 0;
 		//converting multipart hierarchy files to File objects
 		for(String hierName : hierNames){
 			source.getDefinition().setAttributeType(hierName, AttributeType.IDENTIFYING_ATTRIBUTE);
@@ -203,12 +166,12 @@ public class AnonymizationController extends AnonymizationBase {
 		
 		source.getDefinition().setAttributeType("age", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
 		source.getDefinition().setAttributeType("zipcode", AttributeType.INSENSITIVE_ATTRIBUTE);
-		
+		*/
 	    // Create an instance of the anonymizer
         ARXAnonymizer anonymizer = new ARXAnonymizer();//create object
         ARXConfiguration anonConfiguration = ARXConfiguration.create();//defining the privacy model
-        System.out.println("value of kAnon is : " + kAnon);
-        anonConfiguration.addPrivacyModel(new KAnonymity(kAnon));//add privacy model, with supplied severity
+        System.out.println("value of kAnon is 2");
+        anonConfiguration.addPrivacyModel(new KAnonymity(2));//add privacy model, with supplied severity
         //config.addPrivacyModel(new KAnonymity(2));//create k anonymity model with the anonymity value
         anonConfiguration.setMaxOutliers(0d);
 
@@ -216,9 +179,9 @@ public class AnonymizationController extends AnonymizationBase {
         
         List<String[]> anonyRows = new ArrayList<String[]>();
         Iterator<String[]> transformed = result.getOutput(false).iterator();
-        i = 1;
-        headerRow = Arrays.toString(transformed.next());
-        header = headerRow.split("[\\[\\],]");//repeat to remove fields row from the data, for display purposes
+        int i = 1;
+        header = Arrays.toString(transformed.next());
+        headerRow = header.split("[\\[\\],]");//repeat to remove fields row from the data, for display purposes
         while((transformed.hasNext()) && (i % 801 != 0)) {//format stuff for display onscreen
         	String row = Arrays.toString(transformed.next());//view only the data, not the fields
         	String[] data = row.split("[\\[\\],]");
@@ -229,8 +192,8 @@ public class AnonymizationController extends AnonymizationBase {
         printResult(result, source);
         
 		//throw into model for display
-        model.addAttribute("hierNames", hierNames);//add hierarchy names to model to prove uploading multiple hier files
         // model.addAttribute("fileName", name);
+        model.addAttribute("headerRow", headerRow);
 	    model.addAttribute("dataRows", dataRows);
 	    model.addAttribute("anonyRows", anonyRows);
 	   // model.addAttribute("file", convertedFile);
@@ -1382,41 +1345,6 @@ public class AnonymizationController extends AnonymizationBase {
    
 //take in file through variable means 
    // used for EXAMPLE 39
-   public static Data createData(final String dataset, final String extension) throws IOException {
-
-	   Data data = DefaultData.create();//create empty object with full scope to satisfy errors
-       if(extension == "csv") {//to handle csv and excel files
-    	   data = Data.create("src/main/resources/templates/data/" + dataset + "." + extension, StandardCharsets.UTF_8, ';');
-       }
-       else if(extension == "xls" || extension == "xlsx") {
-    	   DataSource dataExcel = DataSource.createExcelSource("src/main/resources/templates/data/" + dataset + "." + extension, 0, true);
-    	   data = Data.create(dataExcel);
-       }
-       // Read generalization hierarchies
-       FilenameFilter hierarchyFilter = new FilenameFilter() {
-           @Override
-           public boolean accept(File dir, String name) {
-               if (name.matches(dataset + "_hierarchy_(.)+.csv")) {
-                   return true;
-               } else {
-                   return false;
-               }
-           }
-       };
-       // Create definition, hierarchies will always be .csv
-       File testDir = new File("src/main/resources/templates/hierarchy/");
-       File[] genHierFiles = testDir.listFiles(hierarchyFilter);
-       Pattern pattern = Pattern.compile("_hierarchy_(.*?).csv");
-       for (File file : genHierFiles) {
-           Matcher matcher = pattern.matcher(file.getName());
-           if (matcher.find()) {
-               CSVHierarchyInput hier = new CSVHierarchyInput(file, StandardCharsets.UTF_8, ';');
-               String attributeName = matcher.group(1);
-               data.getDefinition().setAttributeType(attributeName, Hierarchy.create(hier.getHierarchy()));
-           }
-       }
-       return data;
-   }
    
    /**
     * Perform risk analysis FROM EXAMPLE NOT 46
