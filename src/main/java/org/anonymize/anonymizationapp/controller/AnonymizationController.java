@@ -142,6 +142,7 @@ public class AnonymizationController extends AnonymizationBase {
 		
 		Data source = anonForm.getTheSourceData();
 		String[] theModels = anonForm.getModelsChosen();
+		String[] attributeTypes = anonForm.getAttributesChosen();
 		String[] headerRow = anonForm.getTheHeaderRow();
 		int[] valuesForModels = anonForm.getValuesForModels();
 		String header = "";
@@ -153,11 +154,16 @@ public class AnonymizationController extends AnonymizationBase {
 		for(int aValue : valuesForModels) {
 			System.out.println("The value is: " + aValue);
 		}
+		System.out.println("Printing attribute types chosen");
+		for(String anAttribute : attributeTypes) {
+			System.out.println("The model is: " + anAttribute);
+		}
 		System.out.println("Possibly proved concept?");
 		
-		/*int i = 0;
+		DataHandle handle = source.getHandle();
+		int i = 0;
 		//converting multipart hierarchy files to File objects
-		for(String hierName : hierNames){
+		for(String hierName : headerRow){
 			source.getDefinition().setAttributeType(hierName, AttributeType.IDENTIFYING_ATTRIBUTE);
 			
 			source.getDefinition().setDataType(hierName, determineDataType(handle, i));
@@ -166,7 +172,7 @@ public class AnonymizationController extends AnonymizationBase {
 		
 		source.getDefinition().setAttributeType("age", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
 		source.getDefinition().setAttributeType("zipcode", AttributeType.INSENSITIVE_ATTRIBUTE);
-		*/
+		
 	    // Create an instance of the anonymizer
         ARXAnonymizer anonymizer = new ARXAnonymizer();//create object
         ARXConfiguration anonConfiguration = ARXConfiguration.create();//defining the privacy model
@@ -179,7 +185,7 @@ public class AnonymizationController extends AnonymizationBase {
         
         List<String[]> anonyRows = new ArrayList<String[]>();
         Iterator<String[]> transformed = result.getOutput(false).iterator();
-        int i = 1;
+        i = 1;
         header = Arrays.toString(transformed.next());
         headerRow = header.split("[\\[\\],]");//repeat to remove fields row from the data, for display purposes
         while((transformed.hasNext()) && (i % 801 != 0)) {//format stuff for display onscreen

@@ -7,7 +7,7 @@
 <head>
 
 <!-- Static content -->
-<link rel="stylesheet" href="/resources/css/style.css">
+<link rel="stylesheet" type="text/css" href="css/style.css" />
 <script type="text/javascript" src="/resources/js/app.js"></script>
 
 <title>AARMRD</title>
@@ -18,8 +18,9 @@
   Hello! Let's get started with your data anonymization, please select your data file and your hierarchy files for each field, then submit!<br>
   <br><br><br>
   <hr>
-	<div align="center" style="border-radius: 15px;margin:25px 50px 50px 25px;border-style:ridge;border-color:green;">
+	<div align="center" style="width:600px;border-radius: 15px;margin:100px 150px 25px 350px;border-style:ridge;border-color:green;">
 	    <form action="uploadFiles" method="post" enctype="multipart/form-data">
+	    	<br><br>
 	    	<div id="import">
 		  		<label for="dataFile">Choose a data file(maximum size 1GB)</label>
 		  		<input type="file" id="dataFile" name="dataFile" title="This is a test file upload to prove concept" value="Put your data here" >
@@ -30,8 +31,10 @@
 		  		<input type="file" id="hierFile" name="hierFiles" title="This is a test file upload to prove concept" value="Put your hierarchies here" multiple="multiple">
 		  	</div>
 		  	<br>
+		  	<br>
 		  	<input type="submit" value="Submit Your Files">
 	    </form>
+	    <br>
     </div>
 </body>
 </html>

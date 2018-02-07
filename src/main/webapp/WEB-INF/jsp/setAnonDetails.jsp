@@ -6,11 +6,11 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<link rel="stylesheet" href="/resources/css/style.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css" />
 <script type="text/javascript" src="/resources/js/app.js"></script>
 <title>Spring Boot</title>
 </head>
-<body>
+<body style="background-color:#faf497;">
   <div style="z-index: 10;position: absolute;right: 50;top: 0;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
   <h1>AARMRD Homepage</h1>
   <hr>
@@ -28,7 +28,7 @@
 	    <tr>File contents</tr>
 	</table>
 		
-	<form:form modelAttribute="anonForm" action="detailAnonymizations" method="POST" onsubmit="return validate()">
+	<form:form modelAttribute="anonForm" action="anonymizeData" method="POST" onsubmit="return validate()">
 		<div>
 			<table>
 				<tr>
@@ -60,11 +60,11 @@
 				</form:select>
 				&nbsp&nbspValue for algorithm: <form:input type="number" path="${valuesForModels[fieldNumber.index]}"/>
 				&nbsp&nbspFiled Attribute Type: 
-				<c:forEach items="${attributes}" var="anAttribute">
-					<form:select path="${attributeTypes[fieldNumber.index]}"> 
+				<form:select path="${attributeTypes[fieldNumber.index]}">
+					<c:forEach items="${attributes}" var="anAttribute"> 
 						<form:option value="${anAttribute}">${anAttribute}</form:option>
-					</form:select>
-				</c:forEach>
+					</c:forEach>
+				</form:select>
 				<br><br>
 			</c:forEach>
 		</div>

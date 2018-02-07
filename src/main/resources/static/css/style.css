@@ -1,5 +1,11 @@
+.body {
+	bgcolor:#A9E9A5;
+}
+
+
+
 .form {
-	background-color: #efefef;
+	background-color:#faf497;
 	width: 400px;
 	height: 50px;
 	border-radius: 7px;
