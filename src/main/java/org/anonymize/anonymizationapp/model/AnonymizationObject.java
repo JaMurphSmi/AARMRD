@@ -22,6 +22,8 @@ public class AnonymizationObject {
 	// the array of values used for the selected models
 	private int[] valuesForModels;
 	
+	private String[] attributesChosen;
+	
 	
 	public AnonymizationObject() {
 		this.setTheSourceData(DefaultData.create());
@@ -35,6 +37,7 @@ public class AnonymizationObject {
 		this.setTheHeaderRow(theHeaderRow);
 		this.setValuesForModels(new int[(theHeaderRow.length-1)]);//may be an awful way of initializing, but eh
 		this.setModelsChosen(new String[(theHeaderRow.length-1)]);//initialize with length of the headerRow, to ensure correct number of array positions created
+		this.setAttributesChosen(new String[theHeaderRow.length-1]);
 	}
 
 	public Data getTheSourceData() {
@@ -67,5 +70,13 @@ public class AnonymizationObject {
 
 	public void setModelsChosen(String[] modelsChosen) {
 		this.modelsChosen = modelsChosen;
+	}
+
+	public String[] getAttributesChosen() {
+		return attributesChosen;
+	}
+
+	public void setAttributesChosen(String[] attributesChosen) {
+		this.attributesChosen = attributesChosen;
 	}
 }

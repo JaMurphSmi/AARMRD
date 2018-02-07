@@ -59,6 +59,12 @@
 					</c:forEach>
 				</form:select>
 				&nbsp&nbspValue for algorithm: <form:input type="number" path="${valuesForModels[fieldNumber.index]}"/>
+				&nbsp&nbspFiled Attribute Type: 
+				<c:forEach items="${attributes}" var="anAttribute">
+					<form:select path="${attributeTypes[fieldNumber.index]}"> 
+						<form:option value="${anAttribute}">${anAttribute}</form:option>
+					</form:select>
+				</c:forEach>
 				<br><br>
 			</c:forEach>
 		</div>

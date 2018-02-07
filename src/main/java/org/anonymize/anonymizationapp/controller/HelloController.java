@@ -128,7 +128,7 @@ public class HelloController extends AnonymizationBase {
 		model.addAttribute("source", source);
 		model.addAttribute("models", models);
 		//model.addAttribute("models", AnonModel.values());
-		model.addAttribute("attributeTypes", attributeTypes);
+		model.addAttribute("attributes", attributeTypes);
 		model.addAttribute("dataRows", dataRows);
 	    return "setAnonDetails";
    }
