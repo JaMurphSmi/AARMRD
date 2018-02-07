@@ -1,4 +1,4 @@
-# Application for the Anonymization of Relational Medical Research Data (AARMRD) Project <img align="right" src="https://i.imgur.com/hLCDoAZ.png">
+# Application for the Anonymization of Relational <img align="right" src="https://i.imgur.com/hLCDoAZ.png"> Medical Research Data (AARMRD) Project 
 
 
 Author: Jake Murphy Smith  
