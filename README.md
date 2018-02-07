@@ -1,7 +1,7 @@
 # Application for the Anonymization of Relational Medical Research Data (AARMRD) Project  
-![alt text](https://i.imgur.com/hLCDoAZ.png)
+<img align="right" src="https://i.imgur.com/hLCDoAZ.png">
 
-author: Jake Murphy Smith  
+Author: Jake Murphy Smith  
 
 This Spring-Boot application is intended to provide users with access to a variety of utilities that provide and compliment the operation of data anonymization. This application is focused specifically at the anonymization of medical data for the purpose of secure distribution to third parties.  
   
