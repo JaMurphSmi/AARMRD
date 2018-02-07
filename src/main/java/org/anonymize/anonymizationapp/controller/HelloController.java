@@ -119,6 +119,7 @@ public class HelloController extends AnonymizationBase {
 		AnonymizationObject anonForm = new AnonymizationObject(source, header);//constant for an individual user
 		//////// use header row to allow user to set individual algorithms for each field
 		String[] models = {"k-anonymity","l-diversity","t-closeness","δ-presence"};
+		String[] attributeTypes = {"Identifying", "Quasi-identifying", "Sensitive", "Insensitive"}; 
 		for (String mod : models) {
 			System.out.println(mod + ",");//testing if models in array
 		}
@@ -127,6 +128,7 @@ public class HelloController extends AnonymizationBase {
 		model.addAttribute("source", source);
 		model.addAttribute("models", models);
 		//model.addAttribute("models", AnonModel.values());
+		model.addAttribute("attributeTypes", attributeTypes);
 		model.addAttribute("dataRows", dataRows);
 	    return "setAnonDetails";
    }

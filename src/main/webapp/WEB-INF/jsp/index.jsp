@@ -14,10 +14,11 @@
 </head>
 <body>
 	<div style="z-index: 10;position: absolute;right: 0;top: 0;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
-  <h1>Spring Boot - MVC web application skeleton</h1><br>
+  <h1>AARMRD</h1><br>
   Hello! Let's get started with your data anonymization, please select your data file and your hierarchy files for each field, then submit!<br>
+  <br><br><br>
   <hr>
-	<div class="form">
+	<div align="center" style="border-radius: 15px;margin:25px 50px 50px 25px;border-style:ridge;border-color:green;">
 	    <form action="uploadFiles" method="post" enctype="multipart/form-data">
 	    	<div id="import">
 		  		<label for="dataFile">Choose a data file(maximum size 1GB)</label>

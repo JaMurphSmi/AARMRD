@@ -49,7 +49,7 @@
 				    </c:forEach>
 			</table>
 		</div>
-		<div>
+		<div style="z-index: 9;position: absolute;right: 50;top: 175;">
 			<c:forEach items="${headerRow}" var="head" varStatus="fieldNumber">
 			${head}:  
 				<form:select path="${modelsChosen[fieldNumber.index]}">
