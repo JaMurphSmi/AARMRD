@@ -8,11 +8,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <link rel="stylesheet" type="text/css" href="/css/style.css" />
 <script type="text/javascript" src="/resources/js/app.js"></script>
-<title>Spring Boot</title>
+<title>AARMRD-Home</title>
 </head>
 <body style="background-color:#faf497;">
-  <div style="z-index: 10;position: absolute;right: 50;top: 0;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
-  <h1>AARMRD Homepage</h1>
+  <div style="z-index: 10;position: absolute;right: 0;top: 0;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
+  <h1>AARMRD Homepage</h1><br><br><br>
   <hr>
 
   <h2></h2><br>
@@ -27,48 +27,52 @@
 	    </tr>
 	    <tr>File contents</tr>
 	</table>
-		
-	<form:form modelAttribute="anonForm" action="anonymizeData" method="POST" onsubmit="return validate()">
-		<div>
-			<table>
-				<tr>
-					<c:forEach items="${headerData}" var="head">
-						<th>
-							${head}
-						</th>
+	<div style="overflow:hidden;">
+		<div style="float:left;margin-left: 80px;">
+				<table>
+					<tr>
+						<c:forEach items="${headerData}" var="head">
+							<th style="width:25px;">
+								${head}
+							</th>
+						</c:forEach>
+					</tr>
+					    <c:forEach items="${dataRows}" var="dataRow">
+						    <tr>
+						    	<c:forEach items="${dataRow}" var="dataItem">
+								    <td>
+								       	${dataItem}     
+								    </td>
+								</c:forEach>    
+						    </tr>
+					    </c:forEach>
+				</table>
+		</div>	
+		<div style="float:left;margin-left: 100px;border:3px solid;border-color:#daf497;">
+			<h2>Set the Attributes details for your data set!</h2>
+			<form:form modelAttribute="anonForm" action="anonymizeData" method="POST">
+					<c:forEach items="${headerRow}" var="head" varStatus="fieldNumber">
+						${head}:&nbsp&nbsp&nbsp&nbsp
+						<form:select path="modelsChosen[${fieldNumber.index}]">
+								<form:option value="- - NONE - -">- - NONE - -</form:option>
+							<c:forEach items="${models}" var="algo">
+								<form:option value="${algo}">${algo}</form:option>
+							</c:forEach>
+						</form:select>
+						&nbsp&nbspValue for algorithm: <form:input type="number" path="valuesForModels[${fieldNumber.index}]"/>
+						&nbsp&nbspFiled Attribute Type: 
+						<form:select path="attributesChosen[${fieldNumber.index}]">
+							<c:forEach items="${attributes}" var="anAttribute"> 
+								<form:option value="${anAttribute}">${anAttribute}</form:option>
+							</c:forEach>
+						</form:select>
+						<br><br>
 					</c:forEach>
-				</tr>
-				    <c:forEach items="${dataRows}" var="dataRow">
-					    <tr>
-					    	<c:forEach items="${dataRow}" var="dataItem">
-							    <td>
-							       	${dataItem}     
-							    </td>
-							</c:forEach>    
-					    </tr>
-				    </c:forEach>
-			</table>
-		</div>
-		<div style="z-index: 9;position: absolute;right: 50;top: 175;">
-			<c:forEach items="${headerRow}" var="head" varStatus="fieldNumber">
-			${head}:  
-				<form:select path="${modelsChosen[fieldNumber.index]}">
-						<form:option value="">- - NONE - -</form:option>
-					<c:forEach items="${models}" var="algo">
-						<form:option value="${algo}">${algo}</form:option>
-					</c:forEach>
-				</form:select>
-				&nbsp&nbspValue for algorithm: <form:input type="number" path="${valuesForModels[fieldNumber.index]}"/>
-				&nbsp&nbspFiled Attribute Type: 
-				<form:select path="${attributeTypes[fieldNumber.index]}">
-					<c:forEach items="${attributes}" var="anAttribute"> 
-						<form:option value="${anAttribute}">${anAttribute}</form:option>
-					</c:forEach>
-				</form:select>
+					<input type="submit" value="Submit Your Values"></input>
 				<br><br>
-			</c:forEach>
+			</form:form>
 		</div>
-	</form:form>
+	</div>
 <script>
 
 </script>

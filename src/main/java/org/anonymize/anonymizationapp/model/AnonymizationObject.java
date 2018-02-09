@@ -14,7 +14,7 @@ public class AnonymizationObject {
 	private String[] theHeaderRow;//array in each case, ie 5 fields, array length 5, 100 fields, array length 100
 	
 	// the enum of algorithms available, may not be used for a specific thing ever, might just add a string list of models either
-	private AnonModel anonModels;
+	//private AnonModel anonModels;
 	
 	// the array of models chosen from the select boxes in the view, each select hopefully pathed to an index position
 	private String[] modelsChosen;
@@ -35,9 +35,9 @@ public class AnonymizationObject {
 	public AnonymizationObject(Data theSourceData, String[] theHeaderRow) {
 		this.setTheSourceData(theSourceData);
 		this.setTheHeaderRow(theHeaderRow);
-		this.setValuesForModels(new int[(theHeaderRow.length-1)]);//may be an awful way of initializing, but eh
-		this.setModelsChosen(new String[(theHeaderRow.length-1)]);//initialize with length of the headerRow, to ensure correct number of array positions created
-		this.setAttributesChosen(new String[theHeaderRow.length-1]);
+		this.setValuesForModels(new int[(theHeaderRow.length)]);//may be an awful way of initializing, but eh
+		this.setModelsChosen(new String[(theHeaderRow.length)]);//initialize with length of the headerRow, to ensure correct number of array positions created
+		this.setAttributesChosen(new String[theHeaderRow.length]);
 	}
 
 	public Data getTheSourceData() {

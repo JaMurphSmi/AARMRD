@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,9 +26,11 @@ import org.deidentifier.arx.io.CSVHierarchyInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 //import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.anonymize.anonymizationapp.constants.AnonModel;
@@ -123,6 +127,10 @@ public class HelloController extends AnonymizationBase {
 		for (String mod : models) {
 			System.out.println(mod + ",");//testing if models in array
 		}
+		System.out.println("The data is: " + anonForm.getTheSourceData().toString());
+		System.out.println("ModelsChosen length: " + anonForm.getModelsChosen().length);
+		System.out.println("AttributesChosen length: " + anonForm.getAttributesChosen().length);
+		System.out.println("ValuesChosen length: " + anonForm.getValuesForModels().length);
 		
 		model.addAttribute("anonForm", anonForm);
 		model.addAttribute("source", source);

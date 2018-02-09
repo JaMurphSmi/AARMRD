@@ -2,10 +2,6 @@ package org.anonymize.anonymizationapp.controller;
 
 
 import java.awt.Desktop;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 // Importing ARX required modules, dependencies etc
 import java.io.IOException;
 import java.sql.SQLException;
@@ -15,8 +11,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.text.ParseException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 //import java.util.Arrays;
 import java.util.Date;
@@ -24,12 +18,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.deidentifier.arx.ARXAnonymizer;
 import org.deidentifier.arx.ARXConfiguration;
@@ -49,7 +42,6 @@ import org.deidentifier.arx.DataGeneralizationScheme;
 import org.deidentifier.arx.DataGeneralizationScheme.GeneralizationDegree;
 import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.DataSelector;
-import org.deidentifier.arx.DataSource;
 import org.deidentifier.arx.DataSubset;
 import org.deidentifier.arx.DataType;
 import org.deidentifier.arx.DataType.DataTypeDescription;
@@ -116,6 +108,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -128,85 +121,99 @@ import org.anonymize.anonymizationapp.util.DataAspects;
 
 //import cern.colt.Arrays;
 
-@MultipartConfig
 @Controller											//implements
 public class AnonymizationController extends AnonymizationBase {
-
-	DataAspects dataAspectsHelper;
 	
 	// attempting to handle file uploads successfully
-	@RequestMapping(value = "/anonymizeData", method = RequestMethod.POST)
-	public String detailAnonymizations(@ModelAttribute("anonForm") AnonymizationObject anonForm,
-			@RequestParam("dataRows") List<String[]> dataRows,
-			Model model) throws IOException, ParseException, SQLException, ClassNotFoundException, NoSuchAlgorithmException {
-		
-		Data source = anonForm.getTheSourceData();
-		String[] theModels = anonForm.getModelsChosen();
-		String[] attributeTypes = anonForm.getAttributesChosen();
-		String[] headerRow = anonForm.getTheHeaderRow();
-		int[] valuesForModels = anonForm.getValuesForModels();
-		String header = "";
-		System.out.println("Attempting proof of concept");
-		for(String aModel : theModels) {
-			System.out.println("The model is: " + aModel);
-		}
-		System.out.println("After printing the selected models");
-		for(int aValue : valuesForModels) {
-			System.out.println("The value is: " + aValue);
-		}
-		System.out.println("Printing attribute types chosen");
-		for(String anAttribute : attributeTypes) {
-			System.out.println("The model is: " + anAttribute);
-		}
-		System.out.println("Possibly proved concept?");
-		
-		DataHandle handle = source.getHandle();
-		int i = 0;
-		//converting multipart hierarchy files to File objects
-		for(String hierName : headerRow){
-			source.getDefinition().setAttributeType(hierName, AttributeType.IDENTIFYING_ATTRIBUTE);
+		@RequestMapping("/anonymizeData")
+		public String performAnonymization(@Valid @ModelAttribute("anonForm") AnonymizationObject anonForm, 
+				BindingResult bindResult, Model model) 
+				throws IOException, ParseException, SQLException, ClassNotFoundException, NoSuchAlgorithmException {
 			
-			source.getDefinition().setDataType(hierName, determineDataType(handle, i));
-			++i;
-		}
-		
-		source.getDefinition().setAttributeType("age", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
-		source.getDefinition().setAttributeType("zipcode", AttributeType.INSENSITIVE_ATTRIBUTE);
-		
-	    // Create an instance of the anonymizer
-        ARXAnonymizer anonymizer = new ARXAnonymizer();//create object
-        ARXConfiguration anonConfiguration = ARXConfiguration.create();//defining the privacy model
-        System.out.println("value of kAnon is 2");
-        anonConfiguration.addPrivacyModel(new KAnonymity(2));//add privacy model, with supplied severity
-        //config.addPrivacyModel(new KAnonymity(2));//create k anonymity model with the anonymity value
-        anonConfiguration.setMaxOutliers(0d);
+			Data source = anonForm.getTheSourceData();
+			String[] theModels = anonForm.getModelsChosen();
+			String[] attributeTypes = anonForm.getAttributesChosen();
+			String[] headerRow = anonForm.getTheHeaderRow();
+			int[] valuesForModels = anonForm.getValuesForModels();
+			String header = "";
+			System.out.println("Attempting proof of concept");
+			for(String aModel : theModels) {
+				System.out.println("The model is: " + aModel);
+			}
+			System.out.println("After printing the selected models");
+			for(int aValue : valuesForModels) {
+				System.out.println("The value is: " + aValue);
+			}
+			System.out.println("Printing attribute types chosen");
+			for(String anAttribute : attributeTypes) {
+				System.out.println("The model is: " + anAttribute);
+			}
+			System.out.println("Possibly proved concept?");
+			
+			DataHandle handle = source.getHandle();
+			int i = 0;
+			//assessing data types, defining data attribute types
+			for(String hierName : headerRow){
+				source.getDefinition().setAttributeType(hierName, AttributeType.IDENTIFYING_ATTRIBUTE);
+				
+				source.getDefinition().setDataType(hierName, determineDataType(handle, i));
+				++i;
+			}
+			
+			source.getDefinition().setAttributeType("age", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+			source.getDefinition().setAttributeType("zipcode", AttributeType.INSENSITIVE_ATTRIBUTE);
+			
+		    // Create an instance of the anonymizer
+	        ARXAnonymizer anonymizer = new ARXAnonymizer();//create object
+	        ARXConfiguration anonConfiguration = ARXConfiguration.create();//defining the privacy model
+	        System.out.println("value of kAnon is 2");
+	        anonConfiguration.addPrivacyModel(new KAnonymity(2));//add privacy model, with supplied severity
+	        //config.addPrivacyModel(new KAnonymity(2));//create k anonymity model with the anonymity value
+	        anonConfiguration.setMaxOutliers(0d);
 
-        ARXResult result = anonymizer.anonymize(source, anonConfiguration);
-        
-        List<String[]> anonyRows = new ArrayList<String[]>();
-        Iterator<String[]> transformed = result.getOutput(false).iterator();
-        i = 1;
-        header = Arrays.toString(transformed.next());
-        headerRow = header.split("[\\[\\],]");//repeat to remove fields row from the data, for display purposes
-        while((transformed.hasNext()) && (i % 801 != 0)) {//format stuff for display onscreen
-        	String row = Arrays.toString(transformed.next());//view only the data, not the fields
-        	String[] data = row.split("[\\[\\],]");
-        	anonyRows.add(data);
-        	++i;
+	        ARXResult result = anonymizer.anonymize(source, anonConfiguration);
+	        
+	        //// Display data collection
+	        List<String[]> dataRows = new ArrayList<String[]>();
+	        Iterator<String[]> itHandle = handle.iterator();
+	        i = 1;
+	        
+	        String flubRow = Arrays.toString(itHandle.next());//remove the header row for display purposes
+	        
+	        while((itHandle.hasNext()) && (i % 801 != 0)) {//format stuff for display onscreen
+	        	String row = Arrays.toString(itHandle.next());//view only the data, not the fields
+	        	String[] data = row.split("[\\[\\],]");
+	        	dataRows.add(data);
+	        	++i;
+			}	        
+	        
+	        List<String[]> anonyRows = new ArrayList<String[]>();
+	        Iterator<String[]> transformed = result.getOutput(false).iterator();
+	        i = 1;
+	        
+	        flubRow = Arrays.toString(transformed.next());// to remove header from answer also
+	       
+	        while((transformed.hasNext()) && (i % 801 != 0)) {//format stuff for display onscreen
+	        	String row = Arrays.toString(transformed.next());//view only the data, not the fields
+	        	String[] data = row.split("[\\[\\],]");
+	        	anonyRows.add(data);
+	        	++i;
+			}
+	        
+	        ////// Display data collection
+	        
+	        printResult(result, source);
+	        
+			//throw into model for display
+	        // model.addAttribute("fileName", name);
+	        model.addAttribute("headerRow", headerRow);
+		    model.addAttribute("dataRows", dataRows);
+		    model.addAttribute("anonyRows", anonyRows);
+		   // model.addAttribute("file", convertedFile);
+		   // model.addAttribute("data", sourceData);
+		    
+		return "fileTestPage";
 		}
-        
-        printResult(result, source);
-        
-		//throw into model for display
-        // model.addAttribute("fileName", name);
-        model.addAttribute("headerRow", headerRow);
-	    model.addAttribute("dataRows", dataRows);
-	    model.addAttribute("anonyRows", anonyRows);
-	   // model.addAttribute("file", convertedFile);
-	   // model.addAttribute("data", sourceData);
-	    
-	return "fileTestPage";
-	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////// THIS IS WHERE THE VARIABLE INPUT TEST ENDS
 	

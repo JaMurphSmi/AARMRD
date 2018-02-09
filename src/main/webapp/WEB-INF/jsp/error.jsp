@@ -5,7 +5,6 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<link rel="stylesheet" href="/resources/css/style.css">
 <script type="text/javascript" src="/resources/js/app.js"></script>
 <title>Spring Boot - Error</title>
 </head>
@@ -15,11 +14,11 @@
   <div>You have encountered an error<br>
   apologies for inconvenience caused</div>
   <div class="form">
-    <form action="home" method="post" onsubmit="return validate()">
+    <form action="/" method="post" onsubmit="return validate()">
       <table>
         <tr>
           <td>Return to Home</td>
-          <td><input type="submit" value="Again"></td>
+          <td><input type="submit" value="Return"></td>
         </tr>
       </table>
     </form>
