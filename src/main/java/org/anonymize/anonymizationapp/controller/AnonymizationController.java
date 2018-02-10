@@ -2,8 +2,11 @@ package org.anonymize.anonymizationapp.controller;
 
 
 import java.awt.Desktop;
+import java.io.File;
+import java.io.FilenameFilter;
 // Importing ARX required modules, dependencies etc
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,6 +21,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -42,6 +47,7 @@ import org.deidentifier.arx.DataGeneralizationScheme;
 import org.deidentifier.arx.DataGeneralizationScheme.GeneralizationDegree;
 import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.DataSelector;
+import org.deidentifier.arx.DataSource;
 import org.deidentifier.arx.DataSubset;
 import org.deidentifier.arx.DataType;
 import org.deidentifier.arx.DataType.DataTypeDescription;
@@ -118,11 +124,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import org.anonymize.anonymizationapp.util.DataAspects;
 
-
 //import cern.colt.Arrays;
 
 @Controller											//implements
 public class AnonymizationController extends AnonymizationBase {
+	
+	@Autowired
+	private DataAspects dataAspectsHelper;
 	
 	// attempting to handle file uploads successfully
 		@RequestMapping("/anonymizeData")
@@ -130,12 +138,16 @@ public class AnonymizationController extends AnonymizationBase {
 				BindingResult bindResult, Model model) 
 				throws IOException, ParseException, SQLException, ClassNotFoundException, NoSuchAlgorithmException {
 			
-			Data source = anonForm.getTheSourceData();
+			//Data cannot be passed through form, needs to be created locally, create and instantiate hierarchies also
+			String fileName = anonForm.getFileName();
+			Data source = dataAspectsHelper.createDataAndHierarchies(fileName);//attempt to recreate the data object locally
 			String[] theModels = anonForm.getModelsChosen();
 			String[] attributeTypes = anonForm.getAttributesChosen();
-			String[] headerRow = anonForm.getTheHeaderRow();
+			String[] headerRow = anonForm.getTheHeaderRow();//headerRow might have been the null one all along, test tomorrow
 			int[] valuesForModels = anonForm.getValuesForModels();
-			String header = "";
+			//System.out.println(dataset);
+			//System.out.println(extension);
+			System.out.println(Arrays.toString(headerRow));
 			System.out.println("Attempting proof of concept");
 			for(String aModel : theModels) {
 				System.out.println("The model is: " + aModel);
@@ -215,6 +227,7 @@ public class AnonymizationController extends AnonymizationBase {
 		return "fileTestPage";
 		}
 	
+		
 	////////////////////////////////////////////////////////////////////////////////////////////// THIS IS WHERE THE VARIABLE INPUT TEST ENDS
 	
 	@SuppressWarnings("unused")

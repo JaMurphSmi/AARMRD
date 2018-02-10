@@ -12,7 +12,7 @@
 
 <title>AARMRD</title>
 </head>
-<body>
+<body style="background-color:#faf6b8;">
 	<div style="z-index: 10;position: absolute;right: 0;top: 0;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
   <h1>AARMRD</h1><br>
   Hello! Let's get started with your data anonymization, please select your data file and your hierarchy files for each field, then submit!<br>

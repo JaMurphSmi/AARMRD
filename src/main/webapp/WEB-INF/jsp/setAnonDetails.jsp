@@ -10,13 +10,13 @@
 <script type="text/javascript" src="/resources/js/app.js"></script>
 <title>AARMRD-Home</title>
 </head>
-<body style="background-color:#faf497;">
-  <div style="z-index: 10;position: absolute;right: 0;top: 0;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
+<body style="background-color:#faf6b8;">
+  <div style="z-index: 10;position: absolute;right: 10px;top: 10px;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
   <h1>AARMRD Homepage</h1><br><br><br>
   <hr>
 
   <h2></h2><br>
-	  <div>
+	  <div style="margin-left:50px">
 	  <h2>Submitted File</h2>
 	 <div>
 	 <br><br>
@@ -28,11 +28,11 @@
 	    <tr>File contents</tr>
 	</table>
 	<div style="overflow:hidden;">
-		<div style="float:left;margin-left: 80px;">
+		<div style="float:left;margin-left: 100px;">
 				<table>
 					<tr>
 						<c:forEach items="${headerData}" var="head">
-							<th style="width:25px;">
+							<th align="center" style="width:35px;">
 								${head}
 							</th>
 						</c:forEach>
@@ -40,7 +40,7 @@
 					    <c:forEach items="${dataRows}" var="dataRow">
 						    <tr>
 						    	<c:forEach items="${dataRow}" var="dataItem">
-								    <td>
+								    <td align="center">
 								       	${dataItem}     
 								    </td>
 								</c:forEach>    
@@ -48,9 +48,11 @@
 					    </c:forEach>
 				</table>
 		</div>	
-		<div style="float:left;margin-left: 100px;border:3px solid;border-color:#daf497;">
+		<div style="float:left;margin-left: 100px;padding:10px;border:3px solid;border-color:#d5ce66;">
 			<h2>Set the Attributes details for your data set!</h2>
 			<form:form modelAttribute="anonForm" action="anonymizeData" method="POST">
+					<form:hidden path="fileName"/>
+					<form:hidden path="theHeaderRow"/>
 					<c:forEach items="${headerRow}" var="head" varStatus="fieldNumber">
 						${head}:&nbsp&nbsp&nbsp&nbsp
 						<form:select path="modelsChosen[${fieldNumber.index}]">

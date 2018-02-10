@@ -6,9 +6,7 @@ import org.anonymize.anonymizationapp.constants.AnonModel;
 
 public class AnonymizationObject {
 	
-
-	// The source data being used for the application
-	private Data theSourceData;
+	private String fileName;
 	
 	// The field names of a given dataset, length of this used to dynamically create the correct length
 	private String[] theHeaderRow;//array in each case, ie 5 fields, array length 5, 100 fields, array length 100
@@ -25,27 +23,18 @@ public class AnonymizationObject {
 	private String[] attributesChosen;
 	
 	
-	public AnonymizationObject() {
-		this.setTheSourceData(DefaultData.create());
+	public AnonymizationObject() {//never a situation where this will be called, simply for completeness
 		//do not initialize theHeaderRow
 		//anonModels retrieve values from enum
 		//do not initialize valuesForModels
 	}
-	
-	public AnonymizationObject(Data theSourceData, String[] theHeaderRow) {
-		this.setTheSourceData(theSourceData);
+
+	public AnonymizationObject(String fileName, String[] theHeaderRow) {
+		this.setFileName(fileName);
 		this.setTheHeaderRow(theHeaderRow);
 		this.setValuesForModels(new int[(theHeaderRow.length)]);//may be an awful way of initializing, but eh
 		this.setModelsChosen(new String[(theHeaderRow.length)]);//initialize with length of the headerRow, to ensure correct number of array positions created
 		this.setAttributesChosen(new String[theHeaderRow.length]);
-	}
-
-	public Data getTheSourceData() {
-		return theSourceData;
-	}
-
-	public void setTheSourceData(Data theSourceData) {
-		this.theSourceData = theSourceData;
 	}
 
 	public String[] getTheHeaderRow() {
@@ -78,5 +67,13 @@ public class AnonymizationObject {
 
 	public void setAttributesChosen(String[] attributesChosen) {
 		this.attributesChosen = attributesChosen;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 }

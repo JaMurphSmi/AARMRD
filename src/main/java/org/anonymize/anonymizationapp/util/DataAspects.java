@@ -12,11 +12,36 @@ import org.deidentifier.arx.DataSource;
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.Data.DefaultData;
 import org.deidentifier.arx.io.CSVHierarchyInput;
+import org.springframework.stereotype.Component;
 
-public abstract class DataAspects{
-	public Data createData(final String dataset, final String extension) throws IOException {
+//component used to create the data object upon call with the dataset name and the extension
+@Component
+public class DataAspects{
+	//for initial display purposes, only to obtain rows for display in jsp
+	public Data createData (final String fileName) throws IOException {
+	
+		String[] dataNameAndExtension = fileName.split("\\.");
+		String dataset = dataNameAndExtension[0];//format is [dataset name].[extension]
+		String extension = dataNameAndExtension[1];
+		
+		 Data data = DefaultData.create();//create empty object with full scope to satisfy errors
+	       if(extension.equals("csv")) {//to handle csv and excel files
+	    	   data = Data.create("src/main/resources/templates/data/" + dataset + "." + extension, StandardCharsets.UTF_8, ';');
+	       }
+	       else if(extension.equals("xls") || extension.equals("xlsx")) {
+	    	   DataSource dataExcel = DataSource.createExcelSource("src/main/resources/templates/data/" + dataset + "." + extension, 0, true);
+	    	   data = Data.create(dataExcel);
+	       }
+	       return data;
+	}
+	//for object needed to perform anonymization	
+	public Data createDataAndHierarchies(final String fileName) throws IOException {
 
-		   Data data = DefaultData.create();//create empty object with full scope to satisfy errors
+		String[] dataNameAndExtension = fileName.split("\\.");
+		String dataset = dataNameAndExtension[0];//format is [dataset name].[extension]
+		String extension = dataNameAndExtension[1];
+		
+		 Data data = DefaultData.create();//create empty object with full scope to satisfy errors
 	       if(extension.equals("csv")) {//to handle csv and excel files
 	    	   data = Data.create("src/main/resources/templates/data/" + dataset + "." + extension, StandardCharsets.UTF_8, ';');
 	       }

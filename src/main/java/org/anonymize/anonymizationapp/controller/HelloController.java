@@ -42,8 +42,8 @@ import org.anonymize.anonymizationapp.util.DataAspects;
 @Controller
 public class HelloController extends AnonymizationBase {
 	
-	
-	DataAspects dataAspectsHelper;
+	@Autowired
+	private DataAspects dataAspectsHelper;
 
    @RequestMapping("/")
    public String index() {
@@ -58,12 +58,12 @@ public class HelloController extends AnonymizationBase {
 				
 		//attempting to cast multipartfile object to file(can be modularized later if successful)
 		//prepare dataset name
-		String datasetfile = dataFile.getOriginalFilename();
-		String[] datSetName = datasetfile.split("\\.");
-		String dataset = datSetName[0];//format is [dataset name].[extension]
-		String extension = datSetName[1];
+		String datasetFile = dataFile.getOriginalFilename();
+		
+		model.addAttribute("fileName", datasetFile);
+		
 		// save the dataset to the project hierarchy(lol)
-		File convertedDataFile = new File("src/main/resources/templates/data/" + dataset + "." + extension); //for saving
+		File convertedDataFile = new File("src/main/resources/templates/data/" + datasetFile); //for saving
 		convertedDataFile.createNewFile();
 		FileOutputStream fos = new FileOutputStream(convertedDataFile);
 		fos.write(dataFile.getBytes());
@@ -92,8 +92,8 @@ public class HelloController extends AnonymizationBase {
 		}
 		
 		System.out.println("before creating the data and hierarchies");
-		Data source = createData(dataset, extension);//hopefully this way works 
-		System.out.println("after creating the data and hierarchies successfully");
+		Data source = dataAspectsHelper.createData(datasetFile);//hopefully this way works 
+		System.out.println("after creating the data successfully");
 		DataHandle handle = source.getHandle();//acquiring data handle
 		
 		Iterator<String[]> itHandle = handle.iterator();
@@ -118,22 +118,23 @@ public class HelloController extends AnonymizationBase {
 			++i;
 		}
 		
-		//had to create object to push to jsp, hopefully to use modelAttribute
+		source = null; //garbage collection, to avoid buildup of objects and memory growth
+		
+		//had to create object to push to jsp, to use modelAttribute
 		//other variables instantiated as empty arrays based on the now constant header.length()
-		AnonymizationObject anonForm = new AnonymizationObject(source, header);//constant for an individual user
+		AnonymizationObject anonForm = new AnonymizationObject(datasetFile, header);//constant for an individual user
 		//////// use header row to allow user to set individual algorithms for each field
 		String[] models = {"k-anonymity","l-diversity","t-closeness","δ-presence"};
 		String[] attributeTypes = {"Identifying", "Quasi-identifying", "Sensitive", "Insensitive"}; 
 		for (String mod : models) {
 			System.out.println(mod + ",");//testing if models in array
 		}
-		System.out.println("The data is: " + anonForm.getTheSourceData().toString());
+		//object of type Data cannot be handled by the jsp, as such needs to be recreated between each view
 		System.out.println("ModelsChosen length: " + anonForm.getModelsChosen().length);
 		System.out.println("AttributesChosen length: " + anonForm.getAttributesChosen().length);
 		System.out.println("ValuesChosen length: " + anonForm.getValuesForModels().length);
 		
 		model.addAttribute("anonForm", anonForm);
-		model.addAttribute("source", source);
 		model.addAttribute("models", models);
 		//model.addAttribute("models", AnonModel.values());
 		model.addAttribute("attributes", attributeTypes);
@@ -141,39 +142,4 @@ public class HelloController extends AnonymizationBase {
 	    return "setAnonDetails";
    }
    
-   public Data createData(final String dataset, final String extension) throws IOException {
-
-	   Data data = DefaultData.create();//create empty object with full scope to satisfy errors
-       if(extension.equals("csv")) {//to handle csv and excel files
-    	   data = Data.create("src/main/resources/templates/data/" + dataset + "." + extension, StandardCharsets.UTF_8, ';');
-       }
-       else if(extension.equals("xls") || extension.equals("xlsx")) {
-    	   DataSource dataExcel = DataSource.createExcelSource("src/main/resources/templates/data/" + dataset + "." + extension, 0, true);
-    	   data = Data.create(dataExcel);
-       }
-       // Read generalization hierarchies
-       FilenameFilter hierarchyFilter = new FilenameFilter() {
-           @Override
-           public boolean accept(File dir, String name) {
-               if (name.matches(dataset + "_hierarchy_(.)+.csv")) {
-                   return true;
-               } else {
-                   return false;
-               }
-           }
-       };
-       // Create definition, hierarchies will always be .csv
-       File testDir = new File("src/main/resources/templates/hierarchy/");
-       File[] genHierFiles = testDir.listFiles(hierarchyFilter);
-       Pattern pattern = Pattern.compile("_hierarchy_(.*?).csv");
-       for (File file : genHierFiles) {
-           Matcher matcher = pattern.matcher(file.getName());
-           if (matcher.find()) {
-               CSVHierarchyInput hier = new CSVHierarchyInput(file, StandardCharsets.UTF_8, ';');
-               String attributeName = matcher.group(1);
-               data.getDefinition().setAttributeType(attributeName, Hierarchy.create(hier.getHierarchy()));
-           }
-       }
-       return data;
-   }
 }
