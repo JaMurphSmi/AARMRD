@@ -105,7 +105,7 @@ public class HelloController extends AnonymizationBase {
 		for(int i = 0; i < headerTemp.length - 1; i++) {
 			header[i] = headerTemp[i+1].trim();
 		}//shift all values 
-		model.addAttribute("headerData", headerTemp);
+		//model.addAttribute("headerData", headerTemp);//was incorrect
 		model.addAttribute("headerRow", header);//only need to get the header once as it will do for the resulting dataset also
 		for (String bit : header) {
 			System.out.println(bit + ",");//testing if random space at the start
@@ -113,7 +113,11 @@ public class HelloController extends AnonymizationBase {
 		int i = 1;
 		while((itHandle.hasNext()) && (i % 801 != 0)) {
 			String row = Arrays.toString(itHandle.next());
-			String[] data = row.split("[\\[\\],]");
+			String[] dataTemp = row.split("[\\[\\],]");//all data needs formatting to remove empty columns
+			String[] data = new String[dataTemp.length - 1];
+			for(int j = 0; j < dataTemp.length - 1; j++) {
+				data[j] = dataTemp[j+1].trim();
+			}
 			dataRows.add(data);
 			++i;
 		}

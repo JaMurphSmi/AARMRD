@@ -142,7 +142,7 @@ public class AnonymizationController extends AnonymizationBase {
 			String fileName = anonForm.getFileName();
 			Data source = dataAspectsHelper.createDataAndHierarchies(fileName);//attempt to recreate the data object locally
 			String[] theModels = anonForm.getModelsChosen();
-			String[] attributeTypes = anonForm.getAttributesChosen();
+			String[] attributesChosen = anonForm.getAttributesChosen();
 			String[] headerRow = anonForm.getTheHeaderRow();//headerRow might have been the null one all along, test tomorrow
 			int[] valuesForModels = anonForm.getValuesForModels();
 			//System.out.println(dataset);
@@ -157,15 +157,34 @@ public class AnonymizationController extends AnonymizationBase {
 				System.out.println("The value is: " + aValue);
 			}
 			System.out.println("Printing attribute types chosen");
-			for(String anAttribute : attributeTypes) {
+			for(String anAttribute : attributesChosen) {
 				System.out.println("The model is: " + anAttribute);
 			}
 			System.out.println("Possibly proved concept?");
 			
 			DataHandle handle = source.getHandle();
 			int i = 0;
+			
+			for(i = 0; i < headerRow.length; ++i) {
+				//determine the type of the specific field
+				if(attributesChosen[i].equals("Identifying")){
+					source.getDefinition().setAttributeType(headerRow[i], AttributeType.IDENTIFYING_ATTRIBUTE);
+				}
+				else if(attributesChosen[i].equals("Quasi-Identifying")){
+					source.getDefinition().setAttributeType(headerRow[i], AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+				}
+				else if(attributesChosen[i].equals("Sensitive")){
+					source.getDefinition().setAttributeType(headerRow[i], AttributeType.SENSITIVE_ATTRIBUTE);
+				}
+				else if((attributesChosen[i].equals("Insensitive")) || (attributesChosen[i].equals("- - NONE - -"))){
+					source.getDefinition().setAttributeType(headerRow[i], AttributeType.INSENSITIVE_ATTRIBUTE);
+				}
+				source.getDefinition().setDataType(headerRow[i], determineDataType(handle, i));
+			}
+				
+			
 			//assessing data types, defining data attribute types
-			for(String hierName : headerRow){
+			/*for(String hierName : headerRow){
 				source.getDefinition().setAttributeType(hierName, AttributeType.IDENTIFYING_ATTRIBUTE);
 				
 				source.getDefinition().setDataType(hierName, determineDataType(handle, i));
@@ -174,7 +193,7 @@ public class AnonymizationController extends AnonymizationBase {
 			
 			source.getDefinition().setAttributeType("age", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
 			source.getDefinition().setAttributeType("zipcode", AttributeType.INSENSITIVE_ATTRIBUTE);
-			
+			*/
 		    // Create an instance of the anonymizer
 	        ARXAnonymizer anonymizer = new ARXAnonymizer();//create object
 	        ARXConfiguration anonConfiguration = ARXConfiguration.create();//defining the privacy model
@@ -192,12 +211,22 @@ public class AnonymizationController extends AnonymizationBase {
 	        
 	        String flubRow = Arrays.toString(itHandle.next());//remove the header row for display purposes
 	        
-	        while((itHandle.hasNext()) && (i % 801 != 0)) {//format stuff for display onscreen
+	        /*while((itHandle.hasNext()) && (i % 801 != 0)) {//format stuff for display onscreen
 	        	String row = Arrays.toString(itHandle.next());//view only the data, not the fields
 	        	String[] data = row.split("[\\[\\],]");
 	        	dataRows.add(data);
 	        	++i;
-			}	        
+			}*/	
+	        while((itHandle.hasNext()) && (i % 801 != 0)) {//needs extra cleanup to remove empty column
+				String row = Arrays.toString(itHandle.next());
+				String[] dataTemp = row.split("[\\[\\],]");
+				String[] data = new String[dataTemp.length - 1];
+				for(int j = 0; j < dataTemp.length - 1; j++) {
+					data[j] = dataTemp[j+1].trim();
+				}
+				dataRows.add(data);
+				++i;
+			}
 	        
 	        List<String[]> anonyRows = new ArrayList<String[]>();
 	        Iterator<String[]> transformed = result.getOutput(false).iterator();
@@ -205,11 +234,21 @@ public class AnonymizationController extends AnonymizationBase {
 	        
 	        flubRow = Arrays.toString(transformed.next());// to remove header from answer also
 	       
-	        while((transformed.hasNext()) && (i % 801 != 0)) {//format stuff for display onscreen
+	        /*while((transformed.hasNext()) && (i % 801 != 0)) {//format stuff for display onscreen
 	        	String row = Arrays.toString(transformed.next());//view only the data, not the fields
 	        	String[] data = row.split("[\\[\\],]");
 	        	anonyRows.add(data);
 	        	++i;
+			}*/
+	        while((transformed.hasNext()) && (i % 801 != 0)) {
+				String row = Arrays.toString(transformed.next());
+				String[] dataTemp = row.split("[\\[\\],]");//all data needs formatting to remove empty columns
+				String[] data = new String[dataTemp.length - 1];
+				for(int j = 0; j < dataTemp.length - 1; j++) {
+					data[j] = dataTemp[j+1].trim();
+				}
+				anonyRows.add(data);
+				++i;
 			}
 	        
 	        ////// Display data collection
@@ -224,9 +263,11 @@ public class AnonymizationController extends AnonymizationBase {
 		   // model.addAttribute("file", convertedFile);
 		   // model.addAttribute("data", sourceData);
 		    
-		return "fileTestPage";
-		}
+		return "compareSets";
+	}
 	
+
+			
 		
 	////////////////////////////////////////////////////////////////////////////////////////////// THIS IS WHERE THE VARIABLE INPUT TEST ENDS
 	

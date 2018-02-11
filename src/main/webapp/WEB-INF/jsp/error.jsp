@@ -5,13 +5,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<script type="text/javascript" src="/resources/js/app.js"></script>
+<script type="text/javascript" src="/resources/static/js/app.js"></script>
 <title>Spring Boot - Error</title>
 </head>
 <body>
   <h1>Error</h1>
   <hr>
-  <div>You have encountered an error<br>
+  <div align=center >You have encountered an error<br>
   apologies for inconvenience caused</div>
   <div class="form">
     <form action="/" method="post" onsubmit="return validate()">

@@ -6,8 +6,8 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<link rel="stylesheet" type="text/css" href="/css/style.css" />
-<script type="text/javascript" src="/resources/js/app.js"></script>
+<link rel="stylesheet" type="text/css" href="/resources/static/css/style.css" />
+<script type="text/javascript" src="/resources/static/js/app.js"></script>
 <title>AARMRD-Home</title>
 </head>
 <body style="background-color:#faf6b8;">
@@ -29,10 +29,10 @@
 	</table>
 	<div style="overflow:hidden;">
 		<div style="float:left;margin-left: 100px;">
-				<table>
+				<table style="border-collapse: collapse;">
 					<tr>
-						<c:forEach items="${headerData}" var="head">
-							<th align="center" style="width:35px;">
+						<c:forEach items="${headerRow}" var="head">
+							<th align="center" style="width:35px;border:1px solid #ddd;background-color: #e16830;">
 								${head}
 							</th>
 						</c:forEach>
@@ -40,7 +40,7 @@
 					    <c:forEach items="${dataRows}" var="dataRow">
 						    <tr>
 						    	<c:forEach items="${dataRow}" var="dataItem">
-								    <td align="center">
+								    <td align="center" style="border:1px solid #d6aa44;">
 								       	${dataItem}     
 								    </td>
 								</c:forEach>    
@@ -64,6 +64,7 @@
 						&nbsp&nbspValue for algorithm: <form:input type="number" path="valuesForModels[${fieldNumber.index}]"/>
 						&nbsp&nbspFiled Attribute Type: 
 						<form:select path="attributesChosen[${fieldNumber.index}]">
+							<form:option value="- - NONE - -">- - NONE - -</form:option>
 							<c:forEach items="${attributes}" var="anAttribute"> 
 								<form:option value="${anAttribute}">${anAttribute}</form:option>
 							</c:forEach>
