@@ -129,8 +129,9 @@ import org.anonymize.anonymizationapp.util.DataAspects;
 
 @Controller											//implements
 public class AnonymizationController extends AnonymizationBase {
-	
-	Data sourceData;
+	//solution to the source data issue was to elevate the object to class scope
+	Data sourceData;//now available in all methods within the anonymization controller
+	//may restrict all anonymization actions to the anonymization controller? not have multiple controllers?
 	
 	@Autowired
 	private DataAspects dataAspectsHelper;
