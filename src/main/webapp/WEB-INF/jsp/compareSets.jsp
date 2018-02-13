@@ -7,11 +7,11 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<link rel="stylesheet" type="text/css" href="/css/style.css" />
-<script type="text/javascript" src="/resources/js/app.js"></script>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/static/css/style.css" />
+<script type="text/javascript" src="${pageContext.request.contextPath}/resources/static/js/app.js"></script>
 <title>Spring Boot</title>
 </head>
-<body style="background-color:#faf497;">
+<body style="background-color:#faf6b8;">
 <div>
   <h2>Submitted File</h2>
   	<br><br>
@@ -26,7 +26,7 @@
 			<table style="border-collapse: collapse;">
 				<tr>
 					<c:forEach items="${headerRow}" var="head">
-						<th align="center" style="width:35px;border:1px solid #ddd;background-color: #e16830;">
+						<th align="center" style="width:50px;border:1px solid #ddd;background-color: #e16830;">
 							${head}
 						</th>
 					</c:forEach>

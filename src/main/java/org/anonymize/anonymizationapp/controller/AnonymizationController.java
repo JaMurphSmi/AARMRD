@@ -3,6 +3,7 @@ package org.anonymize.anonymizationapp.controller;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 // Importing ARX required modules, dependencies etc
 import java.io.IOException;
@@ -129,8 +130,111 @@ import org.anonymize.anonymizationapp.util.DataAspects;
 @Controller											//implements
 public class AnonymizationController extends AnonymizationBase {
 	
+	Data sourceData;
+	
 	@Autowired
 	private DataAspects dataAspectsHelper;
+
+   @RequestMapping("/")
+   public String index() {
+      return "index";
+   }
+   
+   // will be a page to handle the uploading of files
+   @RequestMapping("/uploadFiles")//only take in the files, establish data fields first, then allow user to select attribute types, algos etc
+   public String getData(@RequestParam("dataFile") MultipartFile dataFile,
+		   @RequestParam("hierFiles") MultipartFile[] hierFiles, Model model) throws IOException, ParseException {
+		///////////////// Creating the data object
+				
+		//attempting to cast multipartfile object to file(can be modularized later if successful)
+		//prepare dataset name
+		String datasetFile = dataFile.getOriginalFilename();
+		
+		model.addAttribute("fileName", datasetFile);
+		
+		// save the dataset to the project hierarchy(lol)
+		File convertedDataFile = new File("src/main/resources/templates/data/" + datasetFile); //for saving
+		convertedDataFile.createNewFile();
+		FileOutputStream fos = new FileOutputStream(convertedDataFile);
+		fos.write(dataFile.getBytes());
+		fos.close();
+		
+		//////////////////// finished doing stuff for Data
+		
+		////////////////////creating the hierarchies in file path
+			    
+		//defining hierarchy files and names
+		List<String> hierNames = new ArrayList<String>();//for hierarchy names to display
+		//List<Hierarchy> hierarchies = new ArrayList<Hierarchy>();//list to hold the created hierarchy objects
+		
+		for(MultipartFile mulFile: hierFiles) {
+			String fileName = mulFile.getOriginalFilename();
+			File convertedHierFile = new File("src/main/resources/templates/hierarchy/" + fileName);
+			
+			convertedHierFile.createNewFile();
+			
+			FileOutputStream fost = new FileOutputStream(convertedHierFile);
+			fost.write(mulFile.getBytes());
+			fost.close();//works
+			
+			String[] tempArray = fileName.split("[\\_\\.]");//split by underscore and dot		  0         1         2
+			hierNames.add(tempArray[2]);//add file name to list for display reasons further on [dataset]_hierarchy_[column]
+		}
+		
+		System.out.println("before creating the data and hierarchies");
+		sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile);//hopefully this way works 
+		System.out.println("after creating the data successfully");
+		DataHandle handle = sourceData.getHandle();//acquiring data handle
+		
+		Iterator<String[]> itHandle = handle.iterator();
+		List<String[]> dataRows = new ArrayList<String[]>();
+		String headerRow = Arrays.toString(itHandle.next());//get the header of the dataset to display in bold
+		System.out.println(">" + headerRow + "<");
+		String[] headerTemp = headerRow.split("[\\[\\],]");
+		String[] header = new String[headerTemp.length - 1];
+		for(int i = 0; i < headerTemp.length - 1; i++) {
+			header[i] = headerTemp[i+1].trim();
+		}//shift all values 
+		//model.addAttribute("headerData", headerTemp);//was incorrect
+		model.addAttribute("headerRow", header);//only need to get the header once as it will do for the resulting dataset also
+		for (String bit : header) {
+			System.out.println(bit + ",");//testing if random space at the start
+		}
+		int i = 1;
+		while((itHandle.hasNext()) && (i % 801 != 0)) {
+			String row = Arrays.toString(itHandle.next());
+			String[] dataTemp = row.split("[\\[\\],]");//all data needs formatting to remove empty columns
+			String[] data = new String[dataTemp.length - 1];
+			for(int j = 0; j < dataTemp.length - 1; j++) {
+				data[j] = dataTemp[j+1].trim();
+			}
+			dataRows.add(data);
+			++i;
+		}
+		
+		//source = null; //garbage collection, to avoid buildup of objects and memory growth
+		
+		//had to create object to push to jsp, to use modelAttribute
+		//other variables instantiated as empty arrays based on the now constant header.length()
+		AnonymizationObject anonForm = new AnonymizationObject(datasetFile, header);//constant for an individual user
+		//////// use header row to allow user to set individual algorithms for each field
+		String[] models = {"k-anonymity","l-diversity","t-closeness","δ-presence"};
+		String[] attributeTypes = {"Identifying", "Quasi-identifying", "Sensitive", "Insensitive"}; 
+		for (String mod : models) {
+			System.out.println(mod + ",");//testing if models in array
+		}
+		//object of type Data cannot be handled by the jsp, as such needs to be recreated between each view
+		System.out.println("ModelsChosen length: " + anonForm.getModelsChosen().length);
+		System.out.println("AttributesChosen length: " + anonForm.getAttributesChosen().length);
+		System.out.println("ValuesChosen length: " + anonForm.getValuesForModels().length);
+		
+		model.addAttribute("anonForm", anonForm);
+		model.addAttribute("models", models);
+		//model.addAttribute("models", AnonModel.values());
+		model.addAttribute("attributes", attributeTypes);
+		model.addAttribute("dataRows", dataRows);
+	    return "setAnonDetails";
+   }
 	
 	// attempting to handle file uploads successfully
 		@RequestMapping("/anonymizeData")
@@ -139,8 +243,8 @@ public class AnonymizationController extends AnonymizationBase {
 				throws IOException, ParseException, SQLException, ClassNotFoundException, NoSuchAlgorithmException {
 			
 			//Data cannot be passed through form, needs to be created locally, create and instantiate hierarchies also
-			String fileName = anonForm.getFileName();
-			Data source = dataAspectsHelper.createDataAndHierarchies(fileName);//attempt to recreate the data object locally
+			//String fileName = anonForm.getFileName();
+			//Data source = dataAspectsHelper.createDataAndHierarchies(fileName);//attempt to recreate the data object locally
 			String[] theModels = anonForm.getModelsChosen();
 			String[] attributesChosen = anonForm.getAttributesChosen();
 			String[] headerRow = anonForm.getTheHeaderRow();//headerRow might have been the null one all along, test tomorrow
@@ -162,38 +266,26 @@ public class AnonymizationController extends AnonymizationBase {
 			}
 			System.out.println("Possibly proved concept?");
 			
-			DataHandle handle = source.getHandle();
+			DataHandle handle = sourceData.getHandle();
 			int i = 0;
 			
 			for(i = 0; i < headerRow.length; ++i) {
 				//determine the type of the specific field
 				if(attributesChosen[i].equals("Identifying")){
-					source.getDefinition().setAttributeType(headerRow[i], AttributeType.IDENTIFYING_ATTRIBUTE);
+					sourceData.getDefinition().setAttributeType(headerRow[i], AttributeType.IDENTIFYING_ATTRIBUTE);
 				}
 				else if(attributesChosen[i].equals("Quasi-Identifying")){
-					source.getDefinition().setAttributeType(headerRow[i], AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+					sourceData.getDefinition().setAttributeType(headerRow[i], AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
 				}
 				else if(attributesChosen[i].equals("Sensitive")){
-					source.getDefinition().setAttributeType(headerRow[i], AttributeType.SENSITIVE_ATTRIBUTE);
+					sourceData.getDefinition().setAttributeType(headerRow[i], AttributeType.SENSITIVE_ATTRIBUTE);
 				}
 				else if((attributesChosen[i].equals("Insensitive")) || (attributesChosen[i].equals("- - NONE - -"))){
-					source.getDefinition().setAttributeType(headerRow[i], AttributeType.INSENSITIVE_ATTRIBUTE);
+					sourceData.getDefinition().setAttributeType(headerRow[i], AttributeType.INSENSITIVE_ATTRIBUTE);
 				}
-				source.getDefinition().setDataType(headerRow[i], determineDataType(handle, i));
+				sourceData.getDefinition().setDataType(headerRow[i], determineDataType(handle, i));
 			}
 				
-			
-			//assessing data types, defining data attribute types
-			/*for(String hierName : headerRow){
-				source.getDefinition().setAttributeType(hierName, AttributeType.IDENTIFYING_ATTRIBUTE);
-				
-				source.getDefinition().setDataType(hierName, determineDataType(handle, i));
-				++i;
-			}
-			
-			source.getDefinition().setAttributeType("age", AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
-			source.getDefinition().setAttributeType("zipcode", AttributeType.INSENSITIVE_ATTRIBUTE);
-			*/
 		    // Create an instance of the anonymizer
 	        ARXAnonymizer anonymizer = new ARXAnonymizer();//create object
 	        ARXConfiguration anonConfiguration = ARXConfiguration.create();//defining the privacy model
@@ -202,7 +294,7 @@ public class AnonymizationController extends AnonymizationBase {
 	        //config.addPrivacyModel(new KAnonymity(2));//create k anonymity model with the anonymity value
 	        anonConfiguration.setMaxOutliers(0d);
 
-	        ARXResult result = anonymizer.anonymize(source, anonConfiguration);
+	        ARXResult result = anonymizer.anonymize(sourceData, anonConfiguration);
 	        
 	        //// Display data collection
 	        List<String[]> dataRows = new ArrayList<String[]>();
@@ -211,12 +303,6 @@ public class AnonymizationController extends AnonymizationBase {
 	        
 	        String flubRow = Arrays.toString(itHandle.next());//remove the header row for display purposes
 	        
-	        /*while((itHandle.hasNext()) && (i % 801 != 0)) {//format stuff for display onscreen
-	        	String row = Arrays.toString(itHandle.next());//view only the data, not the fields
-	        	String[] data = row.split("[\\[\\],]");
-	        	dataRows.add(data);
-	        	++i;
-			}*/	
 	        while((itHandle.hasNext()) && (i % 801 != 0)) {//needs extra cleanup to remove empty column
 				String row = Arrays.toString(itHandle.next());
 				String[] dataTemp = row.split("[\\[\\],]");
@@ -234,12 +320,6 @@ public class AnonymizationController extends AnonymizationBase {
 	        
 	        flubRow = Arrays.toString(transformed.next());// to remove header from answer also
 	       
-	        /*while((transformed.hasNext()) && (i % 801 != 0)) {//format stuff for display onscreen
-	        	String row = Arrays.toString(transformed.next());//view only the data, not the fields
-	        	String[] data = row.split("[\\[\\],]");
-	        	anonyRows.add(data);
-	        	++i;
-			}*/
 	        while((transformed.hasNext()) && (i % 801 != 0)) {
 				String row = Arrays.toString(transformed.next());
 				String[] dataTemp = row.split("[\\[\\],]");//all data needs formatting to remove empty columns
@@ -253,15 +333,13 @@ public class AnonymizationController extends AnonymizationBase {
 	        
 	        ////// Display data collection
 	        
-	        printResult(result, source);
+	        printResult(result, sourceData);
 	        
 			//throw into model for display
 	        // model.addAttribute("fileName", name);
 	        model.addAttribute("headerRow", headerRow);
 		    model.addAttribute("dataRows", dataRows);
 		    model.addAttribute("anonyRows", anonyRows);
-		   // model.addAttribute("file", convertedFile);
-		   // model.addAttribute("data", sourceData);
 		    
 		return "compareSets";
 	}

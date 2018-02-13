@@ -7,8 +7,8 @@
 <head>
 
 <!-- Static content -->
-<link rel="stylesheet" type="text/css" href="css/style.css" />
-<script type="text/javascript" src="/resources/js/app.js"></script>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/static/css/style.css" />
+<script type="text/javascript" src="${pageContext.request.contextPath}/resources/static/js/app.js"></script>
 
 <title>AARMRD</title>
 </head>
