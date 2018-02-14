@@ -183,7 +183,7 @@ public class AnonymizationController extends AnonymizationBase {
 		}
 		
 		System.out.println("before creating the data and hierarchies");
-		sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile);//hopefully this way works 
+		sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile, hierNames);//hopefully this way works 
 		
 		System.out.println("after creating the data successfully");
 		DataHandle handle = sourceData.getHandle();//acquiring data handle

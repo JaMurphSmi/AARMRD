@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,7 +38,7 @@ public class DataAspects{
 	       return data;
 	}
 	//to create the data and hierarchies in one step	
-	public Data createDataAndHierarchies(final String fileName) throws IOException {
+	public Data createDataAndHierarchies(final String fileName, final List<String> hierNames) throws IOException {
 
 		String[] dataNameAndExtension = fileName.split("\\.");
 		String dataset = dataNameAndExtension[0];//format is [dataset name].[extension]
@@ -48,7 +50,13 @@ public class DataAspects{
 	       }
 	       else if(extension.equals("xls") || extension.equals("xlsx")) {
 	    	   DataSource dataExcel = DataSource.createExcelSource("src/main/resources/templates/data/" + dataset + "." + extension, 0, true);
-	    	   data = Data.create(dataExcel);
+	    	   //need to specify column names in here before casting to type Data, so send field names shaved from
+	    	   int i = 0;
+	    	   for(String hierName : hierNames) {
+	    		   dataExcel.addColumn(hierName);
+	    		   ++i;
+	    	   }
+	    	   data = Data.create(dataExcel);//input hierarchy files
 	       }
 	       // Read generalization hierarchies
 	       FilenameFilter hierarchyFilter = new FilenameFilter() {
