@@ -214,8 +214,9 @@ public class AnonymizationController extends AnonymizationBase {
 			++i;
 		}
 		
-		dataAspectsHelper.deleteFiles();//investigating if order causes issues with file deletion?
 		//source = null; //garbage collection, to avoid buildup of objects and memory growth
+		//should leave the object alone for it to be shared between methods. null it at
+		//the conclusion of anonymization process
 		
 		//had to create object to push to jsp, to use modelAttribute
 		//other variables instantiated as empty arrays based on the now constant header.length()

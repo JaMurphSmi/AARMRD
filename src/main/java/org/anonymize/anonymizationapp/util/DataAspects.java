@@ -82,6 +82,7 @@ public class DataAspects{
 	           }
 	       }
 	       //after all required work completed with the data and hierarchy files, need to remove from file system
+	       this.deleteFiles();
 	       
 	       return data;
 	   }
