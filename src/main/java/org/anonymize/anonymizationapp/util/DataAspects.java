@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import org.deidentifier.arx.Data;
 import org.deidentifier.arx.DataSource;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.Data.DefaultData;
 import org.deidentifier.arx.io.CSVHierarchyInput;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataAspects{
 	//for initial display purposes, only to obtain rows for display in jsp
-	public Data createData (final String fileName) throws IOException {
+	public Data createData (final String fileName) throws IOException {//may now be obsolete
 	
 		String[] dataNameAndExtension = fileName.split("\\.");
 		String dataset = dataNameAndExtension[0];//format is [dataset name].[extension]
@@ -34,7 +35,7 @@ public class DataAspects{
 	       }
 	       return data;
 	}
-	//for object needed to perform anonymization	
+	//to create the data and hierarchies in one step	
 	public Data createDataAndHierarchies(final String fileName) throws IOException {
 
 		String[] dataNameAndExtension = fileName.split("\\.");
@@ -72,7 +73,26 @@ public class DataAspects{
 	               data.getDefinition().setAttributeType(attributeName, Hierarchy.create(hier.getHierarchy()));
 	           }
 	       }
+	       //after all required work completed with the data and hierarchy files, need to remove from file system
+	       
 	       return data;
 	   }
+	
+	public void deleteFiles() throws IOException {
+		try {
+		File dataDelete = new File("src/main/resources/templates/data");
+	    FileUtils.cleanDirectory(dataDelete);
+		}
+		catch(IOException failure) {
+			System.out.println("Deleting file failed, overall function should not be hindered");
+		}
+		try {
+	    File hierarchyDelete = new File("src/main/resources/templates/hierarchy");
+	    FileUtils.cleanDirectory(hierarchyDelete);
+		}
+		catch(IOException failure) {
+			System.out.println("Deleting a certain file failed, overall function should not be hindered");
+		}
+	}
 	   
 }

@@ -184,6 +184,7 @@ public class AnonymizationController extends AnonymizationBase {
 		
 		System.out.println("before creating the data and hierarchies");
 		sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile);//hopefully this way works 
+		
 		System.out.println("after creating the data successfully");
 		DataHandle handle = sourceData.getHandle();//acquiring data handle
 		
@@ -213,6 +214,7 @@ public class AnonymizationController extends AnonymizationBase {
 			++i;
 		}
 		
+		dataAspectsHelper.deleteFiles();//investigating if order causes issues with file deletion?
 		//source = null; //garbage collection, to avoid buildup of objects and memory growth
 		
 		//had to create object to push to jsp, to use modelAttribute
