@@ -33,8 +33,8 @@ public class AnonymizationObject {
 		this.setFileName(fileName);
 		this.setTheHeaderRow(theHeaderRow);
 		this.setValuesForModels(new int[(theHeaderRow.length)]);//may be an awful way of initializing, but eh
-		this.setModelsChosen(new String[(theHeaderRow.length)]);//initialize with length of the headerRow, to ensure correct number of array positions created
-		this.setAttributesChosen(new String[theHeaderRow.length]);
+		this.setAttributesChosen(new String[theHeaderRow.length]);//initialize with length of the headerRow, to ensure correct number of array positions created
+		this.setModelsChosen(new String[theHeaderRow.length]);
 	}
 
 	public String[] getTheHeaderRow() {

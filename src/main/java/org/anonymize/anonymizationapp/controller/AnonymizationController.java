@@ -75,6 +75,7 @@ import org.deidentifier.arx.criteria.EDDifferentialPrivacy;
 import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
 import org.deidentifier.arx.criteria.Inclusion;
 import org.deidentifier.arx.criteria.KAnonymity;
+import org.deidentifier.arx.criteria.OrderedDistanceTCloseness;
 import org.deidentifier.arx.criteria.KMap;
 import org.deidentifier.arx.criteria.ProfitabilityJournalist;
 import org.deidentifier.arx.criteria.ProfitabilityJournalistNoAttack;
@@ -150,7 +151,7 @@ public class AnonymizationController extends AnonymizationBase {
 		//attempting to cast multipartfile object to file(can be modularized later if successful)
 		//prepare dataset name
 		String datasetFile = dataFile.getOriginalFilename();
-		
+		System.out.println("datasetfile name is : " + datasetFile);
 		model.addAttribute("fileName", datasetFile);
 		
 		// save the dataset to the project hierarchy(lol)
@@ -171,7 +172,7 @@ public class AnonymizationController extends AnonymizationBase {
 		for(MultipartFile mulFile: hierFiles) {
 			String fileName = mulFile.getOriginalFilename();
 			File convertedHierFile = new File("src/main/resources/templates/hierarchy/" + fileName);
-			
+			System.out.println("hierfileName is : " + fileName);
 			convertedHierFile.createNewFile();
 			
 			FileOutputStream fost = new FileOutputStream(convertedHierFile);
@@ -184,8 +185,12 @@ public class AnonymizationController extends AnonymizationBase {
 		
 		System.out.println("before creating the data and hierarchies");
 		sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile, hierNames);//hopefully this way works 
-		
 		System.out.println("after creating the data successfully");
+		//after all required work completed with the data and hierarchy files, need to remove from file system
+	    System.out.println("Just before delete");
+	    //dataAspectsHelper.deleteFiles();
+	    System.out.println("Just after delete");
+		
 		DataHandle handle = sourceData.getHandle();//acquiring data handle
 		
 		Iterator<String[]> itHandle = handle.iterator();
@@ -222,7 +227,7 @@ public class AnonymizationController extends AnonymizationBase {
 		//other variables instantiated as empty arrays based on the now constant header.length()
 		AnonymizationObject anonForm = new AnonymizationObject(datasetFile, header);//constant for an individual user
 		//////// use header row to allow user to set individual algorithms for each field
-		String[] models = {"k-anonymity","l-diversity","t-closeness","δ-presence"};
+		String[] models = {"k-anonymity","l-diversity","t-closeness"};//remove delta presence for now,"δ-presence"};
 		String[] attributeTypes = {"Identifying", "Quasi-identifying", "Sensitive", "Insensitive"}; 
 		for (String mod : models) {
 			System.out.println(mod + ",");//testing if models in array
@@ -249,7 +254,7 @@ public class AnonymizationController extends AnonymizationBase {
 			//Data cannot be passed through form, needs to be created locally, create and instantiate hierarchies also
 			//String fileName = anonForm.getFileName();
 			//Data source = dataAspectsHelper.createDataAndHierarchies(fileName);//attempt to recreate the data object locally
-			String[] theModels = anonForm.getModelsChosen();
+			String[] modelsChosen = anonForm.getModelsChosen();
 			String[] attributesChosen = anonForm.getAttributesChosen();
 			String[] headerRow = anonForm.getTheHeaderRow();//headerRow might have been the null one all along, test tomorrow
 			int[] valuesForModels = anonForm.getValuesForModels();
@@ -257,7 +262,7 @@ public class AnonymizationController extends AnonymizationBase {
 			//System.out.println(extension);
 			System.out.println(Arrays.toString(headerRow));
 			System.out.println("Attempting proof of concept");
-			for(String aModel : theModels) {
+			for(String aModel : modelsChosen) {
 				System.out.println("The model is: " + aModel);
 			}
 			System.out.println("After printing the selected models");
@@ -273,6 +278,7 @@ public class AnonymizationController extends AnonymizationBase {
 			DataHandle handle = sourceData.getHandle();
 			int i = 0;
 			
+			//define attribute type & determine the column's data type
 			for(i = 0; i < headerRow.length; ++i) {
 				//determine the type of the specific field
 				if(attributesChosen[i].equals("Identifying")){
@@ -292,13 +298,25 @@ public class AnonymizationController extends AnonymizationBase {
 				
 		    // Create an instance of the anonymizer
 	        ARXAnonymizer anonymizer = new ARXAnonymizer();//create object
-	        ARXConfiguration anonConfiguration = ARXConfiguration.create();//defining the privacy model
-	        System.out.println("value of kAnon is 2");
-	        anonConfiguration.addPrivacyModel(new KAnonymity(2));//add privacy model, with supplied severity
+	        ARXConfiguration anonymizationConfiguration = ARXConfiguration.create();//defining the privacy model
+	        
+	        //specifying everything variable to do with an anonymization, and the anonymizationConfiguration
+	        for(i = 0; i < headerRow.length; ++i) {//can be run anywhere from 1 to x times per dataset size
+	        	if(modelsChosen[i].equals("k-anonymity")){
+	        		anonymizationConfiguration.addPrivacyModel(new KAnonymity(valuesForModels[i]));//for whole dataset, not tied to attribute
+	        	}
+	        	else if (modelsChosen[i].equals("l-diversity")) {
+	        		anonymizationConfiguration.addPrivacyModel(new DistinctLDiversity(headerRow[i], valuesForModels[i]));
+	        	}
+	        	else if (modelsChosen[i].equals("t-closeness")) {
+	        		anonymizationConfiguration.addPrivacyModel(new OrderedDistanceTCloseness(headerRow[i], valuesForModels[i]));
+	        	}
+	        }
+	        //anonymizationConfiguration.addPrivacyModel(new KAnonymity(2));//add privacy model, with supplied severity
 	        //config.addPrivacyModel(new KAnonymity(2));//create k anonymity model with the anonymity value
-	        anonConfiguration.setMaxOutliers(0d);
+	        anonymizationConfiguration.setMaxOutliers(0d);
 
-	        ARXResult result = anonymizer.anonymize(sourceData, anonConfiguration);
+	        ARXResult result = anonymizer.anonymize(sourceData, anonymizationConfiguration);
 	        
 	        //// Display data collection
 	        List<String[]> dataRows = new ArrayList<String[]>();
@@ -363,6 +381,22 @@ public class AnonymizationController extends AnonymizationBase {
 	   model.addAttribute("figures", secArray);
 	   //////////////////////// added in this trying to find methods
 	  // DataSource source = DataSource.createExcelSource("data/test.xls", 0, true);
+	   
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// very useful for later
+// Print frequencies
+/*StatisticsFrequencyDistribution distribution;
+System.out.println(" - Distribution of attribute 'age' in input:");
+distribution = data.getHandle().getStatistics().getFrequencyDistribution(0, false);
+System.out.println("   " + Arrays.toString(distribution.values));
+System.out.println("   " + Arrays.toString(distribution.frequency));
+
+// Print frequencies
+System.out.println(" - Distribution of attribute 'age' in output:");
+distribution = result.getOutput(false).getStatistics().getFrequencyDistribution(0, true);
+System.out.println("   " + Arrays.toString(distribution.values));
+System.out.println("   " + Arrays.toString(distribution.frequency));
+*/	   
+	   
 	   
 	   // 1. List all data types
        for (DataTypeDescription<?> type : DataType.list()){
@@ -500,7 +534,7 @@ public class AnonymizationController extends AnonymizationBase {
        determineDataType(data.getHandle(), 0);
        determineDataType(data.getHandle(), 1);
        determineDataType(data.getHandle(), 2);
-       //determineDataType(data.getHandle(), 3);
+ 
     // NDS-specific settings
        /*config.setMaxOutliers(1d); // Recommended default: 1d //commented for example 24
        config.setAttributeWeight("age", 0.5d); // attribute weight
@@ -548,36 +582,10 @@ public class AnonymizationController extends AnonymizationBase {
        printResult(result, data);
 
        ///////// allows access to the data's statistics
-       // Print input
-       System.out.println(" - Input data:");
-       Iterator<String[]> original = data.getHandle().iterator();
-       while (original.hasNext()) {
-           System.out.print("   ");
-           System.out.println(Arrays.toString(original.next()));
-       }
-
-       // Print results
-       if (result.getGlobalOptimum() != null) {
-           System.out.println(" - Transformed data:");
-           Iterator<String[]> transformed = result.getOutput(false).iterator();
-           while (transformed.hasNext()) {
-               System.out.print("   ");
-               System.out.println(Arrays.toString(transformed.next()));
-           }
-   		}
-
-       // Print frequencies
-       StatisticsFrequencyDistribution distribution;
-       System.out.println(" - Distribution of attribute 'age' in input:");
-       distribution = data.getHandle().getStatistics().getFrequencyDistribution(0, false);
-       System.out.println("   " + Arrays.toString(distribution.values));
-       System.out.println("   " + Arrays.toString(distribution.frequency));
-
-       // Print frequencies
-       System.out.println(" - Distribution of attribute 'age' in output:");
-       distribution = result.getOutput(false).getStatistics().getFrequencyDistribution(0, true);
-       System.out.println("   " + Arrays.toString(distribution.values));
-       System.out.println("   " + Arrays.toString(distribution.frequency));
+       
+       
+       //was just printing out the values
+       
 
        // Print contingency tables
        StatisticsContingencyTable contingency;
