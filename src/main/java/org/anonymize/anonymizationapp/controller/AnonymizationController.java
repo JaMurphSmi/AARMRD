@@ -282,7 +282,7 @@ public class AnonymizationController extends AnonymizationBase {
 			//define attribute type & determine the column's data type
 			for(i = 0; i < headerRow.length; ++i) {
 				//determine the type of the specific field
-				if(attributesChosen[i].equals("Identifying")){
+				if((attributesChosen[i].equals("Identifying")) || (attributesChosen[i].equals("- - NONE - -"))){//identifying by default
 					sourceData.getDefinition().setAttributeType(headerRow[i], AttributeType.IDENTIFYING_ATTRIBUTE);
 				}
 				else if(attributesChosen[i].equals("Quasi-Identifying")){
@@ -291,7 +291,7 @@ public class AnonymizationController extends AnonymizationBase {
 				else if(attributesChosen[i].equals("Sensitive")){
 					sourceData.getDefinition().setAttributeType(headerRow[i], AttributeType.SENSITIVE_ATTRIBUTE);
 				}
-				else if((attributesChosen[i].equals("Insensitive")) || (attributesChosen[i].equals("- - NONE - -"))){
+				else if((attributesChosen[i].equals("Insensitive"))){
 					sourceData.getDefinition().setAttributeType(headerRow[i], AttributeType.INSENSITIVE_ATTRIBUTE);
 				}
 				sourceData.getDefinition().setDataType(headerRow[i], determineDataType(handle, i));
@@ -303,7 +303,7 @@ public class AnonymizationController extends AnonymizationBase {
 	        
 	        //specifying everything variable to do with an anonymization, and the anonymizationConfiguration
 	        for(i = 0; i < headerRow.length; ++i) {//can be run anywhere from 1 to x times per dataset size
-	        	if(modelsChosen[i].equals("k-anonymity")){
+	        	if(modelsChosen[i].equals("k-anonymity")){//can eventually be a large number of algorithms
 	        		anonymizationConfiguration.addPrivacyModel(new KAnonymity(valuesForModels[i]));//for whole dataset, not tied to attribute
 	        	}
 	        	else if (modelsChosen[i].equals("l-diversity")) {
