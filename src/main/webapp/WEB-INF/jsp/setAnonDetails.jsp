@@ -16,10 +16,10 @@
 
 .tooltip .tooltiptext {
     visibility: hidden;
-    width: 600px;
+    width: 650px;
     background-color: #555;
     color: #fff;
-    text-align: center;
+    text-align: left;
     border-radius: 6px;
     padding: 5px 0;
     position: absolute;
@@ -95,12 +95,12 @@
   			Facts about these algorithms : <br>
   			Attributes are Indentifying by default
   			Generalization(done by default) will replace an attribute with '*' if marked as Identifying<br>
-  			k-anonymity will effect <u><b><i>every</i></b></u> attribute in the dataset marked as Quasi-Identifying<br>
-  			k-anonymity needs to only be defined <u><b><i>once per anonymization</i></b></u>, more than one could cause conflicts<br>
-  			l-diversity will uniquely effect the single attribute it is defined for if it is marked as Sensitive<br>
-  			t-closeness will uniquely effect the single attribute it is defined for if it is marked as Sensitive<br>
-  			k-anonymity and l-diversity take integer values
-  			t-closeness takes a double value
+  			<b>k-anonymity</b> will effect <u><b><i>every</i></b></u> attribute in the dataset marked as Quasi-Identifying<br>
+  			<b>k-anonymity</b> needs to only be defined <u><b><i>once per anonymization</i></b></u>, more than one could cause conflicts<br>
+  			<b>l-diversity</b> will uniquely effect the single attribute it is defined for if it is marked as Sensitive<br>
+  			<b>t-closeness</b> will uniquely effect the single attribute it is defined for if it is marked as Sensitive<br>
+  			<b>k-anonymity</b> and <b>l-diversity</b> take integer values
+  			<b>t-closeness</b> takes a double value
   			The value input field increments in steps of 0.1
   			</span>
 			</div>
