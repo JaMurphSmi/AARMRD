@@ -16,7 +16,7 @@
 
 .tooltip .tooltiptext {
     visibility: hidden;
-    width: 500px;
+    width: 600px;
     background-color: #555;
     color: #fff;
     text-align: center;
@@ -26,7 +26,7 @@
     z-index: 1;
     bottom: 125%;
     left: 50%;
-    margin-left: -200px;
+    margin-left: -325px;
     opacity: 0;
     transition: opacity 0.3s;
 }
