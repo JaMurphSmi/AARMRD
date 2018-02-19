@@ -26,7 +26,7 @@
     z-index: 1;
     bottom: 125%;
     left: 50%;
-    margin-left: -150px;
+    margin-left: -200px;
     opacity: 0;
     transition: opacity 0.3s;
 }

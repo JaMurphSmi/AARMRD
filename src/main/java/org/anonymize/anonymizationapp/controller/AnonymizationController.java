@@ -186,10 +186,6 @@ public class AnonymizationController extends AnonymizationBase {
 		System.out.println("before creating the data and hierarchies");
 		sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile, hierNames);//hopefully this way works 
 		System.out.println("after creating the data successfully");
-		//after all required work completed with the data and hierarchy files, need to remove from file system
-	    System.out.println("Just before delete");
-	    //dataAspectsHelper.deleteFiles();
-	    System.out.println("Just after delete");
 		
 		DataHandle handle = sourceData.getHandle();//acquiring data handle
 		
@@ -218,6 +214,11 @@ public class AnonymizationController extends AnonymizationBase {
 			dataRows.add(data);
 			++i;
 		}
+		
+		//after all required work completed with the data and hierarchy files, need to remove from file system
+	    System.out.println("Just before delete");
+	    dataAspectsHelper.deleteFiles();//attempting once again
+	    System.out.println("Just after delete");
 		
 		//source = null; //garbage collection, to avoid buildup of objects and memory growth
 		//should leave the object alone for it to be shared between methods. null it at
