@@ -163,6 +163,5 @@ public class DataAspects{
 		catch(FileNotFoundException failure) {
 			System.out.println("Deleting hierarchy file failed : " + failure.getLocalizedMessage());
 		}
-	}
-	   
+	}   
 }

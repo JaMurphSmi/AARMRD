@@ -75,7 +75,7 @@ function changeIt() {
 	    alert(filename);
 	}
 	var extension;
-	extension = fname.slice((Math.max(0, fname.lastIndexOf(".")) || Infinity) + 1);
+	extension = filename.slice((Math.max(0, filename.lastIndexOf(".")) || Infinity) + 1);//handles even where extension does not exist
 	if(extension === 'db') {
 		document.getElementById("hiddenTable").style.display="inline";
 	}

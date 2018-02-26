@@ -12,6 +12,7 @@ import java.io.FilenameFilter;
 // Importing ARX required modules, dependencies etc
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletContext;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -358,13 +360,20 @@ public class AnonymizationController extends AnonymizationBase {
 	        String file = anonForm.getFileName();
 	        System.out.println("Name of the file is : " + file);
 	        
+	      //used once 'result' outcome becomes relevant, still wish to display original dataset
+	        if(result == null) {//testing now as next lines are dependent on the presence of a valid ARXResult object
+	        	System.out.println("There was no solution to the provided configuration");
+	        	String errorMessage = "There was no solution to the provided configuration";
+	        	model.addAttribute("errorMessage", errorMessage);
+	        	return "compareSets";//return prematurely due to lack of correct result, avoid error failure
+	        }
+	        
 	        String[] nameSplitFromExtension = file.split("\\.");
 	        String dataSetName = nameSplitFromExtension[0];//save anonymized file to the project structure, allowed as it is secure.
 	        anonymizedDataFileName = dataSetName + "_anonymized.csv";//anonymized file will always be in a csv format for now
 	        result.getOutput(false).save("src/main/resources/templates/outputs/" + anonymizedDataFileName, ';');
 	        //### Reanonymizing copies the above file back into the data file, need to restore hierarchies though
 	        // maybe leave the hierarchies as part of the application but remove the original data for the user's protection?
-	        
 	        
 	        List<String[]> anonyRows = new ArrayList<String[]>();
 	        Iterator<String[]> transformed = result.getOutput(false).iterator();
@@ -408,28 +417,55 @@ public class AnonymizationController extends AnonymizationBase {
 			catch (IOException failure) {
 				System.out.println("Error deleting your files: " + failure.getLocalizedMessage());
 			}
+			sourceData = null;//remove reference to object so that memory is garbage collected, fully remove data from the application
 			
 		}
 
-	//create file for user to download
-		// Using HttpServletResponse
-		   @RequestMapping("/downloadAnonymizedFile")//should remain on the final page, and can be accessed from anywhere
-		   public void downloadAnonymizedFile(HttpServletResponse response) throws IOException {
-		      File file = new File("src/main/resources/templates/outputs/" + anonymizedDataFileName);//needs to get the filename
-
-		      response.setContentType("application/csv");
-		      response.setHeader("Content-Disposition", "attachment;filename=" + file.getName());
-		      BufferedInputStream inStrem = new BufferedInputStream(new FileInputStream(file));
-		      BufferedOutputStream outStream = new BufferedOutputStream(response.getOutputStream());
-		      
-		      byte[] buffer = new byte[1024];
-		      int bytesRead = 0;
-		      while ((bytesRead = inStrem.read(buffer)) != -1) {
-		        outStream.write(buffer, 0, bytesRead);
-		      }
-		      outStream.flush();
-		      inStrem.close();
-		   }
+	//create file for user to download   
+		   @RequestMapping("/downloadAnonymizedFile")
+		    public void doDownload(HttpServletRequest request,
+		            HttpServletResponse response) throws IOException {
+		 
+		        // get absolute path of the application
+		        ServletContext context = request.getServletContext();
+		        
+		        // construct the complete absolute path of the file
+		        String fullPath = "src/main/resources/templates/outputs/" + anonymizedDataFileName;      
+		        File downloadFile = new File(fullPath);
+		        FileInputStream inputStream = new FileInputStream(downloadFile);
+		         
+		        // get MIME type of the file
+		        String mimeType = context.getMimeType(fullPath);
+		        if (mimeType == null) {
+		            // set to binary type if MIME mapping not found
+		            mimeType = "application/octet-stream";
+		        }
+		        System.out.println("MIME type: " + mimeType);
+		 
+		        // set content attributes for the response
+		        response.setContentType(mimeType);
+		        response.setContentLength((int) downloadFile.length());
+		 
+		        // set headers for the response
+		        String headerKey = "Content-Disposition";
+		        String headerValue = String.format("attachment; filename=\"%s\"",
+		                downloadFile.getName());
+		        response.setHeader(headerKey, headerValue);
+		 
+		        // get output stream of the response
+		        OutputStream outStream = response.getOutputStream();
+		 
+		        byte[] buffer = new byte[4096];//hardcode for now
+		        int bytesRead = -1;
+		 
+		        // write bytes read from the input stream into the output stream
+		        while ((bytesRead = inputStream.read(buffer)) != -1) {
+		            outStream.write(buffer, 0, bytesRead);
+		        }
+		 
+		        inputStream.close();
+		        outStream.close();
+		    }
 		//no need to remove anonymized dataset as of now, can be requested if needed later on, but not imperetive now
 	////////////////////////////////////////////////////////////////////////////////////////////// THIS IS WHERE THE VARIABLE INPUT TEST ENDS
 	

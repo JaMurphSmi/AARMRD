@@ -65,7 +65,7 @@
 	</div>
 </div>
 <button id="deleteDAH" >Delete Data and Hierarchies</button>&nbsp&nbsp&nbsp
-<button id="downloadAF">Download Anonymized Data</button>
+<a href="/downloadAnonymizedFile">Download Anonymized Data</a>
   <div class="form">
     <form action="/" method="post" onsubmit="return validate()">
       <table>
@@ -88,17 +88,6 @@ $(document).ready(function(){
 	        }
 	    });
 	});
-	
-	$("#deleteAF").click(function(){
-	    $.ajax({
-	        url : 'downloadAnonymizedFile',
-	        method : 'GET',
-	        async : false,
-	        complete : function(data) {
-	            console.log(data.responseText);
-	        }
-	    });
-});
 });
 </script>
 </body>
