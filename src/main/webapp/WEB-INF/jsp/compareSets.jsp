@@ -9,6 +9,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/static/css/style.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/resources/static/js/app.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <title>Spring Boot</title>
 </head>
 <body style="background-color:#faf6b8;">
@@ -63,6 +64,8 @@
 		</table>
 	</div>
 </div>
+<button id="deleteDAH" >Delete Data and Hierarchies</button>&nbsp&nbsp&nbsp
+<button id="downloadAF">Download Anonymized Data</button>
   <div class="form">
     <form action="/" method="post" onsubmit="return validate()">
       <table>
@@ -73,5 +76,30 @@
       </table>
     </form>
   </div>
+<script>
+$(document).ready(function(){
+	$("#deleteDAH").click(function(){
+	    $.ajax({
+	        url : 'deleteDataAndHierarchies',
+	        method : 'GET',
+	        async : false,
+	        complete : function(data) {
+	            console.log(data.responseText);
+	        }
+	    });
+	});
+	
+	$("#deleteAF").click(function(){
+	    $.ajax({
+	        url : 'downloadAnonymizedFile',
+	        method : 'GET',
+	        async : false,
+	        complete : function(data) {
+	            console.log(data.responseText);
+	        }
+	    });
+});
+});
+</script>
 </body>
 </html>

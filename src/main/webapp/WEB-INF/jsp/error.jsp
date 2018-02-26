@@ -5,8 +5,8 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/static/css/style.css" />
-<script type="text/javascript" src="${pageContext.request.contextPath}/resources/static/js/app.js"></script>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/main/resources/static/css/style.css" />
+<script type="text/javascript" src="${pageContext.request.contextPath}/main/resources/static/js/app.js"></script>
 <title>Spring Boot - Error</title>
 </head>
 <body style="background-color:#faf6b8;">

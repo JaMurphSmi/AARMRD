@@ -2,11 +2,16 @@ package org.anonymize.anonymizationapp.controller;
 
 
 import java.awt.Desktop;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 // Importing ARX required modules, dependencies etc
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -28,6 +33,7 @@ import java.util.regex.Pattern;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.deidentifier.arx.ARXAnonymizer;
@@ -108,6 +114,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math3.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -123,7 +130,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.anonymize.anonymizationapp.util.DataAspects;
 
 //import cern.colt.Arrays;
@@ -132,6 +139,8 @@ import org.anonymize.anonymizationapp.util.DataAspects;
 public class AnonymizationController extends AnonymizationBase {
 	//solution to the source data issue was to elevate the object to class scope
 	Data sourceData;//now available in all methods within the anonymization controller
+	ARXResult result;//global for risk and utility analysis
+	String anonymizedDataFileName;//global anonymized dataset file name, for download purposeses 
 	//may restrict all anonymization actions to the anonymization controller? not have multiple controllers?
 	
 	@Autowired
@@ -144,7 +153,8 @@ public class AnonymizationController extends AnonymizationBase {
    
    // will be a page to handle the uploading of files
    @RequestMapping("/uploadFiles")//only take in the files, establish data fields first, then allow user to select attribute types, algos etc
-   public String getData(@RequestParam("dataFile") MultipartFile dataFile,
+   public String getData(@RequestParam("dataFile") MultipartFile dataFile, @RequestParam(value="hiddenTable", required=false) String table,
+		   @RequestParam(value="userName", required=false) String userName, @RequestParam(value="password", required=false) String password,
 		   @RequestParam("hierFiles") MultipartFile[] hierFiles, Model model) throws IOException, ParseException {
 		///////////////// Creating the data object
 				
@@ -215,10 +225,6 @@ public class AnonymizationController extends AnonymizationBase {
 			++i;
 		}
 		
-		//after all required work completed with the data and hierarchy files, need to remove from file system
-	    System.out.println("Just before delete");
-	    dataAspectsHelper.deleteFiles();//attempting once again
-	    System.out.println("Just after delete");
 		
 		//source = null; //garbage collection, to avoid buildup of objects and memory growth
 		//should leave the object alone for it to be shared between methods. null it at
@@ -317,7 +323,7 @@ public class AnonymizationController extends AnonymizationBase {
 	        //config.addPrivacyModel(new KAnonymity(2));//create k anonymity model with the anonymity value
 	        anonymizationConfiguration.setMaxOutliers(0d);
 
-	        ARXResult result = anonymizer.anonymize(sourceData, anonymizationConfiguration);
+	        result = anonymizer.anonymize(sourceData, anonymizationConfiguration);
 	        
 	        //// Display data collection
 	        List<String[]> dataRows = new ArrayList<String[]>();
@@ -337,6 +343,17 @@ public class AnonymizationController extends AnonymizationBase {
 				++i;
 			}
 	        
+	        String file = anonForm.getFileName();
+	        System.out.println("Name of the file is : " + file);
+	        
+	        String[] nameSplitFromExtension = file.split("\\.");
+	        String dataSetName = nameSplitFromExtension[0];//save anonymized file to the project structure, allowed as it is secure.
+	        anonymizedDataFileName = dataSetName + "_anonymized.csv";//anonymized file will always be in a csv format for now
+	        result.getOutput(false).save("src/main/resources/templates/outputs/" + anonymizedDataFileName, ';');
+	        //### Reanonymizing copies the above file back into the data file, need to restore hierarchies though
+	        // maybe leave the hierarchies as part of the application but remove the original data for the user's protection?
+	        
+	        
 	        List<String[]> anonyRows = new ArrayList<String[]>();
 	        Iterator<String[]> transformed = result.getOutput(false).iterator();
 	        i = 1;
@@ -353,23 +370,55 @@ public class AnonymizationController extends AnonymizationBase {
 				anonyRows.add(data);
 				++i;
 			}
-	        
 	        ////// Display data collection
+	        
 	        
 	        printResult(result, sourceData);
 	        
-			//throw into model for display
-	        // model.addAttribute("fileName", name);
+			//throw into model for display	/// now adding statistical information about the sets
+	        
 	        model.addAttribute("headerRow", headerRow);
 		    model.addAttribute("dataRows", dataRows);
 		    model.addAttribute("anonyRows", anonyRows);
 		    
 		return "compareSets";
 	}
-	
-
-			
 		
+	//method that allows the user to delete all files related to their anonymization from the final page
+		@RequestMapping("/deleteDataAndHierarchies")//available on first page? to allow users to cancel securely, remove all traces
+		public void deleteDataAndHierarchies() throws IOException {
+			//when work complete and user wants record gone, need to remove from file system
+			try {
+				System.out.println("Just before delete");
+				dataAspectsHelper.deleteFiles();
+				System.out.println("Just after delete");
+			}
+			catch (IOException failure) {
+				System.out.println("Error deleting your files: " + failure.getLocalizedMessage());
+			}
+			
+		}
+
+	//create file for user to download
+		// Using HttpServletResponse
+		   @RequestMapping("/downloadAnonymizedFile")//should remain on the final page, and can be accessed from anywhere
+		   public void downloadAnonymizedFile(HttpServletResponse response) throws IOException {
+		      File file = new File("src/main/resources/templates/outputs/" + anonymizedDataFileName);//needs to get the filename
+
+		      response.setContentType("application/csv");
+		      response.setHeader("Content-Disposition", "attachment;filename=" + file.getName());
+		      BufferedInputStream inStrem = new BufferedInputStream(new FileInputStream(file));
+		      BufferedOutputStream outStream = new BufferedOutputStream(response.getOutputStream());
+		      
+		      byte[] buffer = new byte[1024];
+		      int bytesRead = 0;
+		      while ((bytesRead = inStrem.read(buffer)) != -1) {
+		        outStream.write(buffer, 0, bytesRead);
+		      }
+		      outStream.flush();
+		      inStrem.close();
+		   }
+		//no need to remove anonymized dataset as of now, can be requested if needed later on, but not imperetive now
 	////////////////////////////////////////////////////////////////////////////////////////////// THIS IS WHERE THE VARIABLE INPUT TEST ENDS
 	
 	@SuppressWarnings("unused")

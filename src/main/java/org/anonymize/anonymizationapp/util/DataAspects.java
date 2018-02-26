@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -42,6 +43,8 @@ public class DataAspects{
 	    	   }
 	    	   data = Data.create(dataExcel);//input hierarchy files
 	       }
+	       
+	       //try internal reference to method instead of included code, could cut codebase down by 100 or so
 	       // Read generalization hierarchies
 	       FilenameFilter hierarchyFilter = new FilenameFilter() {
 	           @Override
@@ -68,21 +71,97 @@ public class DataAspects{
 	       
 	       return data;
 	   }
+	//for db table handling
+	public Data createDataAndHierarchies(final String fileName, final List<String> hierNames, String table) throws IOException, SQLException {
+
+		String[] dataNameAndExtension = fileName.split("\\.");
+		String dataset = dataNameAndExtension[0];//format is [dataset name].[extension]
+		String extension = dataNameAndExtension[1];
+		
+		 Data data = DefaultData.create();//create empty object with full scope to satisfy errors
+		 if(extension.equals("db")) {
+			DataSource dataDatabase = DataSource.createJDBCSource("src/main/resources/templates/data/" + dataset + "." + extension, table);
+			data = Data.create(dataDatabase);
+		 }
+		// Read generalization hierarchies
+	       FilenameFilter hierarchyFilter = new FilenameFilter() {
+	           @Override
+	           public boolean accept(File dir, String name) {
+	               if (name.matches(dataset + "_hierarchy_(.)+.csv")) {
+	                   return true;
+	               } else {
+	                   return false;
+	               }
+	           }
+	       };
+	       // Create definition, hierarchies will always be .csv
+	       File testDir = new File("src/main/resources/templates/hierarchy/");
+	       File[] genHierFiles = testDir.listFiles(hierarchyFilter);
+	       Pattern pattern = Pattern.compile("_hierarchy_(.*?).csv");
+	       for (File file : genHierFiles) {
+	           Matcher matcher = pattern.matcher(file.getName());
+	           if (matcher.find()) {
+	               CSVHierarchyInput hier = new CSVHierarchyInput(file, StandardCharsets.UTF_8, ';');
+	               String attributeName = matcher.group(1);
+	               data.getDefinition().setAttributeType(attributeName, Hierarchy.create(hier.getHierarchy()));
+	           }
+	       }
+		 return data;
+	}
+	//eventually intending to implement db file catering 
+	public Data createDataAndHierarchies(final String fileName, final List<String> hierNames, String table, String user, String password) throws IOException, SQLException {
+
+		String[] dataNameAndExtension = fileName.split("\\.");
+		String dataset = dataNameAndExtension[0];//format is [dataset name].[extension]
+		String extension = dataNameAndExtension[1];
+		
+		 Data data = DefaultData.create();//create empty object with full scope to satisfy errors
+		 if(extension.equals("db")) {
+			DataSource dataDatabase = DataSource.createJDBCSource("src/main/resources/templates/data/" + dataset + "." + extension, user, password, table);
+			data = Data.create(dataDatabase);
+		 }
+		// Read generalization hierarchies
+	       FilenameFilter hierarchyFilter = new FilenameFilter() {
+	           @Override
+	           public boolean accept(File dir, String name) {
+	               if (name.matches(dataset + "_hierarchy_(.)+.csv")) {
+	                   return true;
+	               } else {
+	                   return false;
+	               }
+	           }
+	       };
+	       // Create definition, hierarchies will always be .csv
+	       File testDir = new File("src/main/resources/templates/hierarchy/");
+	       File[] genHierFiles = testDir.listFiles(hierarchyFilter);
+	       Pattern pattern = Pattern.compile("_hierarchy_(.*?).csv");
+	       for (File file : genHierFiles) {
+	           Matcher matcher = pattern.matcher(file.getName());
+	           if (matcher.find()) {
+	               CSVHierarchyInput hier = new CSVHierarchyInput(file, StandardCharsets.UTF_8, ';');
+	               String attributeName = matcher.group(1);
+	               data.getDefinition().setAttributeType(attributeName, Hierarchy.create(hier.getHierarchy()));
+	           }
+	       }
+		 return data;
+	}
 	
 	public void deleteFiles() throws IOException, FileNotFoundException {
+		//try/catch block for deleting the data file
 		try {
 		File dataDelete = new File("src/main/resources/templates/data");
 	    FileUtils.cleanDirectory(dataDelete);
 		}
 		catch(FileNotFoundException failure) {
-			System.out.println("Deleting file failed, overall function should not be hindered");
+			System.out.println("Deleting data file failed : " + failure.getLocalizedMessage());
 		}
+		//try/catch block for deleting the hierarchy files
 		try {
 	    File hierarchyDelete = new File("src/main/resources/templates/hierarchy");
 	    FileUtils.cleanDirectory(hierarchyDelete);
 		}
 		catch(FileNotFoundException failure) {
-			System.out.println("Deleting a certain file failed, overall function should not be hindered");
+			System.out.println("Deleting hierarchy file failed : " + failure.getLocalizedMessage());
 		}
 	}
 	   
