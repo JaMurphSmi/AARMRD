@@ -155,7 +155,7 @@ public class AnonymizationController extends AnonymizationBase {
    @RequestMapping("/uploadFiles")//only take in the files, establish data fields first, then allow user to select attribute types, algos etc
    public String getData(@RequestParam("dataFile") MultipartFile dataFile, @RequestParam(value="hiddenTable", required=false) String table,
 		   @RequestParam(value="userName", required=false) String userName, @RequestParam(value="password", required=false) String password,
-		   @RequestParam("hierFiles") MultipartFile[] hierFiles, Model model) throws IOException, ParseException {
+		   @RequestParam("hierFiles") MultipartFile[] hierFiles, Model model) throws IOException, ParseException, SQLException {
 		///////////////// Creating the data object
 				
 		//attempting to cast multipartfile object to file(can be modularized later if successful)
@@ -192,9 +192,21 @@ public class AnonymizationController extends AnonymizationBase {
 			String[] tempArray = fileName.split("[\\_\\.]");//split by underscore and dot		  0         1         2
 			hierNames.add(tempArray[2]);//add file name to list for display reasons further on [dataset]_hierarchy_[column]
 		}
-		
+		// making data creation variable, normal files xls, csv
 		System.out.println("before creating the data and hierarchies");
-		sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile, hierNames);//hopefully this way works 
+		if(table == null && (!datasetFile.substring(datasetFile.lastIndexOf(".") + 1).equals("db"))) {
+			System.out.println("creating a data object from file : " + datasetFile);
+			sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile, hierNames);//hopefully this way works 
+		}// using db files and tables
+		else if (table != null && (userName == null || password == null)) {
+			System.out.println("creating a data object from table : " + table);
+			sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile, hierNames, table);
+		}
+		else if (table != null && userName != null && password != null) {
+			System.out.println("creating a data object from table with credentials Table Name :" + table + ", userName : " + userName + ", password : " + password);
+			sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile, hierNames, table, userName, password);
+		}
+			
 		System.out.println("after creating the data successfully");
 		
 		DataHandle handle = sourceData.getHandle();//acquiring data handle
