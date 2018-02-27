@@ -420,6 +420,23 @@ public class AnonymizationController extends AnonymizationBase {
 			sourceData = null;//remove reference to object so that memory is garbage collected, fully remove data from the application
 			
 		}
+		
+		//method that allows the user to delete the anonymized file from the application
+				@RequestMapping("/deleteAnonymizedData")//available on first page? to allow users to cancel securely, remove all traces
+				public void deleteAnonymizedData(@RequestParam("deleteName") String deleteName) throws IOException {
+					//when work complete and user wants record gone, need to remove from file system
+					try {//will need to search through directory to get list for combo box
+						deleteName = deleteName + ".csv";
+						System.out.println("Just before delete");
+						dataAspectsHelper.deleteAnonFile(deleteName);
+						System.out.println("Just after delete");
+					}
+					catch (IOException failure) {
+						System.out.println("Error deleting your files: " + failure.getLocalizedMessage());
+					}
+					sourceData = null;//remove reference to object so that memory is garbage collected, fully remove data from the application
+					
+				}
 
 	//create file for user to download   
 		   @RequestMapping("/downloadAnonymizedFile")

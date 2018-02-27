@@ -164,4 +164,11 @@ public class DataAspects{
 			System.out.println("Deleting hierarchy file failed : " + failure.getLocalizedMessage());
 		}
 	}   
+	//delete anonymized file from directory, may be used later on
+	public void deleteAnonFile(String anonymizedFile) throws IOException, FileNotFoundException {
+		//very simple, name the file to be destroyed, it will be
+		File dataDelete = new File("src/main/resources/templates/outputs/" + anonymizedFile);
+	    boolean success = dataDelete.delete();
+	    System.out.println("Success is : " + success);
+	}  
 }
