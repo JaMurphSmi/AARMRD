@@ -363,7 +363,7 @@ public class AnonymizationController extends AnonymizationBase {
 	        if(!result.isResultAvailable()) {//testing now as next lines are dependent on the presence of a valid ARXResult object
 	        	System.out.println("There was no solution to the provided configuration");
 	        	String errorMessage = "There was no solution to the provided configuration";
-	        	model.addAttribute("errorMessage", errorMessage);
+	        	model.addAttribute("errorMessage", errorMessage);//implement in jsp
 	        	return "compareSets";//return prematurely due to lack of correct result, avoid error failure
 	        }
 	        
@@ -374,7 +374,7 @@ public class AnonymizationController extends AnonymizationBase {
 	        //### Reanonymizing copies the above file back into the data file, need to restore hierarchies though
 	        // maybe leave the hierarchies as part of the application but remove the original data for the user's protection?
 	        
-	        //attempting to implement some utility metrics
+	        //attempting to implement some utility metrics, just printing atm
 	        for (ARXNode[] level : result.getLattice().getLevels()) {
 	            for (ARXNode node : level) {
 	                Iterator<String[]> transformed = result.getOutput(node, false).iterator();
@@ -386,6 +386,8 @@ public class AnonymizationController extends AnonymizationBase {
 	                }
 	            }
 	        }
+	        
+	        getDistributionStatistics(headerRow);
 	        
 	        List<String[]> anonyRows = new ArrayList<String[]>();
 	        Iterator<String[]> transformed = result.getOutput(false).iterator();
@@ -497,20 +499,26 @@ public class AnonymizationController extends AnonymizationBase {
 		    }
 		//no need to remove anonymized dataset as of now, can be requested if needed later on, but not imperetive now
 	////////////////////////////////////////////////////////////////////////////////////////////// THIS IS WHERE THE VARIABLE INPUT TEST ENDS
-	//->>>>>change return type eventually
-	public void getDistributionStatistics() {//potentially hierNames, or plain index?
+	//->>>>>change return type eventually to supply these values
+	public void getDistributionStatistics(String[] headerRow) {//potentially hierNames, or plain index?
 		//print frequencies
 		StatisticsFrequencyDistribution distribution;
-		System.out.println(" - Distribution of attribute 'age' in input:");
-		distribution = sourceData.getHandle().getStatistics().getFrequencyDistribution(0, false);
+		int i;
+		DataHandle dataHandle = sourceData.getHandle();
+		DataHandle resultHandle = result.getOutput(false);
+		
+		for(i = 0; i < headerRow.length; ++i) {
+		System.out.println(" - Distribution of attribute " + headerRow[i] + " in input:");
+		distribution = dataHandle.getStatistics().getFrequencyDistribution(i, false);//can split this to individual values?
 		System.out.println("   " + Arrays.toString(distribution.values));
 		System.out.println("   " + Arrays.toString(distribution.frequency));
 
 		// Print frequencies
-		System.out.println(" - Distribution of attribute 'age' in output:");
-		distribution = result.getOutput(false).getStatistics().getFrequencyDistribution(0, true);
+		System.out.println(" - Distribution of attribute " + headerRow[i] + " in output:");
+		distribution = resultHandle.getStatistics().getFrequencyDistribution(i, true);// can split this to individual values?
 		System.out.println("   " + Arrays.toString(distribution.values));
 		System.out.println("   " + Arrays.toString(distribution.frequency));
+		}
 	}
 		   
 		   
