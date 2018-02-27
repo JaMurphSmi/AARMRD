@@ -213,6 +213,10 @@ public class AnonymizationController extends AnonymizationBase {
 		
 		DataHandle handle = sourceData.getHandle();//acquiring data handle
 		
+		System.out.println("inHandle rows name is " + handle.getNumRows());
+	    System.out.println("inHandle columns name is " + handle.getNumColumns());
+	       
+		
 		Iterator<String[]> itHandle = handle.iterator();
 		List<String[]> dataRows = new ArrayList<String[]>();
 		String headerRow = Arrays.toString(itHandle.next());//get the header of the dataset to display in bold
@@ -238,11 +242,6 @@ public class AnonymizationController extends AnonymizationBase {
 			dataRows.add(data);
 			++i;
 		}
-		
-		
-		//source = null; //garbage collection, to avoid buildup of objects and memory growth
-		//should leave the object alone for it to be shared between methods. null it at
-		//the conclusion of anonymization process
 		
 		//had to create object to push to jsp, to use modelAttribute
 		//other variables instantiated as empty arrays based on the now constant header.length()
@@ -361,7 +360,7 @@ public class AnonymizationController extends AnonymizationBase {
 	        System.out.println("Name of the file is : " + file);
 	        
 	      //used once 'result' outcome becomes relevant, still wish to display original dataset
-	        if(result == null) {//testing now as next lines are dependent on the presence of a valid ARXResult object
+	        if(!result.isResultAvailable()) {//testing now as next lines are dependent on the presence of a valid ARXResult object
 	        	System.out.println("There was no solution to the provided configuration");
 	        	String errorMessage = "There was no solution to the provided configuration";
 	        	model.addAttribute("errorMessage", errorMessage);
@@ -374,6 +373,19 @@ public class AnonymizationController extends AnonymizationBase {
 	        result.getOutput(false).save("src/main/resources/templates/outputs/" + anonymizedDataFileName, ';');
 	        //### Reanonymizing copies the above file back into the data file, need to restore hierarchies though
 	        // maybe leave the hierarchies as part of the application but remove the original data for the user's protection?
+	        
+	        //attempting to implement some utility metrics
+	        for (ARXNode[] level : result.getLattice().getLevels()) {
+	            for (ARXNode node : level) {
+	                Iterator<String[]> transformed = result.getOutput(node, false).iterator();
+	                System.out.println("Transformation : "+Arrays.toString(node.getTransformation()));
+	                System.out.println("InformationLoss: "+node.getHighestScore());
+	                while (transformed.hasNext()) {
+	                    System.out.print("   ");
+	                    System.out.println(Arrays.toString(transformed.next()));
+	                }
+	            }
+	        }
 	        
 	        List<String[]> anonyRows = new ArrayList<String[]>();
 	        Iterator<String[]> transformed = result.getOutput(false).iterator();
@@ -485,7 +497,23 @@ public class AnonymizationController extends AnonymizationBase {
 		    }
 		//no need to remove anonymized dataset as of now, can be requested if needed later on, but not imperetive now
 	////////////////////////////////////////////////////////////////////////////////////////////// THIS IS WHERE THE VARIABLE INPUT TEST ENDS
-	
+	//->>>>>change return type eventually
+	public void getDistributionStatistics() {//potentially hierNames, or plain index?
+		//print frequencies
+		StatisticsFrequencyDistribution distribution;
+		System.out.println(" - Distribution of attribute 'age' in input:");
+		distribution = sourceData.getHandle().getStatistics().getFrequencyDistribution(0, false);
+		System.out.println("   " + Arrays.toString(distribution.values));
+		System.out.println("   " + Arrays.toString(distribution.frequency));
+
+		// Print frequencies
+		System.out.println(" - Distribution of attribute 'age' in output:");
+		distribution = result.getOutput(false).getStatistics().getFrequencyDistribution(0, true);
+		System.out.println("   " + Arrays.toString(distribution.values));
+		System.out.println("   " + Arrays.toString(distribution.frequency));
+	}
+		   
+		   
 	@SuppressWarnings("unused")
    @RequestMapping("/anonymize")
    public String index(Model model) throws IOException, ParseException, SQLException, ClassNotFoundException, NoSuchAlgorithmException {
@@ -495,23 +523,8 @@ public class AnonymizationController extends AnonymizationBase {
 	   model.addAttribute("anonMessage", "This is where the anonymization will be placed");
 	   model.addAttribute("figures", secArray);
 	   //////////////////////// added in this trying to find methods
-	  // DataSource source = DataSource.createExcelSource("data/test.xls", 0, true);
-	   
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// very useful for later
-// Print frequencies
-/*StatisticsFrequencyDistribution distribution;
-System.out.println(" - Distribution of attribute 'age' in input:");
-distribution = data.getHandle().getStatistics().getFrequencyDistribution(0, false);
-System.out.println("   " + Arrays.toString(distribution.values));
-System.out.println("   " + Arrays.toString(distribution.frequency));
-
-// Print frequencies
-System.out.println(" - Distribution of attribute 'age' in output:");
-distribution = result.getOutput(false).getStatistics().getFrequencyDistribution(0, true);
-System.out.println("   " + Arrays.toString(distribution.values));
-System.out.println("   " + Arrays.toString(distribution.frequency));
-*/	   
-	   
+	  
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// very useful for later	   
 	   
 	   // 1. List all data types
        for (DataTypeDescription<?> type : DataType.list()){
