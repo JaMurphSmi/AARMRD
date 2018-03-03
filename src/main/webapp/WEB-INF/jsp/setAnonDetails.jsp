@@ -53,21 +53,18 @@
   <div style="z-index: 10;position: absolute;right: 30px;top: 0px;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
   <h1>AARMRD Homepage</h1><br><br><br>
   <hr>
-
-  <h2></h2><br>
 	  <div style="margin-left:50px">
-	  <h2>Submitted File</h2>
+	  <h2>Your Submitted File Contents</h2>
 	 <div>
-	 <br><br>
 	<table>
 	    <tr>
 	        <td>Data FileName</td>
 	        <td>${fileName}</td>
 	    </tr>
-	    <tr>File contents</tr>
 	</table>
+	<br>
 	<div style="overflow:visible;">
-		<div style="float:left;margin-left: 100px;">
+		<div style="float:left;margin-left: 100px; max-width:550px;height:400px;overflow:scroll;">
 				<table style="border-collapse: collapse;">
 					<tr>
 						<c:forEach items="${headerRow}" var="head">
@@ -87,6 +84,7 @@
 					    </c:forEach>
 				</table>
 		</div>	
+		<br>
 		<div style="float:left;margin-left: 100px;padding:10px;border:3px solid;border-color:#d5ce66;">
 			<h2>Set the Attribute details for your data set!</h2>
 			<div class="tooltip">&#10068;
@@ -106,7 +104,6 @@
 			</div>
 			<form:form modelAttribute="anonForm" action="anonymizeData" method="POST">
 					<form:hidden path="fileName"/>
-					<form:hidden path="theHeaderRow"/>
 					<c:forEach items="${headerRow}" var="head" varStatus="fieldNumber">
 						${head}:&nbsp&nbsp&nbsp&nbsp
 						<form:select path="modelsChosen[${fieldNumber.index}]">

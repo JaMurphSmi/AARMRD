@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page import="java.util.Arrays" %>
 <%@ page import="java.util.Iterator" %>
@@ -14,8 +15,8 @@
 </head>
 <body style="background-color:#faf6b8;">
 <div>
-  <h2>Submitted File</h2>
-  	<br><br>
+  <h3>Anonymization Results</h3>
+  	<br>
 			<table>
 			    <tr>
 			        <td>Data FileName</td>
@@ -23,7 +24,7 @@
 			    </tr>
 			    <tr>File contents</tr>
 			</table>
-		<div style="float:left;margin-left: 100px;">
+		<div style="float:left;margin-left: 100px; max-width:550px;height:400px;overflow:scroll;">
 			<table style="border-collapse: collapse;">
 				<tr>
 					<c:forEach items="${headerRow}" var="head">
@@ -43,7 +44,7 @@
 				    </c:forEach>
 			</table>
 		</div>
-	<div style="float:left;margin-left: 100px;">
+	<div style="float:left;margin-left: 100px; max-width:550px;height:400px;overflow:scroll;">
 		<table style="border-collapse: collapse;">
 			<tr>
 				<c:forEach items="${headerRow}" var="head">
@@ -64,14 +65,16 @@
 		</table>
 	</div>
 </div>
+<form action="/goToRiskPage" method="post">
+	<input type="submit" value="Go To Risk Assessment"/> 
+</form>
 <button id="deleteDAH" >Delete Data and Hierarchies</button>&nbsp&nbsp&nbsp
 <a href="/downloadAnonymizedFile">Download Anonymized Data</a>
   <div class="form">
-    <form action="/" method="post" onsubmit="return validate()">
+    <form action="/" method="post">
       <table>
-        <tr>
-          <td>Anonymize again</td>
-          <td><input type="submit" value="Again"></td>
+        <tr><!-- need to do more here, replace dataset with result, have a retry button to link to beginning and drop everything -->
+          <td><input type="submit" value="Anonymize"></td>
         </tr>
       </table>
     </form>

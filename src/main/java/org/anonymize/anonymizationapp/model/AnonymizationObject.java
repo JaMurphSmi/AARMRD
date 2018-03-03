@@ -9,7 +9,7 @@ public class AnonymizationObject {
 	private String fileName;
 	
 	// The field names of a given dataset, length of this used to dynamically create the correct length
-	private String[] theHeaderRow;//array in each case, ie 5 fields, array length 5, 100 fields, array length 100
+	//private String[] theHeaderRow;//array in each case, ie 5 fields, array length 5, 100 fields, array length 100
 	
 	// the enum of algorithms available, may not be used for a specific thing ever, might just add a string list of models either
 	//private AnonModel anonModels;
@@ -18,7 +18,7 @@ public class AnonymizationObject {
 	private String[] modelsChosen;
 	
 	// the array of values used for the selected models
-	private int[] valuesForModels;
+	private double[] valuesForModels;
 	
 	private String[] attributesChosen;
 	
@@ -29,27 +29,18 @@ public class AnonymizationObject {
 		//do not initialize valuesForModels
 	}
 
-	public AnonymizationObject(String fileName, String[] theHeaderRow) {
+	public AnonymizationObject(String fileName, int theHeaderRowLength) {
 		this.setFileName(fileName);
-		this.setTheHeaderRow(theHeaderRow);
-		this.setValuesForModels(new int[(theHeaderRow.length)]);//may be an awful way of initializing, but eh
-		this.setAttributesChosen(new String[theHeaderRow.length]);//initialize with length of the headerRow, to ensure correct number of array positions created
-		this.setModelsChosen(new String[theHeaderRow.length]);
+		this.setValuesForModels(new double[(theHeaderRowLength)]);//may be an awful way of initializing, but eh
+		this.setAttributesChosen(new String[theHeaderRowLength]);//initialize with length of the headerRow, to ensure correct number of array positions created
+		this.setModelsChosen(new String[theHeaderRowLength]);
 	}
 
-	public String[] getTheHeaderRow() {
-		return theHeaderRow;
-	}
-
-	public void setTheHeaderRow(String[] theHeaderRow) {
-		this.theHeaderRow = theHeaderRow;
-	}
-
-	public int[] getValuesForModels() {
+	public double[] getValuesForModels() {
 		return valuesForModels;
 	}
 
-	public void setValuesForModels(int[] valuesForModels) {
+	public void setValuesForModels(double[] valuesForModels) {
 		this.valuesForModels = valuesForModels;
 	}
 

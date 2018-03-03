@@ -72,7 +72,6 @@ function changeIt() {
 	    if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
 	        filename = filename.substring(1);
 	    }
-	    alert(filename);
 	}
 	var extension;
 	extension = filename.slice((Math.max(0, filename.lastIndexOf(".")) || Infinity) + 1);//handles even where extension does not exist

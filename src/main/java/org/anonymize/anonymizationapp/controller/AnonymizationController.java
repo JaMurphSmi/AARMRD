@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.security.NoSuchAlgorithmException;
 //import java.util.Arrays;
@@ -143,6 +144,11 @@ public class AnonymizationController extends AnonymizationBase {
 	Data sourceData;//now available in all methods within the anonymization controller
 	ARXResult result;//global for risk and utility analysis
 	String anonymizedDataFileName;//global anonymized dataset file name, for download purposeses 
+	List<String[]> dataRows = new ArrayList<String[]>();//extract to global variables to allow access in entire application
+	List<String[]> anonyRows = new ArrayList<String[]>();
+	List<String> headerRow = new ArrayList<String>();//making global to improve accessibility and reduce need to pass between methods
+	//also remove from anonymization object
+	
 	//may restrict all anonymization actions to the anonymization controller? not have multiple controllers?
 	
 	@Autowired
@@ -178,7 +184,8 @@ public class AnonymizationController extends AnonymizationBase {
 		////////////////////creating the hierarchies in file path
 			    
 		//defining hierarchy files and names
-		List<String> hierNames = new ArrayList<String>();//for hierarchy names to display
+		//List<String> headerRow = new ArrayList<String>();//for hierarchy names to display
+		//headerRow removed to global
 		//List<Hierarchy> hierarchies = new ArrayList<Hierarchy>();//list to hold the created hierarchy objects
 		
 		for(MultipartFile mulFile: hierFiles) {
@@ -192,21 +199,21 @@ public class AnonymizationController extends AnonymizationBase {
 			fost.close();//works
 			
 			String[] tempArray = fileName.split("[\\_\\.]");//split by underscore and dot		  0         1         2
-			hierNames.add(tempArray[2]);//add file name to list for display reasons further on [dataset]_hierarchy_[column]
+			headerRow.add(tempArray[2]);//add file name to list for display reasons further on [dataset]_hierarchy_[column]
 		}
 		// making data creation variable, normal files xls, csv
 		System.out.println("before creating the data and hierarchies");
 		if(table == null && (!datasetFile.substring(datasetFile.lastIndexOf(".") + 1).equals("db"))) {
 			System.out.println("creating a data object from file : " + datasetFile);
-			sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile, hierNames);//hopefully this way works 
+			sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile, headerRow);//hopefully this way works 
 		}// using db files and tables
 		else if (table != null && (userName == null || password == null)) {
 			System.out.println("creating a data object from table : " + table);
-			sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile, hierNames, table);
+			sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile, headerRow, table);
 		}
 		else if (table != null && userName != null && password != null) {
 			System.out.println("creating a data object from table with credentials Table Name :" + table + ", userName : " + userName + ", password : " + password);
-			sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile, hierNames, table, userName, password);
+			sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile, headerRow, table, userName, password);
 		}
 			
 		System.out.println("after creating the data successfully");
@@ -218,18 +225,17 @@ public class AnonymizationController extends AnonymizationBase {
 	       
 		
 		Iterator<String[]> itHandle = handle.iterator();
-		List<String[]> dataRows = new ArrayList<String[]>();
-		String headerRow = Arrays.toString(itHandle.next());//get the header of the dataset to display in bold
+		String flubRow = Arrays.toString(itHandle.next());//get the header of the dataset to display in bold
 		System.out.println(">" + headerRow + "<");
-		String[] headerTemp = headerRow.split("[\\[\\],]");
-		String[] header = new String[headerTemp.length - 1];
-		for(int i = 0; i < headerTemp.length - 1; i++) {
-			header[i] = headerTemp[i+1].trim();
-		}//shift all values 
+		//String[] headerTemp = headerRow.split("[\\[\\],]");
+		//String[] header = new String[headerTemp.length - 1];
+		//for(int i = 0; i < headerTemp.length - 1; i++) {
+		//	header[i] = headerTemp[i+1].trim();
+		//}//shift all values 
 		//model.addAttribute("headerData", headerTemp);//was incorrect
-		model.addAttribute("headerRow", header);//only need to get the header once as it will do for the resulting dataset also
-		for (String bit : header) {
-			System.out.println(bit + ",");//testing if random space at the start
+		model.addAttribute("headerRow", headerRow);//only need to get the header once as it will do for the resulting dataset also
+		for (String colName : headerRow) {
+			System.out.println(colName + ",");//testing if random space at the start
 		}
 		int i = 1;
 		while((itHandle.hasNext()) && (i % 801 != 0)) {
@@ -245,7 +251,7 @@ public class AnonymizationController extends AnonymizationBase {
 		
 		//had to create object to push to jsp, to use modelAttribute
 		//other variables instantiated as empty arrays based on the now constant header.length()
-		AnonymizationObject anonForm = new AnonymizationObject(datasetFile, header);//constant for an individual user
+		AnonymizationObject anonForm = new AnonymizationObject(datasetFile, headerRow.size());//constant for an individual user
 		//////// use header row to allow user to set individual algorithms for each field
 		String[] models = {"k-anonymity","l-diversity","t-closeness"};//remove delta presence for now,"δ-presence"};
 		String[] attributeTypes = {"Identifying", "Quasi-identifying", "Sensitive", "Insensitive"}; 
@@ -276,17 +282,18 @@ public class AnonymizationController extends AnonymizationBase {
 			//Data source = dataAspectsHelper.createDataAndHierarchies(fileName);//attempt to recreate the data object locally
 			String[] modelsChosen = anonForm.getModelsChosen();
 			String[] attributesChosen = anonForm.getAttributesChosen();
-			String[] headerRow = anonForm.getTheHeaderRow();//headerRow might have been the null one all along, test tomorrow
-			int[] valuesForModels = anonForm.getValuesForModels();
+			double[] valuesForModels = anonForm.getValuesForModels();
 			//System.out.println(dataset);
 			//System.out.println(extension);
-			System.out.println(Arrays.toString(headerRow));
+			for(String aColumn : headerRow) {
+				System.out.print(aColumn + " ");
+			}
 			System.out.println("Attempting proof of concept");
 			for(String aModel : modelsChosen) {
 				System.out.println("The model is: " + aModel);
 			}
 			System.out.println("After printing the selected models");
-			for(int aValue : valuesForModels) {
+			for(double aValue : valuesForModels) {
 				System.out.println("The value is: " + aValue);
 			}
 			System.out.println("Printing attribute types chosen");
@@ -299,38 +306,42 @@ public class AnonymizationController extends AnonymizationBase {
 			int i = 0;
 			
 			//define attribute type & determine the column's data type
-			for(i = 0; i < headerRow.length; ++i) {
+			for(String header : headerRow) {
 				//determine the type of the specific field
 				if((attributesChosen[i].equals("Identifying")) || (attributesChosen[i].equals("- - NONE - -"))){//identifying by default
-					sourceData.getDefinition().setAttributeType(headerRow[i], AttributeType.IDENTIFYING_ATTRIBUTE);
+					sourceData.getDefinition().setAttributeType(header, AttributeType.IDENTIFYING_ATTRIBUTE);
 				}
 				else if(attributesChosen[i].equals("Quasi-Identifying")){
-					sourceData.getDefinition().setAttributeType(headerRow[i], AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+					sourceData.getDefinition().setAttributeType(header, AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
 				}
 				else if(attributesChosen[i].equals("Sensitive")){
-					sourceData.getDefinition().setAttributeType(headerRow[i], AttributeType.SENSITIVE_ATTRIBUTE);
+					sourceData.getDefinition().setAttributeType(header, AttributeType.SENSITIVE_ATTRIBUTE);
 				}
 				else if((attributesChosen[i].equals("Insensitive"))){
-					sourceData.getDefinition().setAttributeType(headerRow[i], AttributeType.INSENSITIVE_ATTRIBUTE);
+					sourceData.getDefinition().setAttributeType(header, AttributeType.INSENSITIVE_ATTRIBUTE);
 				}
-				sourceData.getDefinition().setDataType(headerRow[i], determineDataType(handle, i));
+				sourceData.getDefinition().setDataType(header, determineDataType(handle, i));
+				++i;
 			}
 				
 		    // Create an instance of the anonymizer
 	        ARXAnonymizer anonymizer = new ARXAnonymizer();//create object
 	        ARXConfiguration anonymizationConfiguration = ARXConfiguration.create();//defining the privacy model
 	        
+	        i = 0;
+	        
 	        //specifying everything variable to do with an anonymization, and the anonymizationConfiguration
-	        for(i = 0; i < headerRow.length; ++i) {//can be run anywhere from 1 to x times per dataset size
+	        for(String header : headerRow) {//can be run anywhere from 1 to x times per dataset size
 	        	if(modelsChosen[i].equals("k-anonymity")){//can eventually be a large number of algorithms
-	        		anonymizationConfiguration.addPrivacyModel(new KAnonymity(valuesForModels[i]));//for whole dataset, not tied to attribute
+	        		anonymizationConfiguration.addPrivacyModel(new KAnonymity((int)valuesForModels[i]));//for whole dataset, not tied to attribute
 	        	}
 	        	else if (modelsChosen[i].equals("l-diversity")) {
-	        		anonymizationConfiguration.addPrivacyModel(new DistinctLDiversity(headerRow[i], valuesForModels[i]));
+	        		anonymizationConfiguration.addPrivacyModel(new DistinctLDiversity(header, (int)valuesForModels[i]));
 	        	}
 	        	else if (modelsChosen[i].equals("t-closeness")) {
-	        		anonymizationConfiguration.addPrivacyModel(new OrderedDistanceTCloseness(headerRow[i], valuesForModels[i]));
+	        		anonymizationConfiguration.addPrivacyModel(new OrderedDistanceTCloseness(header, valuesForModels[i]));
 	        	}
+	        	++i;//needed sentinel i to control algorithm aspect
 	        }
 	        //anonymizationConfiguration.addPrivacyModel(new KAnonymity(2));//add privacy model, with supplied severity
 	        //config.addPrivacyModel(new KAnonymity(2));//create k anonymity model with the anonymity value
@@ -339,13 +350,12 @@ public class AnonymizationController extends AnonymizationBase {
 	        result = anonymizer.anonymize(sourceData, anonymizationConfiguration);
 	        
 	        //// Display data collection
-	        List<String[]> dataRows = new ArrayList<String[]>();
 	        Iterator<String[]> itHandle = handle.iterator();
-	        i = 1;
 	        
-	        String flubRow = Arrays.toString(itHandle.next());//remove the header row for display purposes
+	        //removed due to moving the dataRows to global scope, only needs to be done once
+	        //String flubRow = Arrays.toString(itHandle.next());//remove the header row for display purposes
 	        
-	        while((itHandle.hasNext()) && (i % 801 != 0)) {//needs extra cleanup to remove empty column
+	        /*while((itHandle.hasNext()) && (i % 801 != 0)) {//needs extra cleanup to remove empty column
 				String row = Arrays.toString(itHandle.next());
 				String[] dataTemp = row.split("[\\[\\],]");
 				String[] data = new String[dataTemp.length - 1];
@@ -354,7 +364,7 @@ public class AnonymizationController extends AnonymizationBase {
 				}
 				dataRows.add(data);
 				++i;
-			}
+			}*/
 	        
 	        String file = anonForm.getFileName();
 	        System.out.println("Name of the file is : " + file);
@@ -387,13 +397,9 @@ public class AnonymizationController extends AnonymizationBase {
 	            }
 	        }
 	        
-	        getDistributionStatistics(headerRow);
-	        
-	        List<String[]> anonyRows = new ArrayList<String[]>();
 	        Iterator<String[]> transformed = result.getOutput(false).iterator();
-	        i = 1;
 	        
-	        flubRow = Arrays.toString(transformed.next());// to remove header from answer also
+	        String flubRow = Arrays.toString(transformed.next());// to remove header from answer also
 	       
 	        while((transformed.hasNext()) && (i % 801 != 0)) {
 				String row = Arrays.toString(transformed.next());
@@ -407,7 +413,6 @@ public class AnonymizationController extends AnonymizationBase {
 			}
 	        ////// Display data collection
 	        
-	        
 	        printResult(result, sourceData);
 	        
 			//throw into model for display	/// now adding statistical information about the sets
@@ -418,6 +423,51 @@ public class AnonymizationController extends AnonymizationBase {
 		    
 		return "compareSets";
 	}
+		
+		/** gateway method to the risk page, passing AnonyRows, dataRows is already there
+		 *  deleting files functionality can be accessed by returning to view anonymization page
+		 *  same with downloading files, all handles and objects needed can be accessed on backend
+		 *  through the persistent sourceData and result objects
+		 */
+		@RequestMapping("/goToRiskPage")
+		public String showRiskPage(Model model) {
+			String[] countries = {"America", "Australia", "Brasil", "Canada", "China", "Europe", 
+					"European Union", "France", "Germany", "India", "North America", "South America",
+					"United Kingdom", "United States"};
+			
+	        model.addAttribute("countries", countries);
+			model.addAttribute("headerRow", headerRow);
+			model.addAttribute("anonyRows", anonyRows);
+			return "showRisks";
+		}
+		
+		//method used to analyze the risks of a dataset
+		@RequestMapping("/analyseRisks")
+		public void analyseRisks(@RequestParam("populationRegion") String region,
+				@RequestParam("THRESHOLD") double threshold) {
+			getDistributionStatistics();
+	        
+	        System.out.println("\n ------------------------------------------------");
+	        System.out.println("\n ------------------------------------------------");
+	        System.out.println("\n ------------------------------------------------");
+	        System.out.println("\n ------------------------------------------------");
+	        System.out.println("\n ------------------------------------------------");
+	        System.out.println("\n ------------------------------------------------");
+	        
+	        
+	        // Perform risk analysis
+	        System.out.println("\n - Output data");
+	        print(result.getOutput());
+	        System.out.println("\n - Risk analysis:");
+	        analyzeDataRisk(result.getOutput(), region, threshold);
+			
+		}
+		
+		//method used to analyze the utility of a dataset 
+		@RequestMapping("/analyseUtility")
+		public String analyseUtility() {
+			return "showUtilities";
+		}
 		
 	//method that allows the user to delete all files related to their anonymization from the final page
 		@RequestMapping("/deleteDataAndHierarchies")//available on first page? to allow users to cancel securely, remove all traces
@@ -500,26 +550,115 @@ public class AnonymizationController extends AnonymizationBase {
 		//no need to remove anonymized dataset as of now, can be requested if needed later on, but not imperetive now
 	////////////////////////////////////////////////////////////////////////////////////////////// THIS IS WHERE THE VARIABLE INPUT TEST ENDS
 	//->>>>>change return type eventually to supply these values
-	public void getDistributionStatistics(String[] headerRow) {//potentially hierNames, or plain index?
+	private void getDistributionStatistics() {//potentially hierNames, or plain index?
 		//print frequencies
 		StatisticsFrequencyDistribution distribution;
-		int i;
 		DataHandle dataHandle = sourceData.getHandle();
 		DataHandle resultHandle = result.getOutput(false);
 		
-		for(i = 0; i < headerRow.length; ++i) {
-		System.out.println(" - Distribution of attribute " + headerRow[i] + " in input:");
-		distribution = dataHandle.getStatistics().getFrequencyDistribution(i, false);//can split this to individual values?
-		System.out.println("   " + Arrays.toString(distribution.values));
-		System.out.println("   " + Arrays.toString(distribution.frequency));
-
-		// Print frequencies
-		System.out.println(" - Distribution of attribute " + headerRow[i] + " in output:");
-		distribution = resultHandle.getStatistics().getFrequencyDistribution(i, true);// can split this to individual values?
-		System.out.println("   " + Arrays.toString(distribution.values));
-		System.out.println("   " + Arrays.toString(distribution.frequency));
+		int i = 0;
+		for(String header : headerRow) {
+			System.out.println(" - Distribution of attribute " + header + " in input:");
+			distribution = dataHandle.getStatistics().getFrequencyDistribution(i, false);//can split this to individual values?
+			System.out.println("   " + Arrays.toString(distribution.values));
+			System.out.println("   " + Arrays.toString(distribution.frequency));
+			double[] frequency = distribution.frequency;//get frequency of input
+				System.out.print("   ");
+				for(int j = 0; j < frequency.length; ++j) {
+					DecimalFormat f = new DecimalFormat("##.00");
+				    System.out.print(f.format(frequency[j]*100.0) + "%  ");
+				}
+			
+			// Print frequencies
+			System.out.println(" - Distribution of attribute " + header + " in output:");
+			distribution = resultHandle.getStatistics().getFrequencyDistribution(i, true);// can split this to individual values?
+			System.out.println("   " + Arrays.toString(distribution.values));
+			System.out.println("   " + Arrays.toString(distribution.frequency));
+			frequency = distribution.frequency;	//get frequency of output
+				System.out.print("   ");
+				for(int j = 0; j < frequency.length; ++j) {
+					DecimalFormat f = new DecimalFormat("##.00");
+				    System.out.print(f.format(frequency[j]*100.0) + "%  ");
+				}
+				++i;
 		}
 	}
+	
+	/**
+	 * Perform risk analysis
+	 * @param handle
+	 * @param populationRegion
+	 * @param THRESHOLD -> The lowest percentage risk value that is allowed for a particular record
+	 */
+	private void analyzeDataRisk(DataHandle handle, String populationRegion, double THRESHOLD) {   
+	    
+		ARXPopulationModel populationmodel = determineRegion(populationRegion);//chosen from risk screen
+	    //variable models based on significant area
+	       
+	    RiskEstimateBuilder builder = handle.getRiskEstimator(populationmodel);
+	    RiskModelSampleSummary risks = builder.getSampleBasedRiskSummary(THRESHOLD);
+	       
+	    System.out.println(" * Baseline risk threshold: " + getPercent(THRESHOLD));
+	    System.out.println(" * Prosecutor attacker model");
+	    System.out.println("   - Records at risk: " + getPercent(risks.getProsecutorRisk().getRecordsAtRisk()));
+	    System.out.println("   - Highest risk: " + getPercent(risks.getProsecutorRisk().getHighestRisk()));
+	    System.out.println("   - Success rate: " + getPercent(risks.getProsecutorRisk().getSuccessRate()));
+	    System.out.println(" * Journalist attacker model");
+	    System.out.println("   - Records at risk: " + getPercent(risks.getJournalistRisk().getRecordsAtRisk()));
+	    System.out.println("   - Highest risk: " + getPercent(risks.getJournalistRisk().getHighestRisk()));
+	    System.out.println("   - Success rate: " + getPercent(risks.getJournalistRisk().getSuccessRate()));
+	    System.out.println(" * Marketer attacker model");
+	    System.out.println("   - Success rate: " + getPercent(risks.getMarketerRisk().getSuccessRate()));
+	   }
+	   
+	   /**
+	    * Returns a region to be used for risk metrics
+	    * @param area
+	    * @return
+	    */
+	   private static ARXPopulationModel determineRegion(String populationRegion) {
+		   ARXPopulationModel populationmodel = ARXPopulationModel.create(Region.NONE);
+		   
+		   if(populationRegion.equals("Africa")) {
+	    	   populationmodel = ARXPopulationModel.create(Region.AFRICA);
+	       } else if(populationRegion.equals("Australia")) {
+	    	   populationmodel = ARXPopulationModel.create(Region.AUSTRALIA);
+	       } else if(populationRegion.equals("Brazil")) {
+	    	   populationmodel = ARXPopulationModel.create(Region.BRASIL);
+	       } else if(populationRegion.equals("Canada")) {
+	    	   populationmodel = ARXPopulationModel.create(Region.CANADA);
+	       } else if(populationRegion.equals("China")) {
+	    	   populationmodel = ARXPopulationModel.create(Region.CHINA);
+	       } else if(populationRegion.equals("Europe")) {
+	    	   populationmodel = ARXPopulationModel.create(Region.EUROPE);
+	       } else if(populationRegion.equals("European Union")) {
+	    	   populationmodel = ARXPopulationModel.create(Region.EUROPEAN_UNION);
+	       } else if(populationRegion.equals("France")) {
+	    	   populationmodel = ARXPopulationModel.create(Region.FRANCE);
+	       } else if(populationRegion.equals("Germany")) {
+	    	   populationmodel = ARXPopulationModel.create(Region.GERMANY);
+	       } else if(populationRegion.equals("India")) {
+	    	   populationmodel = ARXPopulationModel.create(Region.INDIA);
+	       } else if(populationRegion.equals("North America")) {
+	    	   populationmodel = ARXPopulationModel.create(Region.NORTH_AMERICA);
+	       } else if(populationRegion.equals("South America")) {
+	    	   populationmodel = ARXPopulationModel.create(Region.SOUTH_AMERICA);
+	       } else if(populationRegion.equals("United Kingdom")) {
+	    	   populationmodel = ARXPopulationModel.create(Region.UK);
+	       } else if(populationRegion.equals("United States")) {
+	    	   populationmodel = ARXPopulationModel.create(Region.USA);
+	       }
+		   return populationmodel;
+	   }
+
+	   /**
+	    * Returns a formatted string
+	    * @param value
+	    * @return
+	    */
+	   private static String getPercent(double value) {
+	       return (int)(Math.round(value * 100)) + "%";
+	   }
 		   
 		   
 	@SuppressWarnings("unused")
@@ -1687,39 +1826,6 @@ public class AnonymizationController extends AnonymizationBase {
    }
    */
 
-   /**
-    * Perform risk analysis
-    * @param handle
-    */
-   private static void analyzeData(DataHandle handle) {
-       
-       double THRESHOLD = 0.5d;
-       
-       ARXPopulationModel populationmodel = ARXPopulationModel.create(Region.USA);
-       RiskEstimateBuilder builder = handle.getRiskEstimator(populationmodel);
-       RiskModelSampleSummary risks = builder.getSampleBasedRiskSummary(THRESHOLD);
-       
-       System.out.println(" * Baseline risk threshold: " + getPrecent(THRESHOLD));
-       System.out.println(" * Prosecutor attacker model");
-       System.out.println("   - Records at risk: " + getPrecent(risks.getProsecutorRisk().getRecordsAtRisk()));
-       System.out.println("   - Highest risk: " + getPrecent(risks.getProsecutorRisk().getHighestRisk()));
-       System.out.println("   - Success rate: " + getPrecent(risks.getProsecutorRisk().getSuccessRate()));
-       System.out.println(" * Journalist attacker model");
-       System.out.println("   - Records at risk: " + getPrecent(risks.getJournalistRisk().getRecordsAtRisk()));
-       System.out.println("   - Highest risk: " + getPrecent(risks.getJournalistRisk().getHighestRisk()));
-       System.out.println("   - Success rate: " + getPrecent(risks.getJournalistRisk().getSuccessRate()));
-       System.out.println(" * Marketer attacker model");
-       System.out.println("   - Success rate: " + getPrecent(risks.getMarketerRisk().getSuccessRate()));
-   }
-
-   /**
-    * Returns a formatted string
-    * @param value
-    * @return
-    */
-   private static String getPrecent(double value) {
-       return (int)(Math.round(value * 100)) + "%";
-   }
    
    ///////// exaMPLE 46
    private static void analyzeAttributes(DataHandle handle) {
