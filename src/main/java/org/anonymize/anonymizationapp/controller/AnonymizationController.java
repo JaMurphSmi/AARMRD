@@ -443,7 +443,7 @@ public class AnonymizationController extends AnonymizationBase {
 		
 		//method used to analyze the risks of a dataset
 		@RequestMapping("/analyseRisks")
-		public void analyseRisks(@RequestParam("populationRegion") String region,
+		public String analyseRisks(@RequestParam("populationRegion") String region,
 				@RequestParam("THRESHOLD") double threshold) {
 			getDistributionStatistics();
 	        
@@ -457,10 +457,11 @@ public class AnonymizationController extends AnonymizationBase {
 	        
 	        // Perform risk analysis
 	        System.out.println("\n - Output data");
-	        print(result.getOutput());
+	        print(result.getOutput(false));//simply for proof, has been proven
 	        System.out.println("\n - Risk analysis:");
-	        analyzeDataRisk(result.getOutput(), region, threshold);
-			
+	        System.out.println(" 	");
+	        analyzeDataRisk(result.getOutput(false), region, threshold);
+			return "showRisks";
 		}
 		
 		//method used to analyze the utility of a dataset 
@@ -498,8 +499,7 @@ public class AnonymizationController extends AnonymizationBase {
 					catch (IOException failure) {
 						System.out.println("Error deleting your files: " + failure.getLocalizedMessage());
 					}
-					sourceData = null;//remove reference to object so that memory is garbage collected, fully remove data from the application
-					
+					sourceData = null;//remove reference to object so that memory is garbage collected, fully remove data from the application	
 				}
 
 	//create file for user to download   
@@ -552,6 +552,7 @@ public class AnonymizationController extends AnonymizationBase {
 	//->>>>>change return type eventually to supply these values
 	private void getDistributionStatistics() {//potentially hierNames, or plain index?
 		//print frequencies
+		System.out.println("Inside getDistributionStatistics");
 		StatisticsFrequencyDistribution distribution;
 		DataHandle dataHandle = sourceData.getHandle();
 		DataHandle resultHandle = result.getOutput(false);
@@ -582,6 +583,7 @@ public class AnonymizationController extends AnonymizationBase {
 				}
 				++i;
 		}
+		System.out.println("Leaving getDistributionStatistics");
 	}
 	
 	/**

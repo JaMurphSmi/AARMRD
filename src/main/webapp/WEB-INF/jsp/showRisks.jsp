@@ -19,7 +19,7 @@
 
 .tooltip .tooltiptext {
     visibility: hidden;
-    width: 650px;
+    width: 400px;
     background-color: #555;
     color: #fff;
     text-align: left;
@@ -29,7 +29,7 @@
     z-index: 1;
     bottom: 125%;
     left: 50%;
-    margin-left: -325px;
+    margin-left: -200px;
     opacity: 0;
     transition: opacity 0.3s;
 }
@@ -76,7 +76,8 @@
 				    </c:forEach>
 			</table>
 	</div>
-	<div style="float:left;margin-left: 100px;max-width:550px;overflow:scroll;">
+	<div style="border-style:ridge;border-color:green;float:left;margin-left:100px;margin-top:50px; padding: 25px 25px 25px 25px;max-width:550px;">
+			<h3>Set your Risk Assessment Details</h3>			
 			<form action="/analyseRisks" method="POST">
 				<label for="populationRegion">Select Region : </label>
 					<select name="populationRegion">
@@ -85,15 +86,15 @@
 						</c:forEach>
 					</select>
 				<label for="THRESHOLD">Threshold : </label>
-					<input name="THRESHOLD" id="THRESHOLD" type="number" min="0" max="100" step="0.1"/>
+					<input name="THRESHOLD" id="THRESHOLD" type="number" min="0" max="1" step="0.01"/>
 					<div class="tooltip">&#10068;
-  			<span class="tooltiptext">
-  			This page measures percentage risk of your dataset<br>
-  			The country selection box denotes the region that you are testing against<br>
-  			The threshold is the percentage risk that a record must not surpass. ie threshold set to 50%<br>
-  			success if 47%, failure if 53%. It is to allow the user to control the risk posed to their records.
-  			</span>
-			</div>
+			  			<span class="tooltiptext">
+			  			This page measures percentage risk of your dataset<br>
+			  			The country selection box denotes the region that you are testing against<br>
+			  			The threshold is the percentage risk that a record must not surpass, begins at 0, max 1(100%). ie threshold set to 0.5(50%)<br>
+			  			success if 47%, failure if 53%. It is to allow the user to control the risk posed to their records.
+			  			</span>
+						</div>
 					<br><br>
 					<input type="submit" value="Submit Your Files">
 			</form>
