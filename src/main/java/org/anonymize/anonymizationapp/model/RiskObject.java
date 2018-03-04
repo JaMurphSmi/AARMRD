@@ -4,22 +4,33 @@ import java.util.HashMap;
 
 public class RiskObject {
 	//Map<String, double> ;
-	private HashMap<String, HashMap<Double, String>> dataSetDistributionMetrics;// = new ArrayList<new HashMap<String, double>>();
-	private String threshold;
-	private String[] prosecutorStats = new String[3];
-	private String[] journalistStats = new String[3];
-	private String marketerStat;
+	public HashMap<String, HashMap<String, String>> dataSetInputDistributionMetrics;// = new ArrayList<new HashMap<String, double>>();
+	public HashMap<String, HashMap<String, String>> dataSetOutputDistributionMetrics;
+	public String country;
+	public String threshold;
+	public String[] prosecutorStats = new String[3];
+	public String[] journalistStats = new String[3];
+	public String marketerStat;
 	
-	public void RiskObject() {
-		 this.dataSetDistributionMetrics = new HashMap<String, HashMap<Double, String>>();
+	public RiskObject() {
+		 this.dataSetInputDistributionMetrics = new HashMap<String, HashMap<String, String>>();
+		 this.dataSetOutputDistributionMetrics = new HashMap<String, HashMap<String, String>>();
 	}
 
-	public HashMap<String, HashMap<Double, String>> getDataSetDistributionMetrics() {
-		return dataSetDistributionMetrics;
+	public HashMap<String, HashMap<String, String>> getDataSetInputDistributionMetrics() {
+		return dataSetInputDistributionMetrics;
 	}
 
-	public void setDataSetDistributionMetrics(HashMap<String, HashMap<Double, String>> dataSetDistributionMetrics) {
-		this.dataSetDistributionMetrics = dataSetDistributionMetrics;
+	public void setDataSetInputDistributionMetrics(HashMap<String, HashMap<String, String>> dataSetInputDistributionMetrics) {
+		this.dataSetInputDistributionMetrics = dataSetInputDistributionMetrics;
+	}
+	
+	public HashMap<String, HashMap<String, String>> getDataSetOutputDistributionMetrics() {
+		return dataSetInputDistributionMetrics;
+	}
+
+	public void setDataSetOutputDistributionMetrics(HashMap<String, HashMap<String, String>> dataSetOutputDistributionMetrics) {
+		this.dataSetOutputDistributionMetrics = dataSetOutputDistributionMetrics;
 	}
 
 	public String getThreshold() {
@@ -52,6 +63,14 @@ public class RiskObject {
 
 	public void setMarketerStat(String marketerStat) {
 		this.marketerStat = marketerStat;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
 	}
 
 }

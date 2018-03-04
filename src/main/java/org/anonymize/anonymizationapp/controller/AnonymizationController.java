@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.security.NoSuchAlgorithmException;
@@ -448,10 +449,12 @@ public class AnonymizationController extends AnonymizationBase {
 				@RequestParam("THRESHOLD") double threshold, Model model) {
 			RiskObject riskObject = new RiskObject();
 			
+			riskObject.setCountry(region);
 			//riskObject.setThreshold(threshold);
 			
-			getDistributionStatistics();
-	        
+			//riskObject.getDataSetDistributionMetrics() = getDistributionStatistics();
+			riskObject = getDistributionStatistics(riskObject);//add the maps of data to the object
+			
 	        System.out.println("\n ------------------------------------------------");
 	        System.out.println("\n ------------------------------------------------");
 	        System.out.println("\n ------------------------------------------------");
@@ -461,9 +464,10 @@ public class AnonymizationController extends AnonymizationBase {
 	        // Perform risk analysis
 	        System.out.println("\n - Risk analysis:");
 	        System.out.println(" 	");
-	        analyzeDataRisk(result.getOutput(false), region, threshold, riskObject);
+	        riskObject = analyzeDataRisk(result.getOutput(false), region, threshold, riskObject);//add the model metrics to the object
 	        
 	        model.addAttribute("riskObject", riskObject);
+	        model.addAttribute("anonyRows", anonyRows);
 	        
 			return "showRisks";
 		}
@@ -554,9 +558,13 @@ public class AnonymizationController extends AnonymizationBase {
 		//no need to remove anonymized dataset as of now, can be requested if needed later on, but not imperetive now
 	////////////////////////////////////////////////////////////////////////////////////////////// THIS IS WHERE THE VARIABLE INPUT TEST ENDS
 	//->>>>>change return type eventually to supply these values
-	private void getDistributionStatistics() {//potentially hierNames, or plain index?
+	private RiskObject getDistributionStatistics(RiskObject riskObject) {//potentially hierNames, or plain index?
 		//print frequencies
 		System.out.println("Inside getDistributionStatistics");
+		HashMap<String, HashMap<String, String>> inputDistributions = new HashMap<String, HashMap<String, String>>();
+		HashMap<String, HashMap<String, String>> outputDistributions = new HashMap<String, HashMap<String, String>>();
+		//HashMap<String, String> inputValues = new HashMap<String, String>();//these have to be local to the for loop
+		//HashMap<String, String> outputValues = new HashMap<String, String>();//otherwise just keep adding to them continuously
 		StatisticsFrequencyDistribution distribution;
 		DataHandle dataHandle = sourceData.getHandle();
 		DataHandle resultHandle = result.getOutput(false);
@@ -564,30 +572,46 @@ public class AnonymizationController extends AnonymizationBase {
 		int i = 0;
 		for(String header : headerRow) {
 			System.out.println(" - Distribution of attribute " + header + " in input:");
+			
+			HashMap<String, String> inputValues = new HashMap<String, String>();
+			HashMap<String, String> outputValues = new HashMap<String, String>();
+			
 			distribution = dataHandle.getStatistics().getFrequencyDistribution(i, false);//can split this to individual values?
 			System.out.println("   " + Arrays.toString(distribution.values));
 			System.out.println("   " + Arrays.toString(distribution.frequency));
+			String[] values = distribution.values;//get unique values of input
 			double[] frequency = distribution.frequency;//get frequency of input
 				System.out.print("   ");
 				for(int j = 0; j < frequency.length; ++j) {
 					DecimalFormat f = new DecimalFormat("##.00");
-				    System.out.print(f.format(frequency[j]*100.0) + "%  ");
+					String tempFreq = f.format(frequency[j]*100.0) + "%";
+				    System.out.print(tempFreq);
+				    inputValues.put(values[j], tempFreq);
 				}
-			
+			inputDistributions.put(header, inputValues);
 			// Print frequencies
 			System.out.println(" - Distribution of attribute " + header + " in output:");
 			distribution = resultHandle.getStatistics().getFrequencyDistribution(i, true);// can split this to individual values?
 			System.out.println("   " + Arrays.toString(distribution.values));
 			System.out.println("   " + Arrays.toString(distribution.frequency));
-			frequency = distribution.frequency;	//get frequency of output
+			values = distribution.values;
+			frequency = distribution.frequency;//get frequency of output
 				System.out.print("   ");
 				for(int j = 0; j < frequency.length; ++j) {
 					DecimalFormat f = new DecimalFormat("##.00");
-				    System.out.print(f.format(frequency[j]*100.0) + "%  ");
+					String tempFreq = f.format(frequency[j]*100.0) + "%";
+				    System.out.print(tempFreq);
+				    outputValues.put(values[j], tempFreq);
 				}
+				outputDistributions.put(header, outputValues);
 				++i;
 		}
+		
+		riskObject.setDataSetInputDistributionMetrics(inputDistributions);
+		riskObject.setDataSetOutputDistributionMetrics(outputDistributions);
+		
 		System.out.println("Leaving getDistributionStatistics");
+		return(riskObject);
 	}
 	
 	/**
@@ -614,20 +638,31 @@ public class AnonymizationController extends AnonymizationBase {
 	    //prosecutor risk adding to riskObject
 	    System.out.println(" * Prosecutor attacker model");
 	    System.out.println("   - Records at risk: " + getPercent(risks.getProsecutorRisk().getRecordsAtRisk()));
-	    proseJourn[0] = getPercent(risks.getProsecutorRisk().getRecordsAtRisk());
 	    System.out.println("   - Highest risk: " + getPercent(risks.getProsecutorRisk().getHighestRisk()));
-	    proseJourn[1] = getPercent(risks.getProsecutorRisk().getHighestRisk());
 	    System.out.println("   - Success rate: " + getPercent(risks.getProsecutorRisk().getSuccessRate()));
+	    
+	    proseJourn[0] = getPercent(risks.getProsecutorRisk().getRecordsAtRisk());
+	    proseJourn[1] = getPercent(risks.getProsecutorRisk().getHighestRisk());
 	    proseJourn[2] = getPercent(risks.getProsecutorRisk().getSuccessRate());
+	    //write prosecutor risks
+	    riskObject.setProsecutorStats(proseJourn);
 	    
-	    
-	    
+	    //journalist risk adding to riskObject
 	    System.out.println(" * Journalist attacker model");
 	    System.out.println("   - Records at risk: " + getPercent(risks.getJournalistRisk().getRecordsAtRisk()));
 	    System.out.println("   - Highest risk: " + getPercent(risks.getJournalistRisk().getHighestRisk()));
 	    System.out.println("   - Success rate: " + getPercent(risks.getJournalistRisk().getSuccessRate()));
+	    //overwrite with journalist model values
+	    proseJourn[0] = getPercent(risks.getJournalistRisk().getRecordsAtRisk());
+	    proseJourn[1] = getPercent(risks.getJournalistRisk().getHighestRisk());
+	    proseJourn[2] = getPercent(risks.getJournalistRisk().getSuccessRate());
+	    
+	    riskObject.setJournalistStats(proseJourn);
+	    
 	    System.out.println(" * Marketer attacker model");
 	    System.out.println("   - Success rate: " + getPercent(risks.getMarketerRisk().getSuccessRate()));
+	    
+	    riskObject.setMarketerStat(getPercent(risks.getMarketerRisk().getSuccessRate()));
 	   
 	    return riskObject;
 		}

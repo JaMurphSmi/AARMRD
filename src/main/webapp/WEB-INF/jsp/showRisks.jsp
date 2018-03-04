@@ -49,6 +49,11 @@
     visibility: visible;
     opacity: 1;
 }
+
+table, th, td {
+    border: 1px solid black;
+     border-collapse: collapse;
+}
 </style>
 <title>Risk Metrics</title>
 </head>
@@ -99,9 +104,87 @@
 					<input type="submit" value="Submit Your Files">
 			</form>
 	</div>
-	<div style="float:left;margin-left: 100px;max-width:550px;height:400px;padding: 15px 15px 15px 15px;">
-		
-	</div>
+	<c:if test="${not empty riskObject}">
+		<div style="float:left;margin-left: 100px;max-width:650px;padding: 15px 15px 15px 15px;">
+				<c:if test="${not empty riskObject.threshold}">
+					Threshold Specified : ${riskObject.threshold}		
+				</c:if>
+				<c:if test="${not empty riskObject.country}">
+					Country : ${riskObject.country} <br><br><br>
+				</c:if>
+				<c:if test="${not empty riskObject.prosecutorStats && not empty riskObject.journalistStats && not empty riskObject.marketerStat}">
+					<h4>Attacker Models Statistics</h4> <br><br>
+					<table style="float: left;">
+						<tr>
+							<th></th>
+							<th>Prosecutor Attack Model</th>
+							<th>Journalist Attack Model</th>
+							<th>Marketer Attack Model</th>
+						</tr>
+						<tr>
+							<td>Records at Risk</td>
+							<td>${riskObject.prosecutorStats[0]}</td>
+							<td>${riskObject.journalistStats[0]}</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>Highest Risk</td>
+							<td>${riskObject.prosecutorStats[1]}</td>
+							<td>${riskObject.journalistStats[1]}</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>Success Rate</td>
+							<td>${riskObject.prosecutorStats[2]}</td>
+							<td>${riskObject.journalistStats[2]}</td>
+							<td>${riskObject.marketerStat}</td>
+						</tr>
+					</table>
+				</c:if>
+				<br>
+				<c:if test="${not empty riskObject.dataSetInputDistributionMetrics && not empty riskObject.dataSetOutputDistributionMetrics}">
+					Input Data Set Value Distribution Statistics <br><br>
+					<!-- make the whole table in a loop? --> 
+					<c:forEach items="${riskObject.dataSetInputDistributionMetrics}" var="inputMapEntry">
+						<table style="float: left;">
+							<tr>
+								<th colspan="2"><c:out value="${inputMapEntry.key}"/></th>
+							</tr>
+							<tr>
+								<td>Value</td>
+								<td>Frequency</td>
+							</tr>
+							<c:forEach items="${inputMapEntry.value}" var="inputMapValueEntry">
+								<tr>
+									<td><c:out value="${inputMapValueEntry.key}"/></td>
+									<td><c:out value="${inputMapValueEntry.value}"/></td>
+								</tr>
+							</c:forEach>
+						</table>
+					</c:forEach>
+					<br><br>
+					Output Data Set Value Distribution Statistics <br><br>
+					<c:forEach items="${riskObject.dataSetOutputDistributionMetrics}" var="outputMapEntry">
+						<table style="float: left;">
+							<tr>
+								<th colspan="2"><c:out value="${outputMapEntry.key}"/></th>
+							</tr>
+							<tr>
+								<td>Value</td>
+								<td>Frequency</td>
+							</tr>
+							<c:forEach items="${outputMapEntry.value}" var="outputMapValueEntry">
+								<tr>
+									<td><c:out value="${outputMapValueEntry.key}"/></td>
+									<td><c:out value="${outputMapValueEntry.value}"/></td>
+								</tr>
+							</c:forEach>
+						</table>
+					</c:forEach>
+				</c:if>
+		</div>
+
+	</c:if>
 </div>	
 </body>
 </html>
