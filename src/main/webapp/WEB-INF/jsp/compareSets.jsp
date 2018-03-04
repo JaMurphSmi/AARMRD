@@ -68,7 +68,7 @@
 <form action="/goToRiskPage" method="post">
 	<input type="submit" value="Go To Risk Assessment"/> 
 </form>
-<button id="deleteDAH" >Delete Data and Hierarchies</button>&nbsp&nbsp&nbsp
+<button id="deleteDAH" >Delete Data and Hierarchies</button>&nbsp&nbsp&nbsp<br>
 <a href="/downloadAnonymizedFile">Download Anonymized Data</a>
   <div class="form">
     <form action="/" method="post">

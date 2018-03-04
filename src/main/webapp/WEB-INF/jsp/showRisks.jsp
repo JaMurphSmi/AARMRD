@@ -99,6 +99,9 @@
 					<input type="submit" value="Submit Your Files">
 			</form>
 	</div>
+	<div style="float:left;margin-left: 100px;max-width:550px;height:400px;padding: 15px 15px 15px 15px;">
+		
+	</div>
 </div>	
 </body>
 </html>

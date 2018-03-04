@@ -111,6 +111,7 @@ import org.deidentifier.arx.risk.RiskModelSampleSummary;
 import org.deidentifier.arx.risk.RiskModelSampleUniqueness;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
 import org.anonymize.anonymizationapp.model.AnonymizationObject;
+import org.anonymize.anonymizationapp.model.RiskObject;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
 // ARX related stuff 
@@ -444,11 +445,13 @@ public class AnonymizationController extends AnonymizationBase {
 		//method used to analyze the risks of a dataset
 		@RequestMapping("/analyseRisks")
 		public String analyseRisks(@RequestParam("populationRegion") String region,
-				@RequestParam("THRESHOLD") double threshold) {
+				@RequestParam("THRESHOLD") double threshold, Model model) {
+			RiskObject riskObject = new RiskObject();
+			
+			//riskObject.setThreshold(threshold);
+			
 			getDistributionStatistics();
 	        
-	        System.out.println("\n ------------------------------------------------");
-	        System.out.println("\n ------------------------------------------------");
 	        System.out.println("\n ------------------------------------------------");
 	        System.out.println("\n ------------------------------------------------");
 	        System.out.println("\n ------------------------------------------------");
@@ -456,11 +459,12 @@ public class AnonymizationController extends AnonymizationBase {
 	        
 	        
 	        // Perform risk analysis
-	        System.out.println("\n - Output data");
-	        print(result.getOutput(false));//simply for proof, has been proven
 	        System.out.println("\n - Risk analysis:");
 	        System.out.println(" 	");
-	        analyzeDataRisk(result.getOutput(false), region, threshold);
+	        analyzeDataRisk(result.getOutput(false), region, threshold, riskObject);
+	        
+	        model.addAttribute("riskObject", riskObject);
+	        
 			return "showRisks";
 		}
 		
@@ -592,8 +596,12 @@ public class AnonymizationController extends AnonymizationBase {
 	 * @param populationRegion
 	 * @param THRESHOLD -> The lowest percentage risk value that is allowed for a particular record
 	 */
-	private void analyzeDataRisk(DataHandle handle, String populationRegion, double THRESHOLD) {   
+	private RiskObject analyzeDataRisk(DataHandle handle, String populationRegion, double THRESHOLD, RiskObject riskObject) {   
 	    
+		String[] proseJourn = new String[3];//temp string array for prosecutor/journalist to put into riskObject
+		
+		riskObject.setThreshold(getPercent(THRESHOLD));
+		
 		ARXPopulationModel populationmodel = determineRegion(populationRegion);//chosen from risk screen
 	    //variable models based on significant area
 	       
@@ -601,17 +609,28 @@ public class AnonymizationController extends AnonymizationBase {
 	    RiskModelSampleSummary risks = builder.getSampleBasedRiskSummary(THRESHOLD);
 	       
 	    System.out.println(" * Baseline risk threshold: " + getPercent(THRESHOLD));
+	    
+	    
+	    //prosecutor risk adding to riskObject
 	    System.out.println(" * Prosecutor attacker model");
 	    System.out.println("   - Records at risk: " + getPercent(risks.getProsecutorRisk().getRecordsAtRisk()));
+	    proseJourn[0] = getPercent(risks.getProsecutorRisk().getRecordsAtRisk());
 	    System.out.println("   - Highest risk: " + getPercent(risks.getProsecutorRisk().getHighestRisk()));
+	    proseJourn[1] = getPercent(risks.getProsecutorRisk().getHighestRisk());
 	    System.out.println("   - Success rate: " + getPercent(risks.getProsecutorRisk().getSuccessRate()));
+	    proseJourn[2] = getPercent(risks.getProsecutorRisk().getSuccessRate());
+	    
+	    
+	    
 	    System.out.println(" * Journalist attacker model");
 	    System.out.println("   - Records at risk: " + getPercent(risks.getJournalistRisk().getRecordsAtRisk()));
 	    System.out.println("   - Highest risk: " + getPercent(risks.getJournalistRisk().getHighestRisk()));
 	    System.out.println("   - Success rate: " + getPercent(risks.getJournalistRisk().getSuccessRate()));
 	    System.out.println(" * Marketer attacker model");
 	    System.out.println("   - Success rate: " + getPercent(risks.getMarketerRisk().getSuccessRate()));
-	   }
+	   
+	    return riskObject;
+		}
 	   
 	   /**
 	    * Returns a region to be used for risk metrics
