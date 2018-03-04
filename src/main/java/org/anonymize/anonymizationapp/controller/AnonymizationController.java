@@ -4,10 +4,12 @@ package org.anonymize.anonymizationapp.controller;
 import java.awt.Desktop;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 // Importing ARX required modules, dependencies etc
 import java.io.IOException;
@@ -149,6 +151,9 @@ public class AnonymizationController extends AnonymizationBase {
 	List<String[]> dataRows = new ArrayList<String[]>();//extract to global variables to allow access in entire application
 	List<String[]> anonyRows = new ArrayList<String[]>();
 	List<String> headerRow = new ArrayList<String>();//making global to improve accessibility and reduce need to pass between methods
+	final String[] countries = {"America", "Australia", "Brasil", "Canada", "China", "Europe", 
+			"European Union", "France", "Germany", "India", "North America", "South America",
+			"United Kingdom", "United States"};//countries and regions for risk metrics
 	//also remove from anonymization object
 	
 	//may restrict all anonymization actions to the anonymization controller? not have multiple controllers?
@@ -200,9 +205,26 @@ public class AnonymizationController extends AnonymizationBase {
 			fost.write(mulFile.getBytes());
 			fost.close();//works
 			
-			String[] tempArray = fileName.split("[\\_\\.]");//split by underscore and dot		  0         1         2
-			headerRow.add(tempArray[2]);//add file name to list for display reasons further on [dataset]_hierarchy_[column]
+			//String[] tempArray = fileName.split("[\\_\\.]");//split by underscore and dot		  0         1         2
+			//headerRow.add(tempArray[2]);//add file name to list for display reasons further on [dataset]_hierarchy_[column]
+		}//removing the headerRow from this, need to make it in proper order
+		
+		//needed to keep the order of fields correct
+		BufferedReader fileReader = new BufferedReader(new FileReader("src/main/resources/templates/data/" + datasetFile));
+		
+		try {
+			 // "Prime" the while loop        
+		    String headerLine = fileReader.readLine();
+		    
+		    String[] fields = headerLine.split(";");
+		    for(int i= 0; i < fields.length; ++i) {
+		    	headerRow.add(fields[i]);//should be in order now
+		    }
 		}
+		finally {
+			fileReader.close();
+		}
+		
 		// making data creation variable, normal files xls, csv
 		System.out.println("before creating the data and hierarchies");
 		if(table == null && (!datasetFile.substring(datasetFile.lastIndexOf(".") + 1).equals("db"))) {
@@ -433,9 +455,6 @@ public class AnonymizationController extends AnonymizationBase {
 		 */
 		@RequestMapping("/goToRiskPage")
 		public String showRiskPage(Model model) {
-			String[] countries = {"America", "Australia", "Brasil", "Canada", "China", "Europe", 
-					"European Union", "France", "Germany", "India", "North America", "South America",
-					"United Kingdom", "United States"};
 			
 	        model.addAttribute("countries", countries);
 			model.addAttribute("headerRow", headerRow);
@@ -457,8 +476,6 @@ public class AnonymizationController extends AnonymizationBase {
 			
 	        System.out.println("\n ------------------------------------------------");
 	        System.out.println("\n ------------------------------------------------");
-	        System.out.println("\n ------------------------------------------------");
-	        System.out.println("\n ------------------------------------------------");
 	        
 	        
 	        // Perform risk analysis
@@ -468,6 +485,7 @@ public class AnonymizationController extends AnonymizationBase {
 	        
 	        model.addAttribute("riskObject", riskObject);
 	        model.addAttribute("anonyRows", anonyRows);
+	        model.addAttribute("countries", countries);
 	        
 			return "showRisks";
 		}
@@ -588,6 +606,7 @@ public class AnonymizationController extends AnonymizationBase {
 				    System.out.print(tempFreq);
 				    inputValues.put(values[j], tempFreq);
 				}
+				System.out.println();
 			inputDistributions.put(header, inputValues);
 			// Print frequencies
 			System.out.println(" - Distribution of attribute " + header + " in output:");
@@ -603,6 +622,7 @@ public class AnonymizationController extends AnonymizationBase {
 				    System.out.print(tempFreq);
 				    outputValues.put(values[j], tempFreq);
 				}
+				System.out.println();
 				outputDistributions.put(header, outputValues);
 				++i;
 		}

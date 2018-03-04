@@ -26,7 +26,7 @@ public class RiskObject {
 	}
 	
 	public HashMap<String, HashMap<String, String>> getDataSetOutputDistributionMetrics() {
-		return dataSetInputDistributionMetrics;
+		return dataSetOutputDistributionMetrics;
 	}
 
 	public void setDataSetOutputDistributionMetrics(HashMap<String, HashMap<String, String>> dataSetOutputDistributionMetrics) {

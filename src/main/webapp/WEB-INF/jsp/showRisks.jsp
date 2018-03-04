@@ -105,7 +105,7 @@ table, th, td {
 			</form>
 	</div>
 	<c:if test="${not empty riskObject}">
-		<div style="float:left;margin-left: 100px;max-width:650px;padding: 15px 15px 15px 15px;">
+		<div style="float:left;margin-left: 100px;max-width:1050px;padding: 15px 15px 15px 15px;overflow: scrollable;">
 				<c:if test="${not empty riskObject.threshold}">
 					Threshold Specified : ${riskObject.threshold}		
 				</c:if>
@@ -142,45 +142,50 @@ table, th, td {
 					</table>
 				</c:if>
 				<br>
+				<!-- from here down is all risk metrics -->
 				<c:if test="${not empty riskObject.dataSetInputDistributionMetrics && not empty riskObject.dataSetOutputDistributionMetrics}">
-					Input Data Set Value Distribution Statistics <br><br>
-					<!-- make the whole table in a loop? --> 
-					<c:forEach items="${riskObject.dataSetInputDistributionMetrics}" var="inputMapEntry">
-						<table style="float: left;">
-							<tr>
-								<th colspan="2"><c:out value="${inputMapEntry.key}"/></th>
-							</tr>
-							<tr>
-								<td>Value</td>
-								<td>Frequency</td>
-							</tr>
-							<c:forEach items="${inputMapEntry.value}" var="inputMapValueEntry">
+					<div align="center" style="float:left;">
+						Input Data Set Value Distribution Statistics <br><br>
+						<!-- make the whole table in a loop? --> 
+						<c:forEach items="${riskObject.dataSetInputDistributionMetrics}" var="inputMapEntry">
+							<table style="float: left;">
 								<tr>
-									<td><c:out value="${inputMapValueEntry.key}"/></td>
-									<td><c:out value="${inputMapValueEntry.value}"/></td>
+									<th colspan="2"><c:out value="${inputMapEntry.key}"/></th>
 								</tr>
-							</c:forEach>
-						</table>
-					</c:forEach>
+								<tr>
+									<td>Value</td>
+									<td>Frequency</td>
+								</tr>
+								<c:forEach items="${inputMapEntry.value}" var="inputMapValueEntry">
+									<tr>
+										<td><c:out value="${inputMapValueEntry.key}"/></td>
+										<td><c:out value="${inputMapValueEntry.value}"/></td>
+									</tr>
+								</c:forEach>
+							</table>
+						</c:forEach>
+					</div>
 					<br><br>
-					Output Data Set Value Distribution Statistics <br><br>
-					<c:forEach items="${riskObject.dataSetOutputDistributionMetrics}" var="outputMapEntry">
-						<table style="float: left;">
-							<tr>
-								<th colspan="2"><c:out value="${outputMapEntry.key}"/></th>
-							</tr>
-							<tr>
-								<td>Value</td>
-								<td>Frequency</td>
-							</tr>
-							<c:forEach items="${outputMapEntry.value}" var="outputMapValueEntry">
+					<div align="center" style="float:left;">
+						Output Data Set Value Distribution Statistics <br><br>
+						<c:forEach items="${riskObject.dataSetOutputDistributionMetrics}" var="outputMapEntry">
+							<table style="float: left;">
 								<tr>
-									<td><c:out value="${outputMapValueEntry.key}"/></td>
-									<td><c:out value="${outputMapValueEntry.value}"/></td>
+									<th colspan="2"><c:out value="${outputMapEntry.key}"/></th>
 								</tr>
-							</c:forEach>
-						</table>
-					</c:forEach>
+								<tr>
+									<td>Value</td>
+									<td>Frequency</td>
+								</tr>
+								<c:forEach items="${outputMapEntry.value}" var="outputMapValueEntry">
+									<tr>
+										<td><c:out value="${outputMapValueEntry.key}"/></td>
+										<td><c:out value="${outputMapValueEntry.value}"/></td>
+									</tr>
+								</c:forEach>
+							</table>
+						</c:forEach>
+					</div>
 				</c:if>
 		</div>
 
