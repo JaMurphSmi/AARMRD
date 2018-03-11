@@ -17,8 +17,14 @@ public class PieChartGenerator {
 	public void makePieChart(String title) {
 
 	    // Create dataset
-	    PieDataset dataset = createDataset();
-
+	    
+	    DefaultPieDataset defaultDataset = new DefaultPieDataset();
+		   
+	    defaultDataset.setValue("20-39", 7);
+	    defaultDataset.setValue("0-19", 3);
+	    
+	    PieDataset dataset = defaultDataset;
+	    
 	    // Create chart
 	    JFreeChart chart = ChartFactory.createPieChart(
 	        "Pie Chart Example",
@@ -38,16 +44,5 @@ public class PieChartGenerator {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	  }
-
-	  private PieDataset createDataset() {
-
-	    DefaultPieDataset dataset=new DefaultPieDataset();
-	    dataset.setValue("80-100", 120);
-	    dataset.setValue("60-79", 80);
-	    dataset.setValue("40-59", 20);
-	    dataset.setValue("20-39", 7);
-	    dataset.setValue("0-19", 3);
-	    return dataset;
 	  }
 }
