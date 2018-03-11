@@ -87,7 +87,13 @@
     	<version>3.6.0</version>
     </dependency>
     <!-- Attempting to add ARX library -->
-    
+    <!-- Attempting to add JFreeChart library -->
+    <dependency>
+	    <groupId>org.jfree</groupId>
+	    <artifactId>jfreechart</artifactId>
+	    <version>1.0.19</version>
+	</dependency>
+    <!-- Attempting to add JFreeChart library -->
 	<!-- adding dependency for sqlite jdbc -->
     <dependency>
         <groupId>org.xerial</groupId>
