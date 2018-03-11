@@ -189,11 +189,6 @@ public class AnonymizationController extends AnonymizationBase {
 		//////////////////// finished doing stuff for Data
 		
 		////////////////////creating the hierarchies in file path
-			    
-		//defining hierarchy files and names
-		//List<String> headerRow = new ArrayList<String>();//for hierarchy names to display
-		//headerRow removed to global
-		//List<Hierarchy> hierarchies = new ArrayList<Hierarchy>();//list to hold the created hierarchy objects
 		
 		for(MultipartFile mulFile: hierFiles) {
 			String fileName = mulFile.getOriginalFilename();
@@ -208,6 +203,8 @@ public class AnonymizationController extends AnonymizationBase {
 			//String[] tempArray = fileName.split("[\\_\\.]");//split by underscore and dot		  0         1         2
 			//headerRow.add(tempArray[2]);//add file name to list for display reasons further on [dataset]_hierarchy_[column]
 		}//removing the headerRow from this, need to make it in proper order
+		
+		headerRow = null;//zero out header row to avoid duplicate field headers in tables
 		
 		//needed to keep the order of fields correct
 		BufferedReader fileReader = new BufferedReader(new FileReader("src/main/resources/templates/data/" + datasetFile));
@@ -251,12 +248,7 @@ public class AnonymizationController extends AnonymizationBase {
 		Iterator<String[]> itHandle = handle.iterator();
 		String flubRow = Arrays.toString(itHandle.next());//get the header of the dataset to display in bold
 		System.out.println(">" + headerRow + "<");
-		//String[] headerTemp = headerRow.split("[\\[\\],]");
-		//String[] header = new String[headerTemp.length - 1];
-		//for(int i = 0; i < headerTemp.length - 1; i++) {
-		//	header[i] = headerTemp[i+1].trim();
-		//}//shift all values 
-		//model.addAttribute("headerData", headerTemp);//was incorrect
+		
 		model.addAttribute("headerRow", headerRow);//only need to get the header once as it will do for the resulting dataset also
 		for (String colName : headerRow) {
 			System.out.println(colName + ",");//testing if random space at the start
@@ -409,7 +401,7 @@ public class AnonymizationController extends AnonymizationBase {
 	        // maybe leave the hierarchies as part of the application but remove the original data for the user's protection?
 	        
 	        //attempting to implement some utility metrics, just printing atm
-	        for (ARXNode[] level : result.getLattice().getLevels()) {
+	        /*for (ARXNode[] level : result.getLattice().getLevels()) {
 	            for (ARXNode node : level) {
 	                Iterator<String[]> transformed = result.getOutput(node, false).iterator();
 	                System.out.println("Transformation : "+Arrays.toString(node.getTransformation()));
@@ -419,7 +411,7 @@ public class AnonymizationController extends AnonymizationBase {
 	                    System.out.println(Arrays.toString(transformed.next()));
 	                }
 	            }
-	        }
+	        }*/
 	        
 	        Iterator<String[]> transformed = result.getOutput(false).iterator();
 	        
