@@ -139,6 +139,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.anonymize.anonymizationapp.util.DataAspects;
+import org.anonymize.anonymizationapp.util.PieChartGenerator;
 
 //import cern.colt.Arrays;
 
@@ -161,6 +162,11 @@ public class AnonymizationController extends AnonymizationBase {
 	@Autowired
 	private DataAspects dataAspectsHelper;
 
+	@Autowired
+	private PieChartGenerator pieChartGenerator;
+	
+	
+	
    @RequestMapping("/")
    public String index() {
       return "index";
@@ -598,6 +604,7 @@ public class AnonymizationController extends AnonymizationBase {
 				    System.out.print(tempFreq);
 				    inputValues.put(values[j], tempFreq);
 				}
+				pieChartGenerator.makePieChart(inputValues);
 				System.out.println();
 			inputDistributions.put(header, inputValues);
 			// Print frequencies
@@ -614,6 +621,7 @@ public class AnonymizationController extends AnonymizationBase {
 				    System.out.print(tempFreq);
 				    outputValues.put(values[j], tempFreq);
 				}
+				pieChartGenerator.makePieChart(outputValues);
 				System.out.println();
 				outputDistributions.put(header, outputValues);
 				++i;

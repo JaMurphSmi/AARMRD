@@ -3,6 +3,7 @@ package org.anonymize.anonymizationapp.util;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
@@ -14,7 +15,7 @@ import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
 
 public class PieChartGenerator {
-	public void makePieChart(String title) {
+	public void makePieChart(HashMap<String, String> pieValues) {
 
 	    // Create dataset
 	    
