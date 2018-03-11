@@ -590,7 +590,10 @@ public class AnonymizationController extends AnonymizationBase {
 			System.out.println(" - Distribution of attribute " + header + " in input:");
 			
 			HashMap<String, String> inputValues = new HashMap<String, String>();
+			HashMap<String, String> inputValuesClean = new HashMap<String, String>();
+			
 			HashMap<String, String> outputValues = new HashMap<String, String>();
+			HashMap<String, String> outputValuesClean = new HashMap<String, String>();
 			
 			distribution = dataHandle.getStatistics().getFrequencyDistribution(i, false);//can split this to individual values?
 			System.out.println("   " + Arrays.toString(distribution.values));
@@ -603,8 +606,10 @@ public class AnonymizationController extends AnonymizationBase {
 					String tempFreq = f.format(frequency[j]*100.0) + "%";
 				    System.out.print(tempFreq);
 				    inputValues.put(values[j], tempFreq);
+				    tempFreq = f.format(frequency[j]*100.0);
+				    inputValuesClean.put(values[j], tempFreq);
 				}
-				pieChartGenerator.makePieChart(inputValues);
+				pieChartGenerator.makePieChart(header, inputValuesClean);
 				System.out.println();
 			inputDistributions.put(header, inputValues);
 			// Print frequencies
@@ -620,8 +625,10 @@ public class AnonymizationController extends AnonymizationBase {
 					String tempFreq = f.format(frequency[j]*100.0) + "%";
 				    System.out.print(tempFreq);
 				    outputValues.put(values[j], tempFreq);
+				    tempFreq = f.format(frequency[j]*100.0);
+				    outputValuesClean.put(values[j], tempFreq);
 				}
-				pieChartGenerator.makePieChart(outputValues);
+				pieChartGenerator.makePieChart(header,outputValuesClean);
 				System.out.println();
 				outputDistributions.put(header, outputValues);
 				++i;

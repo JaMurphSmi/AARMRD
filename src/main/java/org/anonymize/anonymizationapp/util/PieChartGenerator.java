@@ -15,20 +15,20 @@ import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
 
 public class PieChartGenerator {
-	public void makePieChart(HashMap<String, String> pieValues) {
+	public void makePieChart(String theTitle, HashMap<String, String> pieValues) {
 
 	    // Create dataset
 	    
 	    DefaultPieDataset defaultDataset = new DefaultPieDataset();
-		   
-	    defaultDataset.setValue("20-39", 7);
-	    defaultDataset.setValue("0-19", 3);
+	    for (HashMap.Entry<String, String> entry : pieValues.entrySet()) {
+	    	defaultDataset.setValue(entry.getKey(), Double.parseDouble(entry.getValue()));
+	    }   
 	    
 	    PieDataset dataset = defaultDataset;
 	    
 	    // Create chart
 	    JFreeChart chart = ChartFactory.createPieChart(
-	        "Pie Chart Example",
+	        theTitle,
 	        dataset,
 	        true, 
 	        true,
