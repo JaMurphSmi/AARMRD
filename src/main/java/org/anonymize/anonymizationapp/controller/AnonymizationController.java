@@ -210,7 +210,7 @@ public class AnonymizationController extends AnonymizationBase {
 			//headerRow.add(tempArray[2]);//add file name to list for display reasons further on [dataset]_hierarchy_[column]
 		}//removing the headerRow from this, need to make it in proper order
 		
-		headerRow = null;//zero out header row to avoid duplicate field headers in tables
+		headerRow.clear();//zero out header row to avoid duplicate field headers in tables
 		
 		//needed to keep the order of fields correct
 		BufferedReader fileReader = new BufferedReader(new FileReader("src/main/resources/templates/data/" + datasetFile));

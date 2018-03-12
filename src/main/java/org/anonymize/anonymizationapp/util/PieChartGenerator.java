@@ -13,8 +13,11 @@ import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PieChartGenerator {
+	
 	public void makePieChart(String theTitle, HashMap<String, String> pieValues) {
 
 	    // Create dataset
@@ -36,11 +39,11 @@ public class PieChartGenerator {
 
 	    //Format Label
 	    PieSectionLabelGenerator labelGenerator = new StandardPieSectionLabelGenerator(
-	        "Marks {0} : ({2})", new DecimalFormat("0"), new DecimalFormat("0%"));
+	        "Value {0} : ({2})", new DecimalFormat("0"), new DecimalFormat("0%"));
 	    ((PiePlot) chart.getPlot()).setLabelGenerator(labelGenerator);
 	    
 	    try {
-			ChartUtilities.saveChartAsJPEG(new File("path/piechart.png"),chart,400, 300);
+			ChartUtilities.saveChartAsJPEG(new File("src/main/resources/templates/charts/"+ theTitle +".png"),chart,400, 300);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
