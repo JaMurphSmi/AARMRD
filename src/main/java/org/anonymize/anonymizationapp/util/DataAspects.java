@@ -33,9 +33,16 @@ public class DataAspects{
 	       if(extension.equals("csv")) {//to handle csv and excel files
 	    	   data = Data.create("src/main/resources/templates/data/" + dataset + "." + extension, StandardCharsets.UTF_8, ';');
 	       }
+	       /**
+	        * Xls and dbs cannot be used as the sequence of fields in a data set cannot be determined through hierarchy file names anymore
+	        * this is due to the columns being out of alphabetical order, and the file picker putting them into order regardless of choice
+	        */
 	       else if(extension.equals("xls") || extension.equals("xlsx")) {
 	    	   DataSource dataExcel = DataSource.createExcelSource("src/main/resources/templates/data/" + dataset + "." + extension, 0, true);
 	    	   //need to specify column names in here before casting to type Data, so send field names shaved from
+	    	   
+	    	   //dataExcel.
+	    	   
 	    	   int i = 0;
 	    	   for(String hierName : hierNames) {
 	    		   dataExcel.addColumn(hierName);

@@ -141,10 +141,11 @@ table, th, td {
 						</tr>
 					</table>
 				</c:if>
-				<br>
+				<br><br><br>
+
 				<!-- from here down is all risk metrics -->
 				<c:if test="${not empty riskObject.dataSetInputDistributionMetrics && not empty riskObject.dataSetOutputDistributionMetrics}">
-					<div align="center" style="float:left;">
+					<div align="center" style="max-width:700px;">
 						Input Data Set Value Distribution Statistics <br><br>
 						<!-- make the whole table in a loop? --> 
 						<c:forEach items="${riskObject.dataSetInputDistributionMetrics}" var="inputMapEntry">
@@ -163,10 +164,11 @@ table, th, td {
 									</tr>
 								</c:forEach>
 							</table>
+							&nbsp
 						</c:forEach>
 					</div>
-					<br><br>
-					<div align="center" style="float:left;">
+					<br><br><br><br><br><br><br><br><br><br>
+					<div align="center" style="max-width:700px;">
 						Output Data Set Value Distribution Statistics <br><br>
 						<c:forEach items="${riskObject.dataSetOutputDistributionMetrics}" var="outputMapEntry">
 							<table style="float: left;">
@@ -184,11 +186,11 @@ table, th, td {
 									</tr>
 								</c:forEach>
 							</table>
+							&nbsp
 						</c:forEach>
 					</div>
 				</c:if>
-		</div>
-
+			</div>
 	</c:if>
 </div>	
 </body>

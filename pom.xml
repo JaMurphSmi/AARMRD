@@ -94,6 +94,20 @@
 	    <version>1.0.19</version>
 	</dependency>
     <!-- Attempting to add JFreeChart library -->
+    <!-- Adding dependency for smile for utility attempts  -->
+    <!-- https://mvnrepository.com/artifact/com.github.haifengl/smile-core -->
+	<dependency>
+	    <groupId>com.github.haifengl</groupId>
+	    <artifactId>smile-core</artifactId>
+	    <version>1.5.1</version>
+	</dependency>
+    <!--  -->
+    <!-- https://mvnrepository.com/artifact/net.objecthunter/exp4j -->
+	<dependency>
+	    <groupId>net.objecthunter</groupId>
+	    <artifactId>exp4j</artifactId>
+	    <version>0.4.0.ALPHA-2</version>
+	</dependency>
 	<!-- adding dependency for sqlite jdbc -->
     <dependency>
         <groupId>org.xerial</groupId>

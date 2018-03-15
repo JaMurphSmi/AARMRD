@@ -80,6 +80,7 @@ import org.deidentifier.arx.aggregates.HierarchyBuilderIntervalBased.Range;
 import org.deidentifier.arx.aggregates.HierarchyBuilderOrderBased;
 import org.deidentifier.arx.aggregates.HierarchyBuilderRedactionBased;
 import org.deidentifier.arx.aggregates.HierarchyBuilderRedactionBased.Order;
+//import org.deidentifier.arx.aggregates.StatisticsQuality;//does not exist in the current jar
 import org.deidentifier.arx.criteria.AverageReidentificationRisk;
 import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.DistinctLDiversity;
@@ -112,6 +113,7 @@ import org.deidentifier.arx.risk.RiskModelPopulationUniqueness.PopulationUniquen
 import org.deidentifier.arx.risk.RiskModelSampleRisks;
 import org.deidentifier.arx.risk.RiskModelSampleSummary;
 import org.deidentifier.arx.risk.RiskModelSampleUniqueness;
+import org.anonymize.anonymizationapp.aggregates.StatisticsQuality;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
 import org.anonymize.anonymizationapp.model.AnonymizationObject;
 import org.anonymize.anonymizationapp.model.RiskObject;
@@ -129,15 +131,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.anonymize.anonymizationapp.util.DataAspects;
 import org.anonymize.anonymizationapp.util.PieChartGenerator;
 
@@ -483,16 +481,42 @@ public class AnonymizationController extends AnonymizationBase {
 	        
 	        model.addAttribute("riskObject", riskObject);
 	        model.addAttribute("anonyRows", anonyRows);
+	        model.addAttribute("headerRow", headerRow);
 	        model.addAttribute("countries", countries);
 	        
 			return "showRisks";
 		}
 		
 		//method used to analyze the utility of a dataset 
-		@RequestMapping("/analyseUtility")
+		/*@RequestMapping("/analyseUtility")
 		public String analyseUtility() {
+			// Access statistics
+		       StatisticsQuality utility = sourceData.getHandle().getStatistics().getQualityStatistics();
+		       System.out.println("Input:");
+		       System.out.println(" - Ambiguity: " + utility.getAmbiguity().getValue());
+		       System.out.println(" - AECS: " + utility.getAverageClassSize().getValue());
+		       System.out.println(" - Discernibility: " + utility.getDiscernibility().getValue());
+		       System.out.println(" - Granularity: " + utility.getGranularity().getArithmeticMean(false));
+		       System.out.println(" - Attribute-level SE: " + utility.getAttributeLevelSquaredError().getArithmeticMean(false));
+		       System.out.println(" - Non-Uniform Entropy: " + utility.getNonUniformEntropy().getArithmeticMean(false));
+		       System.out.println(" - Precision: " + utility.getGeneralizationIntensity().getArithmeticMean(false));
+		       System.out.println(" - Record-level SE: " + utility.getRecordLevelSquaredError().getValue());
+		       
+		       DataHandle theOutput = result.getHandle();
+		       
+		       // Access statistics
+		       utility = theOutput.getStatistics().;
+		       System.out.println("Output:");
+		       System.out.println(" - Ambiguity: " + utility.getAmbiguity().getValue());
+		       System.out.println(" - AECS: " + utility.getAverageClassSize().getValue());
+		       System.out.println(" - Discernibility: " + utility.getDiscernibility().getValue());
+		       System.out.println(" - Granularity: " + utility.getGranularity().getArithmeticMean(false));
+		       System.out.println(" - MSE: " + utility.getAttributeLevelSquaredError().getArithmeticMean(false));
+		       System.out.println(" - Non-Uniform Entropy: " + utility.getNonUniformEntropy().getArithmeticMean(false));
+		       System.out.println(" - Precision: " + utility.getGeneralizationIntensity().getArithmeticMean(false));
+		       System.out.println(" - SSE: " + utility.getRecordLevelSquaredError().getValue());
 			return "showUtilities";
-		}
+		}*/
 		
 	//method that allows the user to delete all files related to their anonymization from the final page
 		@RequestMapping("/deleteDataAndHierarchies")//available on first page? to allow users to cancel securely, remove all traces
@@ -628,7 +652,7 @@ public class AnonymizationController extends AnonymizationBase {
 				    tempFreq = f.format(frequency[j]*100.0);
 				    outputValuesClean.put(values[j], tempFreq);
 				}
-				pieChartGenerator.makePieChart(header,outputValuesClean);
+				pieChartGenerator.makePieChart(header+"_1",outputValuesClean);
 				System.out.println();
 				outputDistributions.put(header, outputValues);
 				++i;
@@ -660,7 +684,6 @@ public class AnonymizationController extends AnonymizationBase {
 	    RiskModelSampleSummary risks = builder.getSampleBasedRiskSummary(THRESHOLD);
 	       
 	    System.out.println(" * Baseline risk threshold: " + getPercent(THRESHOLD));
-	    
 	    
 	    //prosecutor risk adding to riskObject
 	    System.out.println(" * Prosecutor attacker model");
@@ -841,7 +864,7 @@ public class AnonymizationController extends AnonymizationBase {
        data.getDefinition().setMinimumGeneralization("gender", 1);*/
        //data.getDefinition().setAttributeType("disease", AttributeType.SENSITIVE_ATTRIBUTE);
 /////this might be very very very important to look into 
-       /*HierarchyBuilderRedactionBased<?> builder1 = HierarchyBuilderRedactionBased.create(Order.RIGHT_TO_LEFT,
+      /*HierarchyBuilderRedactionBased<?> builder1 = HierarchyBuilderRedactionBased.create(Order.RIGHT_TO_LEFT,
                Order.RIGHT_TO_LEFT,
                ' ',
                '*');
