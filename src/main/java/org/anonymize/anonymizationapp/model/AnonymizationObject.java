@@ -1,8 +1,6 @@
 package org.anonymize.anonymizationapp.model;
 
-import org.deidentifier.arx.Data;
-import org.deidentifier.arx.Data.DefaultData;
-import org.anonymize.anonymizationapp.constants.AnonModel;
+
 
 public class AnonymizationObject {
 	

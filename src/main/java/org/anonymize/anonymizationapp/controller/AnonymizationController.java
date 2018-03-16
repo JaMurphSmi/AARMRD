@@ -113,7 +113,6 @@ import org.deidentifier.arx.risk.RiskModelPopulationUniqueness.PopulationUniquen
 import org.deidentifier.arx.risk.RiskModelSampleRisks;
 import org.deidentifier.arx.risk.RiskModelSampleSummary;
 import org.deidentifier.arx.risk.RiskModelSampleUniqueness;
-import org.anonymize.anonymizationapp.aggregates.StatisticsQuality;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
 import org.anonymize.anonymizationapp.model.AnonymizationObject;
 import org.anonymize.anonymizationapp.model.RiskObject;
@@ -121,6 +120,13 @@ import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
 // ARX related stuff 
 import org.apache.commons.math3.util.Pair;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
@@ -209,23 +215,65 @@ public class AnonymizationController extends AnonymizationBase {
 		}//removing the headerRow from this, need to make it in proper order
 		
 		headerRow.clear();//zero out header row to avoid duplicate field headers in tables
+		String[] checkExtension = datasetFile.split("\\.");
 		
-		//needed to keep the order of fields correct
-		BufferedReader fileReader = new BufferedReader(new FileReader("src/main/resources/templates/data/" + datasetFile));
-		
-		try {
-			 // "Prime" the while loop        
-		    String headerLine = fileReader.readLine();
-		    
-		    String[] fields = headerLine.split(";");
-		    for(int i= 0; i < fields.length; ++i) {
-		    	headerRow.add(fields[i]);//should be in order now
-		    }
+		if(checkExtension[1].equals("csv")) {
+			//needed to keep the order of fields correct
+			BufferedReader fileReader = new BufferedReader(new FileReader("src/main/resources/templates/data/" + datasetFile));
+			
+			try {
+				 // "Prime" the while loop        
+			    String headerLine = fileReader.readLine();
+			    
+			    String[] fields = headerLine.split(";");
+			    for(int i= 0; i < fields.length; ++i) {
+			    	headerRow.add(fields[i]);//should be in order now
+			    }
+			}
+			finally {
+				fileReader.close();
+			}
+		}//header row must be read from the xls or xlsx file in another way
+		else if ((checkExtension[1].equals("xls")) || (checkExtension[1].equals("xlsx")))
+		{
+			InputStream inp = new FileInputStream("src/main/resources/templates/data/" + datasetFile);
+			try {
+				
+				XSSFWorkbook wb = (XSSFWorkbook) WorkbookFactory.create(inp);
+				int FIRST_ROW_TO_GET = 0; // 0 based
+				Sheet s = wb.getSheetAt(0);
+				
+				// Create a DataFormatter to format and get each cell's value as String
+		        DataFormatter dataFormatter = new DataFormatter();
+				
+				for (int i = FIRST_ROW_TO_GET; i < 1; i++) {
+				   Row row = s.getRow(i);
+				   if (row == null) {
+				      // The whole row is blank
+				   }
+				   else {
+				      for (int cn=row.getFirstCellNum(); cn<row.getLastCellNum(); cn++) {
+				         Cell c = row.getCell(cn, Row.RETURN_BLANK_AS_NULL);
+				         if (c == null) {
+				            // The cell is empty
+				         } else {
+				        	 String cellValue = dataFormatter.formatCellValue(c);
+				             System.out.print(cellValue + "\t");
+				             headerRow.add(cellValue);  
+				         }
+				      }
+				   }
+				}
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			finally {
+				inp.close();
+			}
 		}
-		finally {
-			fileReader.close();
-		}
-		
+		System.out.println("After getting the header row if no problems arise");
+		System.out.println("Has successfully worked");
 		// making data creation variable, normal files xls, csv
 		System.out.println("before creating the data and hierarchies");
 		if(table == null && (!datasetFile.substring(datasetFile.lastIndexOf(".") + 1).equals("db"))) {
