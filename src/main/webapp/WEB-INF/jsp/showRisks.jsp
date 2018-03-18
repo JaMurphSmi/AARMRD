@@ -151,23 +151,25 @@ table, th, td {
 						Input Data Set Value Distribution Statistics <br><br>
 						<!-- make the whole table in a loop? --> 
 						<c:forEach items="${riskObject.dataSetInputDistributionMetrics}" var="inputMapEntry">
-							<table style="float: left;">
-								<tr>
-									<th colspan="2"><c:out value="${inputMapEntry.key}"/></th>
-								</tr>
-								<tr>
-									<td>Value</td>
-									<td>Frequency</td>
-								</tr>
-								<c:forEach items="${inputMapEntry.value}" var="inputMapValueEntry">
+							<div>
+								<table style="float: left;">
 									<tr>
-										<td><c:out value="${inputMapValueEntry.key}"/></td>
-										<td><c:out value="${inputMapValueEntry.value}%"/></td>
+										<th colspan="2"><c:out value="${inputMapEntry.key}"/></th>
 									</tr>
-								</c:forEach>
-							</table>
-							&nbsp<!-- generate divs for piecharts at the end of each iteration -->
-							<div style="float:left;" id="${inputMapEntry.key}"></div>
+									<tr>
+										<td>Value</td>
+										<td>Frequency</td>
+									</tr>
+									<c:forEach items="${inputMapEntry.value}" var="inputMapValueEntry">
+										<tr>
+											<td><c:out value="${inputMapValueEntry.key}"/></td>
+											<td><c:out value="${inputMapValueEntry.value}%"/></td>
+										</tr>
+									</c:forEach>
+								</table>
+								&nbsp<br><br><br><br><br><br><!-- generate divs for piecharts at the end of each iteration -->
+								<div style="float:left;" id="${inputMapEntry.key}"></div>
+							</div>
 						</c:forEach>
 					</div>
 					<br><br><br><br><br><br><br><br><br><br>
@@ -189,7 +191,7 @@ table, th, td {
 									</tr>
 								</c:forEach>
 							</table>
-							&nbsp
+							&nbsp<br><br><br><br><br><br>
 							<div style="float:left;" id="${outputMapEntry.key}_1"></div>
 						</c:forEach>
 					</div>
