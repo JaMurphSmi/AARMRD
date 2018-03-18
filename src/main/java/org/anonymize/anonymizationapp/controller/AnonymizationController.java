@@ -675,7 +675,7 @@ public class AnonymizationController extends AnonymizationBase {
 				System.out.print("   ");
 				for(int j = 0; j < frequency.length; ++j) {
 					DecimalFormat f = new DecimalFormat("##.00");
-					String tempFreq = f.format(frequency[j]*100.0) + "%";
+					String tempFreq = f.format(frequency[j]*100.0);// + "%";
 				    System.out.print(tempFreq);
 				    inputValues.put(values[j], tempFreq);
 				    tempFreq = f.format(frequency[j]*100.0);
@@ -694,7 +694,7 @@ public class AnonymizationController extends AnonymizationBase {
 				System.out.print("   ");
 				for(int j = 0; j < frequency.length; ++j) {
 					DecimalFormat f = new DecimalFormat("##.00");
-					String tempFreq = f.format(frequency[j]*100.0) + "%";
+					String tempFreq = f.format(frequency[j]*100.0);// + "%";
 				    System.out.print(tempFreq);
 				    outputValues.put(values[j], tempFreq);
 				    tempFreq = f.format(frequency[j]*100.0);
