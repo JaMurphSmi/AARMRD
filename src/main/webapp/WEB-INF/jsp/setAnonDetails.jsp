@@ -51,7 +51,7 @@
 </head>
 <body  style="background-color:#faf6b8;">
   <div style="z-index: 10;position: absolute;right: 30px;top: 0px;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
-  <h1>AARMRD Homepage</h1><br><br><br>
+  <h1>Set Anonymization Details</h1><br><br><br>
   <hr>
 	  <div style="margin-left:50px">
 	  <h2>Your Submitted File Contents</h2>
@@ -63,26 +63,28 @@
 	    </tr>
 	</table>
 	<br>
-	<div style="overflow:visible;">
-		<div style="float:left;margin-left: 100px; max-width:550px;height:400px;overflow:scroll;">
-				<table style="border-collapse: collapse;">
-					<tr>
-						<c:forEach items="${headerRow}" var="head">
-							<th align="center" style="width:35px;border:1px solid #ddd;background-color: #e16830;">
-								${head}
-							</th>
-						</c:forEach>
-					</tr>
-					    <c:forEach items="${dataRows}" var="dataRow">
-						    <tr>
-						    	<c:forEach items="${dataRow}" var="dataItem">
-								    <td align="center" style="border:1px solid #d6aa44;">
-								       	${dataItem}     
-								    </td>
-								</c:forEach>    
-						    </tr>
-					    </c:forEach>
-				</table>
+	<div>
+		<div style="float:left;margin-left: 100px; max-width:550px;height:300px;overflow:hidden;">
+				<div style="overflow:auto;height:300px;">
+					<table style="border-collapse: collapse;">
+						<tr>
+							<c:forEach items="${headerRow}" var="head">
+								<th align="center" style="width:35px;border:1px solid #ddd;background-color: #e16830;">
+									${head}
+								</th>
+							</c:forEach>
+						</tr>
+						    <c:forEach items="${dataRows}" var="dataRow">
+							    <tr>
+							    	<c:forEach items="${dataRow}" var="dataItem">
+									    <td align="center" style="border:1px solid #d6aa44;">
+									       	${dataItem}     
+									    </td>
+									</c:forEach>    
+							    </tr>
+						    </c:forEach>
+					</table>
+				</div>
 		</div>	
 		<br>
 		<div style="float:left;margin-left: 100px;padding:10px;border:3px solid;border-color:#d5ce66;">

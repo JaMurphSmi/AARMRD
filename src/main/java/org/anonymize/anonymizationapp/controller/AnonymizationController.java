@@ -152,6 +152,7 @@ public class AnonymizationController extends AnonymizationBase {
 	//solution to the source data issue was to elevate the object to class scope
 	Data sourceData;//now available in all methods within the anonymization controller
 	ARXResult result;//global for risk and utility analysis
+	String sourceDataFileName;//global filename of the raw data, used to overcome restarts
 	String anonymizedDataFileName;//global anonymized dataset file name, for download purposeses 
 	List<String[]> dataRows = new ArrayList<String[]>();//extract to global variables to allow access in entire application
 	List<String[]> anonyRows = new ArrayList<String[]>();
@@ -170,7 +171,6 @@ public class AnonymizationController extends AnonymizationBase {
 	private PieChartGenerator pieChartGenerator;
 	
 	
-	
    @RequestMapping("/")
    public String index() {
       return "index";
@@ -182,113 +182,116 @@ public class AnonymizationController extends AnonymizationBase {
 		   @RequestParam(value="userName", required=false) String userName, @RequestParam(value="password", required=false) String password,
 		   @RequestParam("hierFiles") MultipartFile[] hierFiles, Model model) throws IOException, ParseException, SQLException {
 		///////////////// Creating the data object
-				
-		//attempting to cast multipartfile object to file(can be modularized later if successful)
-		//prepare dataset name
-		String datasetFile = dataFile.getOriginalFilename();
-		System.out.println("datasetfile name is : " + datasetFile);
-		model.addAttribute("fileName", datasetFile);
 		
-		// save the dataset to the project hierarchy(lol)
-		File convertedDataFile = new File("src/main/resources/templates/data/" + datasetFile); //for saving
-		convertedDataFile.createNewFile();
-		FileOutputStream fos = new FileOutputStream(convertedDataFile);
-		fos.write(dataFile.getBytes());
-		fos.close();
-		
-		//////////////////// finished doing stuff for Data
-		
-		////////////////////creating the hierarchies in file path
-		
-		for(MultipartFile mulFile: hierFiles) {
-			String fileName = mulFile.getOriginalFilename();
-			File convertedHierFile = new File("src/main/resources/templates/hierarchy/" + fileName);
-			System.out.println("hierfileName is : " + fileName);
-			convertedHierFile.createNewFile();
+	   if(sourceData != null) {
+	   }
+	   else {
+			//attempting to cast multipartfile object to file(can be modularized later if successful)
+			//prepare dataset name
+			sourceDataFileName = dataFile.getOriginalFilename();
+			System.out.println("sourceDataFileName name is : " + sourceDataFileName);
+			model.addAttribute("fileName", sourceDataFileName);
 			
-			FileOutputStream fost = new FileOutputStream(convertedHierFile);
-			fost.write(mulFile.getBytes());
-			fost.close();//works
+			// save the dataset to the project hierarchy(lol)
+			File convertedDataFile = new File("src/main/resources/templates/data/" + sourceDataFileName); //for saving
+			convertedDataFile.createNewFile();
+			FileOutputStream fos = new FileOutputStream(convertedDataFile);
+			fos.write(dataFile.getBytes());
+			fos.close();
 			
-			//String[] tempArray = fileName.split("[\\_\\.]");//split by underscore and dot		  0         1         2
-			//headerRow.add(tempArray[2]);//add file name to list for display reasons further on [dataset]_hierarchy_[column]
-		}//removing the headerRow from this, need to make it in proper order
-		
-		headerRow.clear();//zero out header row to avoid duplicate field headers in tables
-		String[] checkExtension = datasetFile.split("\\.");
-		
-		if(checkExtension[1].equals("csv")) {
-			//needed to keep the order of fields correct
-			BufferedReader fileReader = new BufferedReader(new FileReader("src/main/resources/templates/data/" + datasetFile));
+			//////////////////// finished doing stuff for Data
 			
-			try {
-				 // "Prime" the while loop        
-			    String headerLine = fileReader.readLine();
-			    
-			    String[] fields = headerLine.split(";");
-			    for(int i= 0; i < fields.length; ++i) {
-			    	headerRow.add(fields[i]);//should be in order now
-			    }
-			}
-			finally {
-				fileReader.close();
-			}
-		}//header row must be read from the xls or xlsx file in another way
-		else if ((checkExtension[1].equals("xls")) || (checkExtension[1].equals("xlsx")))
-		{
-			InputStream inp = new FileInputStream("src/main/resources/templates/data/" + datasetFile);
-			try {
+			////////////////////creating the hierarchies in file path
+			
+			for(MultipartFile mulFile: hierFiles) {
+				String fileName = mulFile.getOriginalFilename();
+				File convertedHierFile = new File("src/main/resources/templates/hierarchy/" + fileName);
+				System.out.println("hierfileName is : " + fileName);
+				convertedHierFile.createNewFile();
 				
-				XSSFWorkbook wb = (XSSFWorkbook) WorkbookFactory.create(inp);
-				int FIRST_ROW_TO_GET = 0; // 0 based
-				Sheet s = wb.getSheetAt(0);
+				FileOutputStream fost = new FileOutputStream(convertedHierFile);
+				fost.write(mulFile.getBytes());
+				fost.close();//works
 				
-				// Create a DataFormatter to format and get each cell's value as String
-		        DataFormatter dataFormatter = new DataFormatter();
+				//String[] tempArray = fileName.split("[\\_\\.]");//split by underscore and dot		  0         1         2
+				//headerRow.add(tempArray[2]);//add file name to list for display reasons further on [dataset]_hierarchy_[column]
+			}//removing the headerRow from this, need to make it in proper order
+			
+			headerRow.clear();//zero out header row to avoid duplicate field headers in tables
+			String[] checkExtension = sourceDataFileName.split("\\.");
+			
+			if(checkExtension[1].equals("csv")) {
+				//needed to keep the order of fields correct
+				BufferedReader fileReader = new BufferedReader(new FileReader("src/main/resources/templates/data/" + sourceDataFileName));
 				
-				for (int i = FIRST_ROW_TO_GET; i < 1; i++) {
-				   Row row = s.getRow(i);
-				   if (row == null) {
-				      // The whole row is blank
-				   }
-				   else {
-				      for (int cn=row.getFirstCellNum(); cn<row.getLastCellNum(); cn++) {
-				         Cell c = row.getCell(cn, Row.RETURN_BLANK_AS_NULL);
-				         if (c == null) {
-				            // The cell is empty
-				         } else {
-				        	 String cellValue = dataFormatter.formatCellValue(c);
-				             System.out.print(cellValue + "\t");
-				             headerRow.add(cellValue);  
-				         }
-				      }
-				   }
+				try {
+					 // "Prime" the while loop        
+				    String headerLine = fileReader.readLine();
+				    
+				    String[] fields = headerLine.split(";");
+				    for(int i= 0; i < fields.length; ++i) {
+				    	headerRow.add(fields[i]);//should be in order now
+				    }
 				}
-			} catch (InvalidFormatException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				finally {
+					fileReader.close();
+				}
+			}//header row must be read from the xls or xlsx file in another way
+			else if ((checkExtension[1].equals("xls")) || (checkExtension[1].equals("xlsx")))
+			{
+				InputStream inp = new FileInputStream("src/main/resources/templates/data/" + sourceDataFileName);
+				try {
+					
+					XSSFWorkbook wb = (XSSFWorkbook) WorkbookFactory.create(inp);
+					int FIRST_ROW_TO_GET = 0; // 0 based
+					Sheet s = wb.getSheetAt(0);
+					
+					// Create a DataFormatter to format and get each cell's value as String
+			        DataFormatter dataFormatter = new DataFormatter();
+					
+					for (int i = FIRST_ROW_TO_GET; i < 1; i++) {
+					   Row row = s.getRow(i);
+					   if (row == null) {
+					      // The whole row is blank
+					   }
+					   else {
+					      for (int cellNum=row.getFirstCellNum(); cellNum<row.getLastCellNum(); cellNum++) {
+					         Cell cell = row.getCell(cellNum, Row.RETURN_BLANK_AS_NULL);
+					         if (cell == null) {
+					            // The cell is empty
+					         } else {
+					        	 String cellValue = dataFormatter.formatCellValue(cell);
+					             System.out.print(cellValue + "\t");
+					             headerRow.add(cellValue);  
+					         }
+					      }
+					   }
+					}
+				} catch (InvalidFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				finally {
+					inp.close();
+				}
 			}
-			finally {
-				inp.close();
+			System.out.println("After getting the header row if no problems arise");
+			System.out.println("Has successfully worked");
+			// making data creation variable, normal files xls, csv
+			System.out.println("before creating the data and hierarchies");
+			if(table == null && (!sourceDataFileName.substring(sourceDataFileName.lastIndexOf(".") + 1).equals("db"))) {
+				System.out.println("creating a data object from file : " + sourceDataFileName);
+				sourceData = dataAspectsHelper.createDataAndHierarchies(sourceDataFileName, headerRow);//hopefully this way works 
+			}// using db files and tables
+			else if (table != null && (userName == null || password == null)) {
+				System.out.println("creating a data object from table : " + table);
+				sourceData = dataAspectsHelper.createDataAndHierarchies(sourceDataFileName, headerRow, table);
 			}
-		}
-		System.out.println("After getting the header row if no problems arise");
-		System.out.println("Has successfully worked");
-		// making data creation variable, normal files xls, csv
-		System.out.println("before creating the data and hierarchies");
-		if(table == null && (!datasetFile.substring(datasetFile.lastIndexOf(".") + 1).equals("db"))) {
-			System.out.println("creating a data object from file : " + datasetFile);
-			sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile, headerRow);//hopefully this way works 
-		}// using db files and tables
-		else if (table != null && (userName == null || password == null)) {
-			System.out.println("creating a data object from table : " + table);
-			sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile, headerRow, table);
-		}
-		else if (table != null && userName != null && password != null) {
-			System.out.println("creating a data object from table with credentials Table Name :" + table + ", userName : " + userName + ", password : " + password);
-			sourceData = dataAspectsHelper.createDataAndHierarchies(datasetFile, headerRow, table, userName, password);
-		}
-			
+			else if (table != null && userName != null && password != null) {
+				System.out.println("creating a data object from table with credentials Table Name :" + table + ", userName : " + userName + ", password : " + password);
+				sourceData = dataAspectsHelper.createDataAndHierarchies(sourceDataFileName, headerRow, table, userName, password);
+			}
+	   }
 		System.out.println("after creating the data successfully");
 		
 		DataHandle handle = sourceData.getHandle();//acquiring data handle
@@ -319,7 +322,7 @@ public class AnonymizationController extends AnonymizationBase {
 		
 		//had to create object to push to jsp, to use modelAttribute
 		//other variables instantiated as empty arrays based on the now constant header.length()
-		AnonymizationObject anonForm = new AnonymizationObject(datasetFile, headerRow.size());//constant for an individual user
+		AnonymizationObject anonForm = new AnonymizationObject(sourceDataFileName, headerRow.size());//constant for an individual user
 		//////// use header row to allow user to set individual algorithms for each field
 		String[] models = {"k-anonymity","l-diversity","t-closeness"};//remove delta presence for now,"δ-presence"};
 		String[] attributeTypes = {"Identifying", "Quasi-identifying", "Sensitive", "Insensitive"}; 
@@ -345,9 +348,9 @@ public class AnonymizationController extends AnonymizationBase {
 				BindingResult bindResult, Model model) 
 				throws IOException, ParseException, SQLException, ClassNotFoundException, NoSuchAlgorithmException {
 			
-			//Data cannot be passed through form, needs to be created locally, create and instantiate hierarchies also
-			//String fileName = anonForm.getFileName();
-			//Data source = dataAspectsHelper.createDataAndHierarchies(fileName);//attempt to recreate the data object locally
+			//Data object was made global to allow access at all times and reduce computational requirement
+			//inconsequential with small sets, however improves performance 300% across anonymization and risk screens
+			//by making the creation of the Data object a one-time event
 			String[] modelsChosen = anonForm.getModelsChosen();
 			String[] attributesChosen = anonForm.getAttributesChosen();
 			double[] valuesForModels = anonForm.getValuesForModels();
@@ -412,7 +415,7 @@ public class AnonymizationController extends AnonymizationBase {
 	        	++i;//needed sentinel i to control algorithm aspect
 	        }
 	        //anonymizationConfiguration.addPrivacyModel(new KAnonymity(2));//add privacy model, with supplied severity
-	        //config.addPrivacyModel(new KAnonymity(2));//create k anonymity model with the anonymity value
+	        
 	        anonymizationConfiguration.setMaxOutliers(0d);
 
 	        result = anonymizer.anonymize(sourceData, anonymizationConfiguration);
@@ -439,8 +442,9 @@ public class AnonymizationController extends AnonymizationBase {
 	        
 	      //used once 'result' outcome becomes relevant, still wish to display original dataset
 	        if(!result.isResultAvailable()) {//testing now as next lines are dependent on the presence of a valid ARXResult object
-	        	System.out.println("There was no solution to the provided configuration");
-	        	String errorMessage = "There was no solution to the provided configuration";
+	        	System.out.println("There was no solution to the provided configuration, you may need to start again");
+	        	String errorMessage = "There was no solution to the provided configuration, you may need to start again";
+	        	model.addAttribute("dataRows", dataRows);
 	        	model.addAttribute("errorMessage", errorMessage);//implement in jsp
 	        	return "compareSets";//return prematurely due to lack of correct result, avoid error failure
 	        }
@@ -482,7 +486,7 @@ public class AnonymizationController extends AnonymizationBase {
 	        ////// Display data collection
 	        
 	        printResult(result, sourceData);
-	        
+	        // TODO : use the printResult method to return values that can be used for the report at the end
 			//throw into model for display	/// now adding statistical information about the sets
 	        
 	        model.addAttribute("headerRow", headerRow);
@@ -491,6 +495,18 @@ public class AnonymizationController extends AnonymizationBase {
 		    
 		return "compareSets";
 	}
+		/**
+		 * Access method to allow users to return to the compareSets jsp
+		 * 
+		 */
+		@RequestMapping("/returnSender")
+		public String returnToSender(Model model) {
+			model.addAttribute("headerRow", headerRow);
+			model.addAttribute("dataRows", dataRows);
+			model.addAttribute("anonyRows", anonyRows);
+			
+			return "compareSets";//returns to jsp page with all attributes set as before
+		}
 		
 		/** gateway method to the risk page, passing AnonyRows, dataRows is already there
 		 *  deleting files functionality can be accessed by returning to view anonymization page
@@ -536,6 +552,7 @@ public class AnonymizationController extends AnonymizationBase {
 		}
 		
 		//method used to analyze the utility of a dataset 
+		//utility is highly volatile in current ARX API
 		/*@RequestMapping("/analyseUtility")
 		public String analyseUtility() {
 			// Access statistics
@@ -582,6 +599,8 @@ public class AnonymizationController extends AnonymizationBase {
 			
 		}
 		
+		
+		// TODO : integrate this
 		//method that allows the user to delete the anonymized file from the application
 				@RequestMapping("/deleteAnonymizedData")//available on first page? to allow users to cancel securely, remove all traces
 				public void deleteAnonymizedData(@RequestParam("deleteName") String deleteName) throws IOException {
@@ -1040,7 +1059,6 @@ public class AnonymizationController extends AnonymizationBase {
        redactionBased();
        intervalBased();
        orderBased();
-       ldlCholesterol();
        dates();
        loadStore();
 /// to here seems to be a constant   
@@ -2465,20 +2483,6 @@ public class AnonymizationController extends AnonymizationBase {
        }
        return result;
    }
-
-   /**
-    * Returns example data.
-    *
-    * @return
-    */
-   private static String[] getExampleLDLData() {
-
-       String[] result = new String[15];
-       for (int i=0; i< result.length; i++){
-           result[i] = String.valueOf(Math.random() * 9.9d);
-       }
-       return result;
-   }
    
    /**
     * Exemplifies the use of the interval-based builder.
@@ -2524,55 +2528,6 @@ public class AnonymizationController extends AnonymizationBase {
        System.out.println("");
        System.out.println("RESULT");
 
-       // Print resulting hierarchy
-       printArray(builder.build().getHierarchy());
-       System.out.println("");
-   }
-
-   /**
-    * Exemplifies the use of the interval-based builder for LDL cholesterol
-    * in mmol/l.
-    */
-   private static void ldlCholesterol() {
-
-
-       // Create the builder
-       HierarchyBuilderIntervalBased<Double> builder = HierarchyBuilderIntervalBased.create(DataType.DECIMAL);
-       
-       // Define base intervals
-       builder.addInterval(0d, 1.8d, "very low");
-       builder.addInterval(1.8d, 2.6d, "low");
-       builder.addInterval(2.6d, 3.4d, "normal");
-       builder.addInterval(3.4d, 4.1d, "borderline high");
-       builder.addInterval(4.1d, 4.9d, "high");
-       builder.addInterval(4.9d, 10d, "very high");
-       
-       // Define grouping fanouts
-       builder.getLevel(0).addGroup(2, "low").addGroup(2, "normal").addGroup(2, "high");
-       builder.getLevel(1).addGroup(2, "low-normal").addGroup(1, "high");
-
-       System.out.println("--------------------------");
-       System.out.println("LDL-CHOLESTEROL HIERARCHY");
-       System.out.println("--------------------------");
-       System.out.println("");
-       System.out.println("SPECIFICATION");
-       
-       // Print specification
-       for (Interval<Double> interval : builder.getIntervals()){
-           System.out.println(interval);
-       }
-
-       // Print specification
-       for (Level<Double> level : builder.getLevels()) {
-           System.out.println(level);
-       }
-       
-       // Print info about resulting levels
-       System.out.println("Resulting levels: "+Arrays.toString(builder.prepare(getExampleLDLData())));
-       
-       System.out.println("");
-       System.out.println("RESULT");
-       
        // Print resulting hierarchy
        printArray(builder.build().getHierarchy());
        System.out.println("");

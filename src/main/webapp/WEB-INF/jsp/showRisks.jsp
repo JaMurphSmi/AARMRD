@@ -11,8 +11,20 @@
 <link rel="stylesheet" href="/resources/css/style.css">
 <script type="text/javascript" src="/resources/js/app.js"></script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-
 <style>
+.button {
+	  background-color: ForestGreen;  
+	  border-radius: 5px;
+	  color: white;
+	  padding: .5em;
+	  text-decoration: none;
+	}
+
+	.button:focus,
+	.button:hover {
+	  background-color: DarkGreen;
+	}
+
 .tooltip {
     position: relative;
     display: inline-block;
@@ -60,30 +72,31 @@ table, th, td {
 <title>Risk Metrics</title>
 </head>
 <body>
-	<h3>Review Risk Metrics</h3>
-	<hr>
-<div>
-	<div style="float:left;margin-left: 100px;max-width:550px;height:400px;overflow:scroll;">
-			<table style="border-collapse: collapse;">
-				<tr>
-					<c:forEach items="${headerRow}" var="head"><!-- maybe add a percentage column? -->
-						<th align="center" style="width:35px;border:1px solid #ddd;background-color: #e16830;">
-							${head}
-						</th>
-					</c:forEach>
-				</tr>
-				    <c:forEach items="${anonyRows}" var="anonRow">
-					    <tr>
-					    	<c:forEach items="${anonRow}" var="anonItem">
-							    <td align="center" style="border:1px solid #d6aa44;">
-							       	${anonItem}     
-							    </td>
-							</c:forEach>    
-					    </tr>
-				    </c:forEach>
-			</table>
-	</div>
-	<div style="border-style:ridge;border-color:green;float:left;margin-left:100px;margin-top:50px; padding: 25px 25px 25px 25px;max-width:550px;">
+ <div style="z-index: 10;position: absolute;right: 30px;top: 0px;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
+	<h1>Review Risk Metrics</h1><br>
+  	<hr>
+	<div style="overflow:hidden;">
+		<div style="float:left;margin-left: 100px;max-width:550px;height:400px;overflow:auto;">
+				<table style="border-collapse: collapse;">
+					<tr>
+						<c:forEach items="${headerRow}" var="head"><!-- maybe add a percentage column? -->
+							<th align="center" style="width:35px;border:1px solid #ddd;background-color: #e16830;">
+								${head}
+							</th>
+						</c:forEach>
+					</tr>
+					    <c:forEach items="${anonyRows}" var="anonRow">
+						    <tr>
+						    	<c:forEach items="${anonRow}" var="anonItem">
+								    <td align="center" style="border:1px solid #d6aa44;">
+								       	${anonItem}     
+								    </td>
+								</c:forEach>    
+						    </tr>
+					    </c:forEach>
+				</table>
+		</div>
+		<div style="border-style:ridge;border-color:green;float:left;margin-left:100px;margin-top:50px; padding: 25px 25px 25px 25px;max-width:550px;">
 			<h3>Set your Risk Assessment Details</h3>			
 			<form action="/analyseRisks" method="POST">
 				<label for="populationRegion">Select Region : </label>
@@ -101,13 +114,18 @@ table, th, td {
 			  			The threshold is the percentage risk that a record must not surpass, begins at 0, max 1(100%). ie threshold set to 0.5(50%)<br>
 			  			success if 47%, failure if 53%. It is to allow the user to control the risk posed to their records.
 			  			</span>
-						</div>
+					</div>
 					<br><br>
 					<input type="submit" value="Submit Your Files">
+			</form><br><br>
+			<form action="/returnSender" method="post">
+				<input type="submit" class="button" value="Return to Comparison"/> 
 			</form>
+		</div>
 	</div>
+<div>
 	<c:if test="${not empty riskObject}">
-		<div style="float:left;margin-left: 100px;max-width:1050px;padding: 15px 15px 15px 15px;overflow: scrollable;">
+		<div style="float:center;margin-left: 100px;max-width:1050px;padding: 15px 15px 15px 15px;overflow: scrollable;">
 				<c:if test="${not empty riskObject.threshold}">
 					Threshold Specified : ${riskObject.threshold}		
 				</c:if>
@@ -143,60 +161,66 @@ table, th, td {
 						</tr>
 					</table>
 				</c:if>
+			</div>
 				<br><br><br>
-
 				<!-- from here down is all risk metrics -->
 				<c:if test="${not empty riskObject.dataSetInputDistributionMetrics && not empty riskObject.dataSetOutputDistributionMetrics}">
-					<div align="center" style="max-width:700px;">
-						Input Data Set Value Distribution Statistics <br><br>
-						<!-- make the whole table in a loop? --> 
-						<c:forEach items="${riskObject.dataSetInputDistributionMetrics}" var="inputMapEntry">
-							<div>
-								<table style="float: left;">
-									<tr>
-										<th colspan="2"><c:out value="${inputMapEntry.key}"/></th>
-									</tr>
-									<tr>
-										<td>Value</td>
-										<td>Frequency</td>
-									</tr>
-									<c:forEach items="${inputMapEntry.value}" var="inputMapValueEntry">
+					<div align="center" style="width:1455px;">
+						<div style="border-color:green;margin-left:50px;float:left;width:700px;overflow:hidden;">
+							Input Data Set Value Distribution Statistics <br><br>
+							<!-- make the whole table in a loop? --> 
+							<c:forEach items="${riskObject.dataSetInputDistributionMetrics}" var="inputMapEntry">
+								<div style="float:left;width:700px;overflow:hidden;">
+									<div style="float:left;width:225px;overflow:auto;">
+										<table style="float: left;">
+											<tr>
+												<th colspan="2"><c:out value="${inputMapEntry.key}"/></th>
+											</tr>
+											<tr>
+												<td>Value</td>
+												<td>Frequency</td>
+											</tr>
+											<c:forEach items="${inputMapEntry.value}" var="inputMapValueEntry">
+												<tr>
+													<td><c:out value="${inputMapValueEntry.key}"/></td>
+													<td><c:out value="${inputMapValueEntry.value}%"/></td>
+												</tr>
+											</c:forEach>
+										</table>
+									</div>
+									&nbsp<!-- generate divs for piecharts at the end of each iteration -->
+									<div style="float:left;" id="${inputMapEntry.key}"></div>
+								</div>
+							</c:forEach>
+						</div>
+						<div style="border-color:green;float:left;width:700px;overflow:hidden;">
+							 Output Data Set Value Distribution Statistics <br><br>
+							<c:forEach items="${riskObject.dataSetOutputDistributionMetrics}" var="outputMapEntry">
+								<div style="float:left;width:700px;overflow:hidden;">
+									<div style="float:left;width:225px;overflow:auto;">
+									<table style="float: left;">
 										<tr>
-											<td><c:out value="${inputMapValueEntry.key}"/></td>
-											<td><c:out value="${inputMapValueEntry.value}%"/></td>
+											<th colspan="2"><c:out value="${outputMapEntry.key}"/></th>
 										</tr>
-									</c:forEach>
-								</table>
-								&nbsp<br><br><br><br><br><br><!-- generate divs for piecharts at the end of each iteration -->
-								<div style="float:left;" id="${inputMapEntry.key}"></div>
-							</div>
-						</c:forEach>
-					</div>
-					<br><br><br><br><br><br><br><br><br><br>
-					<div align="center" style="max-width:700px;">
-						Output Data Set Value Distribution Statistics <br><br>
-						<c:forEach items="${riskObject.dataSetOutputDistributionMetrics}" var="outputMapEntry">
-							<table style="float: left;">
-								<tr>
-									<th colspan="2"><c:out value="${outputMapEntry.key}"/></th>
-								</tr>
-								<tr>
-									<td>Value</td>
-									<td>Frequency</td>
-								</tr>
-								<c:forEach items="${outputMapEntry.value}" var="outputMapValueEntry">
-									<tr>
-										<td><c:out value="${outputMapValueEntry.key}"/></td>
-										<td><c:out value="${outputMapValueEntry.value}%"/></td>
-									</tr>
-								</c:forEach>
-							</table>
-							&nbsp<br><br><br><br><br><br>
-							<div style="float:left;" id="${outputMapEntry.key}_1"></div>
-						</c:forEach>
+										<tr>
+											<td>Value</td>
+											<td>Frequency</td>
+										</tr>
+										<c:forEach items="${outputMapEntry.value}" var="outputMapValueEntry">
+											<tr>
+												<td><c:out value="${outputMapValueEntry.key}"/></td>
+												<td><c:out value="${outputMapValueEntry.value}%"/></td>
+											</tr>
+										</c:forEach>
+									</table>
+									</div>
+									&nbsp
+									<div style="float:left;" id="${outputMapEntry.key}_1"></div>
+								</div>
+							</c:forEach>
+						</div>
 					</div>
 				</c:if>
-			</div>
 	</c:if>
 </div>	
 <script type="text/javascript">
@@ -230,8 +254,8 @@ table, th, td {
 		            is3D : true,
 		            pieSliceText: 'label',
 		            tooltip :  {showColorCode: true},
-		            'width' : 400,
-		            'height' : 350,
+		            'width' : 300,
+		            'height' : 250,
 		            backgroundColor: 'transparent'
 		        };
 		 
@@ -256,8 +280,8 @@ table, th, td {
 	            is3D : true,
 	            pieSliceText: 'label',
 	            tooltip :  {showColorCode: true},
-	            'width' : 400,
-	            'height' : 350,
+	            'width' : 300,
+	            'height' : 250,
 	            backgroundColor: 'transparent'
 	        };
 	 
