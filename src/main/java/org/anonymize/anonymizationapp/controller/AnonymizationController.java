@@ -150,13 +150,14 @@ import org.anonymize.anonymizationapp.util.PieChartGenerator;
 @Controller											//implements
 public class AnonymizationController extends AnonymizationBase {
 	//solution to the source data issue was to elevate the object to class scope
-	Data sourceData;//now available in all methods within the anonymization controller
-	ARXResult result;//global for risk and utility analysis
-	String sourceDataFileName;//global filename of the raw data, used to overcome restarts
-	String anonymizedDataFileName;//global anonymized dataset file name, for download purposeses 
-	List<String[]> dataRows = new ArrayList<String[]>();//extract to global variables to allow access in entire application
-	List<String[]> anonyRows = new ArrayList<String[]>();
-	List<String> headerRow = new ArrayList<String>();//making global to improve accessibility and reduce need to pass between methods
+	private Data sourceData;//now available in all methods within the anonymization controller
+	private ARXResult result;//global for risk and utility analysis
+	private String sourceDataFileName;//global filename of the raw data, used to overcome restarts
+	private String anonymizedDataFileName;//global anonymized dataset file name, for download purposeses 
+	private List<String[]> dataRows = new ArrayList<String[]>();//extract to global variables to allow access in entire application
+	private List<String[]> anonyRows = new ArrayList<String[]>();
+	private List<String> headerRow = new ArrayList<String>();//making global to improve accessibility and reduce need to pass between methods
+	private List<String> hierFileList = new ArrayList<String>();//used to determine what fields do not have a supplied hierarchy
 	final String[] countries = {"America", "Australia", "Brasil", "Canada", "China", "Europe", 
 			"European Union", "France", "Germany", "India", "North America", "South America",
 			"United Kingdom", "United States"};//countries and regions for risk metrics
@@ -177,15 +178,18 @@ public class AnonymizationController extends AnonymizationBase {
    }
    
    // will be a page to handle the uploading of files
+   // making dataFiles and hierFiles not required to allow user to return to here without returning to the upload screen
    @RequestMapping("/uploadFiles")//only take in the files, establish data fields first, then allow user to select attribute types, algos etc
-   public String getData(@RequestParam("dataFile") MultipartFile dataFile, @RequestParam(value="hiddenTable", required=false) String table,
+   public String getData(@RequestParam(value="dataFile", required=false) MultipartFile dataFile, @RequestParam(value="hiddenTable", required=false) String table,
 		   @RequestParam(value="userName", required=false) String userName, @RequestParam(value="password", required=false) String password,
-		   @RequestParam("hierFiles") MultipartFile[] hierFiles, Model model) throws IOException, ParseException, SQLException {
+		   @RequestParam(value="hierFiles", required=false) MultipartFile[] hierFiles, 
+		   @RequestParam(value="hierChecks", required=false) String[] hierChecks, Model model) throws IOException, ParseException, SQLException {
 		///////////////// Creating the data object
 		
 	   if(sourceData != null) {
+		   System.out.println("Data object already exists, skipping the annoying bit");
 	   }
-	   else {
+	   else if(sourceData == null && hierChecks == null) {
 			//attempting to cast multipartfile object to file(can be modularized later if successful)
 			//prepare dataset name
 			sourceDataFileName = dataFile.getOriginalFilename();
@@ -202,7 +206,7 @@ public class AnonymizationController extends AnonymizationBase {
 			//////////////////// finished doing stuff for Data
 			
 			////////////////////creating the hierarchies in file path
-			
+			//adding extra functionality for 'lack of hierarchy' comparison list
 			for(MultipartFile mulFile: hierFiles) {
 				String fileName = mulFile.getOriginalFilename();
 				File convertedHierFile = new File("src/main/resources/templates/hierarchy/" + fileName);
@@ -213,8 +217,8 @@ public class AnonymizationController extends AnonymizationBase {
 				fost.write(mulFile.getBytes());
 				fost.close();//works
 				
-				//String[] tempArray = fileName.split("[\\_\\.]");//split by underscore and dot		  0         1         2
-				//headerRow.add(tempArray[2]);//add file name to list for display reasons further on [dataset]_hierarchy_[column]
+				String[] tempArray = fileName.split("[\\_\\.]");//split by underscore and dot		  0         1         2
+				hierFileList.add(tempArray[2]);//add file name to list for display reasons further on [dataset]_hierarchy_[column]
 			}//removing the headerRow from this, need to make it in proper order
 			
 			headerRow.clear();//zero out header row to avoid duplicate field headers in tables
@@ -280,7 +284,7 @@ public class AnonymizationController extends AnonymizationBase {
 			// making data creation variable, normal files xls, csv
 			System.out.println("before creating the data and hierarchies");
 			if(table == null && (!sourceDataFileName.substring(sourceDataFileName.lastIndexOf(".") + 1).equals("db"))) {
-				System.out.println("creating a data object from file : " + sourceDataFileName);
+				System.out.println("creating a data object from file : " + sourceDataFileName);//this call doesn't discriminate csv and xls
 				sourceData = dataAspectsHelper.createDataAndHierarchies(sourceDataFileName, headerRow);//hopefully this way works 
 			}// using db files and tables
 			else if (table != null && (userName == null || password == null)) {
@@ -292,33 +296,47 @@ public class AnonymizationController extends AnonymizationBase {
 				sourceData = dataAspectsHelper.createDataAndHierarchies(sourceDataFileName, headerRow, table, userName, password);
 			}
 	   }
-		System.out.println("after creating the data successfully");
+	   if(sourceData != null && hierChecks != null) {//to accommodate if the user wants to create hierarchies for a field
+		   //this is where integer field hierarchies are created
+		   dataRows = dataAspectsHelper.createDataRows(sourceData);
+		   //hierChecks will be used here
+		   for(int i = 0; i < hierChecks.length; ++i) {
+			 	   System.out.println("The input index that need hierarchies are : " + hierChecks[i]);
+			   //if(hierChecks[i]) {
+			   //   String[] dataNeedsHierarchy = dataAspectsHelper.getCertainFieldValues(hierChecks[i]);
+			   //}
+		   }
+	   }
+	   else if(sourceData != null && hierChecks == null) {			
+			//used as a controller for whether or not the option to create a hierarchy should be presented to user
+			//controlled based on order of headerRow as headerRow is correct order
+			int[] noHierArr = new int[headerRow.size()];
+			boolean noHierarchyDetected = false;
+			int i = 0;
+			
+			for(String headerMember : headerRow) {//compare each header row value with every hierFile value
+				noHierArr[i] = dataAspectsHelper.compareWithHierFileNames(headerMember, hierFileList);
+				if(noHierArr[i] == -1) {
+					noHierarchyDetected = true;
+				}
+				i++;
+			}
+			if(noHierarchyDetected) {
+				System.out.println("Field with no hierarchy detected, rerouting to assignment screen");
+				model.addAttribute("headerRow", headerRow);
+				model.addAttribute("noHierArr", noHierArr);
+				return "needHierarchies";
+			}
+	   }
+	    System.out.println("after creating the data successfully and all hierarchy aspects");	
 		
-		DataHandle handle = sourceData.getHandle();//acquiring data handle
-		
-		System.out.println("inHandle rows name is " + handle.getNumRows());
-	    System.out.println("inHandle columns name is " + handle.getNumColumns());
-	       
-		
-		Iterator<String[]> itHandle = handle.iterator();
-		String flubRow = Arrays.toString(itHandle.next());//get the header of the dataset to display in bold
 		System.out.println(">" + headerRow + "<");
 		
 		model.addAttribute("headerRow", headerRow);//only need to get the header once as it will do for the resulting dataset also
 		for (String colName : headerRow) {
 			System.out.println(colName + ",");//testing if random space at the start
 		}
-		int i = 1;
-		while((itHandle.hasNext()) && (i % 801 != 0)) {
-			String row = Arrays.toString(itHandle.next());
-			String[] dataTemp = row.split("[\\[\\],]");//all data needs formatting to remove empty columns
-			String[] data = new String[dataTemp.length - 1];
-			for(int j = 0; j < dataTemp.length - 1; j++) {
-				data[j] = dataTemp[j+1].trim();
-			}
-			dataRows.add(data);
-			++i;
-		}
+		
 		
 		//had to create object to push to jsp, to use modelAttribute
 		//other variables instantiated as empty arrays based on the now constant header.length()
@@ -336,12 +354,12 @@ public class AnonymizationController extends AnonymizationBase {
 		
 		model.addAttribute("anonForm", anonForm);
 		model.addAttribute("models", models);
-		//model.addAttribute("models", AnonModel.values());
 		model.addAttribute("attributes", attributeTypes);
 		model.addAttribute("dataRows", dataRows);
 	    return "setAnonDetails";
    }
-	
+
+
 	// attempting to handle file uploads successfully
 		@RequestMapping("/anonymizeData")
 		public String performAnonymization(@Valid @ModelAttribute("anonForm") AnonymizationObject anonForm, 
@@ -661,6 +679,9 @@ public class AnonymizationController extends AnonymizationBase {
 		 
 		        inputStream.close();
 		        outStream.close();
+		        //GDPR compliance, user identity protection through deletion
+		        dataAspectsHelper.deleteFiles();
+		        sourceData = null;//destroy original data object to remove any possible traces
 		    }
 		//no need to remove anonymized dataset as of now, can be requested if needed later on, but not imperetive now
 	////////////////////////////////////////////////////////////////////////////////////////////// THIS IS WHERE THE VARIABLE INPUT TEST ENDS
@@ -1056,7 +1077,7 @@ public class AnonymizationController extends AnonymizationBase {
            System.out.println("   [" + e.value1 + ", " + e.value2 + ", " + e.frequency + "]");
        }
        
-       redactionBased();
+       //makeRedactionBasedHierarchy();
        intervalBased();
        orderBased();
        dates();
@@ -2613,7 +2634,7 @@ public class AnonymizationController extends AnonymizationBase {
    /**
     * Exemplifies the use of the redaction-based builder.
     */
-   private static void redactionBased() {
+   private static void makeRedactionBasedHierarchy(String[] fieldData) {
 
        // Create the builder
        HierarchyBuilderRedactionBased<?> builder = HierarchyBuilderRedactionBased.create(Order.RIGHT_TO_LEFT,

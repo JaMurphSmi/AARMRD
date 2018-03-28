@@ -7,11 +7,14 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.deidentifier.arx.Data;
+import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.DataSource;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.deidentifier.arx.AttributeType.Hierarchy;
@@ -36,13 +39,14 @@ public class DataAspects{
 	       /**
 	        * Xls and dbs cannot be used as the sequence of fields in a data set cannot be determined through hierarchy file names anymore
 	        * this is due to the columns being out of alphabetical order, and the file picker putting them into order regardless of choice
+	        * ##Another reason is that not all hierarchies may be supplied for the data set
 	        */
 	       else if(extension.equals("xls") || extension.equals("xlsx")) {
 	    	   DataSource dataExcel = DataSource.createExcelSource("src/main/resources/templates/data/" + dataset + "." + extension, 0, true);
 	    	   //need to specify column names in here before casting to type Data, so send field names shaved from
 	    	   
 	    	   //dataExcel.
-	    	   
+	    	   //hierNames now in correct order due to pre-opening of file in main controller
 	    	   int i = 0;
 	    	   for(String hierName : hierNames) {
 	    		   dataExcel.addColumn(hierName);
@@ -67,7 +71,7 @@ public class DataAspects{
 	       File testDir = new File("src/main/resources/templates/hierarchy/");
 	       File[] genHierFiles = testDir.listFiles(hierarchyFilter);
 	       Pattern pattern = Pattern.compile("_hierarchy_(.*?).csv");
-	       for (File file : genHierFiles) {
+	       for (File file : genHierFiles) {//need to determine how to identify which attributes have no hierarchy supplied
 	           Matcher matcher = pattern.matcher(file.getName());
 	           if (matcher.find()) {
 	               CSVHierarchyInput hier = new CSVHierarchyInput(file, StandardCharsets.UTF_8, ';');
@@ -151,6 +155,45 @@ public class DataAspects{
 	           }
 	       }
 		 return data;
+	}
+	
+	
+	public List<String[]> createDataRows(Data sourceData) {
+		List<String[]> dataRows = new ArrayList<String[]>();
+		
+		DataHandle handle = sourceData.getHandle();//acquiring data handle
+		
+		System.out.println("inHandle rows name is " + handle.getNumRows());
+	    System.out.println("inHandle columns name is " + handle.getNumColumns());
+	    
+	    Iterator<String[]> itHandle = handle.iterator();
+		String flubRow = Arrays.toString(itHandle.next());//get the header of the dataset to display in bold
+		
+		int i = 1;
+		while((itHandle.hasNext()) && (i % 801 != 0)) {
+			String row = Arrays.toString(itHandle.next());
+			String[] dataTemp = row.split("[\\[\\],]");//all data needs formatting to remove empty columns
+			String[] data = new String[dataTemp.length - 1];
+			for(int j = 0; j < dataTemp.length - 1; j++) {
+				data[j] = dataTemp[j+1].trim();
+			}
+			dataRows.add(data);
+			++i;
+		}
+		
+		return dataRows;
+	}
+	
+	
+	
+	//quick utility method used to determine if a headerRow field has a corresponding hierarchy file
+	public int compareWithHierFileNames(String headerMember, List<String> hierFileList) {
+		for(String hierFile : hierFileList) {
+			if(hierFile.equals(headerMember)) {
+				return 1;//break inner loop only, no need to keep searching if value already found
+			}
+		}
+		return -1;
 	}
 	
 	public void deleteFiles() throws IOException, FileNotFoundException {

@@ -180,7 +180,12 @@
 			</div><br><br><br>
 		  <div class="form">
 		    <form action="/" method="post">
-		      <input type="submit" class="button" value="Begin Again">
+		      <input id="deleteDAHAF" type="submit" class="button" value="Begin Again/Upload New Files">
+		    </form>
+		  </div>
+		  <div class="form">
+		    <form action="/uploadFiles" method="post">
+		      <input type="submit" class="button" value="Use Original File Again(Hierarchies are saved)">
 		    </form>
 		  </div>
 	</div>
@@ -195,6 +200,18 @@ $(document).ready(function(){
 	            console.log(data.responseText);
 	        }
 	    });
+	});
+});
+$(document).ready(function(){
+	$("#deleteDAHAF").click(function(){
+		$.ajax({
+			url : 'deleteDataAndHierarchiesAnonymizedFile',
+			method : 'GET',
+			async : false,
+			complete : function(data) {
+				console.log(data.responseText);
+			}
+		});
 	});
 });
 </script>
