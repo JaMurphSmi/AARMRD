@@ -102,6 +102,14 @@
 	    <version>1.5.1</version>
 	</dependency>
     <!--  -->
+    
+    <!-- https://mvnrepository.com/artifact/jasperreports/jasperreports -->
+	<dependency>
+	    <groupId>jasperreports</groupId>
+	    <artifactId>jasperreports</artifactId>
+	    <version>3.5.3</version>
+	</dependency>
+    
     <!-- https://mvnrepository.com/artifact/net.objecthunter/exp4j -->
 	<dependency>
 	    <groupId>net.objecthunter</groupId>
