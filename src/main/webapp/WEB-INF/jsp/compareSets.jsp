@@ -158,7 +158,7 @@
 		</div>
 		</c:if>
 </div>
-	<div style="float:left;margin:25px 25px 25px 50px;">
+	<div style="float:left;margin:25px 25px 25px 50px;border:3px solid;border-color:#d5ce66;">
 		<form action="/goToRiskPage" method="post">
 			<input type="submit" class="button" value="Go To Risk Assessment"/> 
 		</form><br><br><br>
@@ -169,7 +169,7 @@
 				  	Clicking allows you to explicitly delete all content associated with your anonymization.<br>
 				  	This is also automatically performed when you download your new data file.
 				</span>
-		</div><br><br><br><br>
+		</div><br><br>
 			<a href="/downloadAnonymizedFile" class="button">Download Anonymized Data</a>
 			<div class="tooltip">&#10068;
 				<span class="tooltiptext1">
@@ -177,12 +177,12 @@
 				  	Pressing this button concludes your service, and once your anonymized file is downloaded<br>
 				  	to your machine, all data you have uploaded for this transaction will be erased from the application
 				</span>
-			</div><br><br><br>
+			</div><br><br>
 		  <div class="form">
 		    <form action="/" method="post">
 		      <input id="deleteDAHAF" type="submit" class="button" value="Begin Again/Upload New Files">
 		    </form>
-		  </div>
+		  </div><br><br>
 		  <div class="form">
 		    <form action="/uploadFiles" method="post">
 		      <input type="submit" class="button" value="Use Original File Again(Hierarchies are saved)">

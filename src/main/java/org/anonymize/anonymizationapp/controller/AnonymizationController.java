@@ -301,10 +301,10 @@ public class AnonymizationController extends AnonymizationBase {
 		   dataRows = dataAspectsHelper.createDataRows(sourceData);
 		   //hierChecks will be used here
 		   for(int i = 0; i < hierChecks.length; ++i) {
-			 	   System.out.println("The input index that need hierarchies are : " + hierChecks[i]);
-			   //if(hierChecks[i]) {
-			   //   String[] dataNeedsHierarchy = dataAspectsHelper.getCertainFieldValues(hierChecks[i]);
-			   //}
+			 	System.out.println("The input index that need hierarchies are : " + hierChecks[i]);
+			    String[] dataNeedsHierarchy = dataAspectsHelper.getCertainFieldValues(hierChecks[i], dataRows);
+			    System.out.println("Setting definition for " + headerRow.get(Integer.valueOf(hierChecks[i])));
+			    sourceData.getDefinition().setHierarchy(headerRow.get(Integer.valueOf(hierChecks[i])), dataAspectsHelper.makeRedactionBasedHierarchy(dataNeedsHierarchy));
 		   }
 	   }
 	   else if(sourceData != null && hierChecks == null) {			
@@ -343,7 +343,7 @@ public class AnonymizationController extends AnonymizationBase {
 		AnonymizationObject anonForm = new AnonymizationObject(sourceDataFileName, headerRow.size());//constant for an individual user
 		//////// use header row to allow user to set individual algorithms for each field
 		String[] models = {"k-anonymity","l-diversity","t-closeness"};//remove delta presence for now,"δ-presence"};
-		String[] attributeTypes = {"Identifying", "Quasi-identifying", "Sensitive", "Insensitive"}; 
+		String[] attributeTypes = {"Identifying", "Quasi-Identifying", "Sensitive", "Insensitive"}; 
 		for (String mod : models) {
 			System.out.println(mod + ",");//testing if models in array
 		}
@@ -387,7 +387,7 @@ public class AnonymizationController extends AnonymizationBase {
 			}
 			System.out.println("Printing attribute types chosen");
 			for(String anAttribute : attributesChosen) {
-				System.out.println("The model is: " + anAttribute);
+				System.out.println("The attribute is: " + anAttribute);
 			}
 			System.out.println("Possibly proved concept?");
 			
@@ -399,15 +399,19 @@ public class AnonymizationController extends AnonymizationBase {
 				//determine the type of the specific field
 				if((attributesChosen[i].equals("Identifying")) || (attributesChosen[i].equals("- - NONE - -"))){//identifying by default
 					sourceData.getDefinition().setAttributeType(header, AttributeType.IDENTIFYING_ATTRIBUTE);
+					System.out.println("Set the attribute value to identifying for: " + header);
 				}
 				else if(attributesChosen[i].equals("Quasi-Identifying")){
 					sourceData.getDefinition().setAttributeType(header, AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
+					System.out.println("Set the attribute value to quasi-identifying for: " + header);
 				}
 				else if(attributesChosen[i].equals("Sensitive")){
 					sourceData.getDefinition().setAttributeType(header, AttributeType.SENSITIVE_ATTRIBUTE);
+					System.out.println("Set the attribute value to sensitive for: " + header);
 				}
 				else if((attributesChosen[i].equals("Insensitive"))){
 					sourceData.getDefinition().setAttributeType(header, AttributeType.INSENSITIVE_ATTRIBUTE);
+					System.out.println("Set the attribute value to insensitive for: " + header);
 				}
 				sourceData.getDefinition().setDataType(header, determineDataType(handle, i));
 				++i;
@@ -2619,33 +2623,6 @@ public class AnonymizationController extends AnonymizationBase {
        for (Level<Long> level : builder.getLevels()) {
            System.out.println(level);
        }
-       
-       // Print info about resulting groups
-       System.out.println("Resulting levels: "+Arrays.toString(builder.prepare(getExampleData())));
-       
-       System.out.println("");
-       System.out.println("RESULT");
-       
-       // Print resulting hierarchy
-       printArray(builder.build().getHierarchy());
-       System.out.println("");
-   }
-   
-   /**
-    * Exemplifies the use of the redaction-based builder.
-    */
-   private static void makeRedactionBasedHierarchy(String[] fieldData) {
-
-       // Create the builder
-       HierarchyBuilderRedactionBased<?> builder = HierarchyBuilderRedactionBased.create(Order.RIGHT_TO_LEFT,
-                                                                                   Order.RIGHT_TO_LEFT,
-                                                                                   ' ', '*');
-
-       System.out.println("-------------------------");
-       System.out.println("REDACTION-BASED HIERARCHY");
-       System.out.println("-------------------------");
-       System.out.println("");
-       System.out.println("SPECIFICATION");
        
        // Print info about resulting groups
        System.out.println("Resulting levels: "+Arrays.toString(builder.prepare(getExampleData())));

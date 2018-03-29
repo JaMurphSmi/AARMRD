@@ -16,9 +16,12 @@ import java.util.regex.Pattern;
 import org.deidentifier.arx.Data;
 import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.DataSource;
+import org.anonymize.anonymizationapp.model.AnonymizationBase;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.Data.DefaultData;
+import org.deidentifier.arx.aggregates.HierarchyBuilderRedactionBased;
+import org.deidentifier.arx.aggregates.HierarchyBuilderRedactionBased.Order;
 import org.deidentifier.arx.io.CSVHierarchyInput;
 import org.springframework.stereotype.Component;
 
@@ -157,7 +160,7 @@ public class DataAspects{
 		 return data;
 	}
 	
-	
+	//abstract creation of the dataRows string array list to the helper class for modularization
 	public List<String[]> createDataRows(Data sourceData) {
 		List<String[]> dataRows = new ArrayList<String[]>();
 		
@@ -165,7 +168,7 @@ public class DataAspects{
 		
 		System.out.println("inHandle rows name is " + handle.getNumRows());
 	    System.out.println("inHandle columns name is " + handle.getNumColumns());
-	    
+
 	    Iterator<String[]> itHandle = handle.iterator();
 		String flubRow = Arrays.toString(itHandle.next());//get the header of the dataset to display in bold
 		
@@ -184,8 +187,6 @@ public class DataAspects{
 		return dataRows;
 	}
 	
-	
-	
 	//quick utility method used to determine if a headerRow field has a corresponding hierarchy file
 	public int compareWithHierFileNames(String headerMember, List<String> hierFileList) {
 		for(String hierFile : hierFileList) {
@@ -194,6 +195,48 @@ public class DataAspects{
 			}
 		}
 		return -1;
+	}
+	
+	
+	//implementing method to gather the values 
+	public String[] getCertainFieldValues(String indexNeeded, List<String[]> dataRows) {
+		String[] fieldValues = new String[dataRows.size()];
+		
+		int i = 0;
+		for(String[] dataRow : dataRows) {//gets the value from desired index position for each attribute
+			fieldValues[i] = dataRow[Integer.valueOf(indexNeeded)];
+			++i;
+		}
+		return fieldValues;
+	}
+	
+	/**
+	  * Exemplifies the use of the redaction-based builder.
+	  */
+	public HierarchyBuilderRedactionBased<?> makeRedactionBasedHierarchy(String[] fieldData) {
+
+	    // Create the builder
+	    HierarchyBuilderRedactionBased<?> builder = HierarchyBuilderRedactionBased.create(Order.RIGHT_TO_LEFT,
+	                                                                                Order.RIGHT_TO_LEFT,
+	                                                                                ' ', '*');
+
+	    System.out.println("-------------------------");
+	    System.out.println("REDACTION-BASED HIERARCHY");
+	    System.out.println("-------------------------");
+	    System.out.println("");
+	    System.out.println("SPECIFICATION");
+	       
+	    // Print info about resulting groups
+	    System.out.println("Resulting levels: "+Arrays.toString(builder.prepare(fieldData)));
+	       
+	    System.out.println("");
+	    System.out.println("RESULT");
+	       
+	    // Print resulting hierarchy
+	    // was Tested with a test set, worked correctly
+	    //printArray(builder.build().getHierarchy());
+	    System.out.println("");
+	    return builder;
 	}
 	
 	public void deleteFiles() throws IOException, FileNotFoundException {
