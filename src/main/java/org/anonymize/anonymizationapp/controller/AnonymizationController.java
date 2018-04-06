@@ -115,6 +115,7 @@ import org.deidentifier.arx.risk.RiskModelSampleSummary;
 import org.deidentifier.arx.risk.RiskModelSampleUniqueness;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
 import org.anonymize.anonymizationapp.model.AnonymizationObject;
+import org.anonymize.anonymizationapp.model.AnonymizationReport;
 import org.anonymize.anonymizationapp.model.RiskObject;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
@@ -142,6 +143,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+
 import org.anonymize.anonymizationapp.util.DataAspects;
 import org.anonymize.anonymizationapp.util.PieChartGenerator;
 
@@ -162,6 +168,7 @@ public class AnonymizationController extends AnonymizationBase {
 			"European Union", "France", "Germany", "India", "North America", "South America",
 			"United Kingdom", "United States"};//countries and regions for risk metrics
 	//also remove from anonymization object
+	private AnonymizationReport anonReport;
 	
 	//may restrict all anonymization actions to the anonymization controller? not have multiple controllers?
 	
@@ -442,6 +449,16 @@ public class AnonymizationController extends AnonymizationBase {
 
 	        result = anonymizer.anonymize(sourceData, anonymizationConfiguration);
 	        
+	        // ===================================================
+	        // assigning values to the anonymization report object
+	        anonReport.setInformationLoss(result.getGlobalOptimum().getLowestScore() + " / " + result.getGlobalOptimum().getHighestScore());
+	        
+	        final DecimalFormat df1 = new DecimalFormat("#####0.00");
+	        final String sTotal = df1.format(result.getTime() / 1000d) + "s";
+	        
+	        anonReport.setTimeTaken(sTotal);
+	        // ===================================================
+	        
 	        //// Display data collection
 	        Iterator<String[]> itHandle = handle.iterator();
 	        
@@ -474,6 +491,7 @@ public class AnonymizationController extends AnonymizationBase {
 	        String[] nameSplitFromExtension = file.split("\\.");
 	        String dataSetName = nameSplitFromExtension[0];//save anonymized file to the project structure, allowed as it is secure.
 	        anonymizedDataFileName = dataSetName + "_anonymized.csv";//anonymized file will always be in a csv format for now
+	        anonReport.setFileName(anonymizedDataFileName);
 	        result.getOutput(false).save("src/main/resources/templates/outputs/" + anonymizedDataFileName, ';');
 	        //### Reanonymizing copies the above file back into the data file, need to restore hierarchies though
 	        // maybe leave the hierarchies as part of the application but remove the original data for the user's protection?
@@ -551,6 +569,7 @@ public class AnonymizationController extends AnonymizationBase {
 			RiskObject riskObject = new RiskObject();
 			
 			riskObject.setCountry(region);
+			anonReport.setCountry(region);//region added to specific anonymization report object
 			//riskObject.setThreshold(threshold);
 			
 			//riskObject.getDataSetDistributionMetrics() = getDistributionStatistics();
@@ -617,8 +636,7 @@ public class AnonymizationController extends AnonymizationBase {
 			catch (IOException failure) {
 				System.out.println("Error deleting your files: " + failure.getLocalizedMessage());
 			}
-			sourceData = null;//remove reference to object so that memory is garbage collected, fully remove data from the application
-			
+			sourceData = null;//remove reference to object so that memory is garbage collected, fully remove data from the application	
 		}
 		
 		
@@ -687,6 +705,8 @@ public class AnonymizationController extends AnonymizationBase {
 		        dataAspectsHelper.deleteFiles();
 		        sourceData = null;//destroy original data object to remove any possible traces
 		    }
+		   
+		   
 		//no need to remove anonymized dataset as of now, can be requested if needed later on, but not imperetive now
 	////////////////////////////////////////////////////////////////////////////////////////////// THIS IS WHERE THE VARIABLE INPUT TEST ENDS
 	//->>>>>change return type eventually to supply these values
@@ -762,12 +782,14 @@ public class AnonymizationController extends AnonymizationBase {
 	 * @param handle
 	 * @param populationRegion
 	 * @param THRESHOLD -> The lowest percentage risk value that is allowed for a particular record
+	 * @extra Now adds values to the object used for the anonymization risk report
 	 */
 	private RiskObject analyzeDataRisk(DataHandle handle, String populationRegion, double THRESHOLD, RiskObject riskObject) {   
 	    
 		String[] proseJourn = new String[3];//temp string array for prosecutor/journalist to put into riskObject
 		
 		riskObject.setThreshold(getPercent(THRESHOLD));
+		anonReport.setThreshold(getPercent(THRESHOLD));
 		
 		ARXPopulationModel populationmodel = determineRegion(populationRegion);//chosen from risk screen
 	    //variable models based on significant area
@@ -784,8 +806,11 @@ public class AnonymizationController extends AnonymizationBase {
 	    System.out.println("   - Success rate: " + getPercent(risks.getProsecutorRisk().getSuccessRate()));
 	    
 	    proseJourn[0] = getPercent(risks.getProsecutorRisk().getRecordsAtRisk());
+	    anonReport.setProsecutorRecordsAtRisk(getPercent(risks.getProsecutorRisk().getRecordsAtRisk()));
 	    proseJourn[1] = getPercent(risks.getProsecutorRisk().getHighestRisk());
+	    anonReport.setProsecutorHighestRisk(getPercent(risks.getProsecutorRisk().getHighestRisk()));
 	    proseJourn[2] = getPercent(risks.getProsecutorRisk().getSuccessRate());
+	    anonReport.setProsecutorSuccessRate(getPercent(risks.getProsecutorRisk().getSuccessRate()));
 	    //write prosecutor risks
 	    riskObject.setProsecutorStats(proseJourn);
 	    
@@ -796,8 +821,11 @@ public class AnonymizationController extends AnonymizationBase {
 	    System.out.println("   - Success rate: " + getPercent(risks.getJournalistRisk().getSuccessRate()));
 	    //overwrite with journalist model values
 	    proseJourn[0] = getPercent(risks.getJournalistRisk().getRecordsAtRisk());
+	    anonReport.setJournalistRecordsAtRisk(getPercent(risks.getJournalistRisk().getRecordsAtRisk()));
 	    proseJourn[1] = getPercent(risks.getJournalistRisk().getHighestRisk());
+	    anonReport.setJournalistHighestRisk(getPercent(risks.getJournalistRisk().getHighestRisk()));
 	    proseJourn[2] = getPercent(risks.getJournalistRisk().getSuccessRate());
+	    anonReport.setJournalistSuccessRate(getPercent(risks.getJournalistRisk().getSuccessRate()));
 	    
 	    riskObject.setJournalistStats(proseJourn);
 	    
@@ -805,6 +833,7 @@ public class AnonymizationController extends AnonymizationBase {
 	    System.out.println("   - Success rate: " + getPercent(risks.getMarketerRisk().getSuccessRate()));
 	    
 	    riskObject.setMarketerStat(getPercent(risks.getMarketerRisk().getSuccessRate()));
+	    anonReport.setMarketerStat(getPercent(risks.getMarketerRisk().getSuccessRate()));
 	   
 	    return riskObject;
 		}
@@ -858,6 +887,34 @@ public class AnonymizationController extends AnonymizationBase {
 	       return (int)(Math.round(value * 100)) + "%";
 	   }
 		   
+
+	   public void makeJasperReport() {
+	      String sourceFileName = 
+	         "C://tools/jasperreports-5.0.1/test/jasper_report_template.jasper";
+	      ArrayList<AnonymizationReport> anonRep = new ArrayList<AnonymizationReport>();//had to throw the anonRep object
+	      //into an arraylist as the JRBeanCollectionDataSource only takes collections
+	      //each object is considered a row, but filled with all info needed
+	      
+	      anonRep.add(anonReport);
+	      JRBeanCollectionDataSource beanColDataSource =
+	      new JRBeanCollectionDataSource(anonRep);
+	
+	      Map<String,String> parameters = new HashMap<String,String>();
+	      /**
+	       * Creating parameters for some headings on risk report
+	       */
+	      parameters.put("ReportTitle", "Anonymization Risk Report");
+	      parameters.put("Author", "Provided by AARMRD");
+	      
+	
+	      try {
+	         JasperFillManager.fillReportToFile(
+	         sourceFileName, parameters, beanColDataSource);
+	      } catch (JRException e) {
+	         e.printStackTrace();
+	      }
+	   }
+	   
 		   
 	@SuppressWarnings("unused")
    @RequestMapping("/anonymize")
