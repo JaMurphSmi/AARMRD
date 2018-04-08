@@ -7,7 +7,7 @@
    xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation = "http://jasperreports.sourceforge.net/jasperreports
    http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
-   name = "jasper_report_template" pageWidth = "595"
+   name = "anonReport" pageWidth = "595"
    pageHeight = "842" columnWidth = "515"
    leftMargin = "40" rightMargin = "40" topMargin = "50" bottomMargin = "50">
 	
@@ -52,6 +52,10 @@
    
    <field name = "journalistSuccessRate" class = "java.lang.String">
       <fieldDescription><![CDATA[journalistSuccessRate]]></fieldDescription>
+   </field>
+   
+   <field name = "marketerStat" class = "java.lang.String">
+      <fieldDescription><![CDATA[marketerStat]]></fieldDescription>
    </field>
    
    <field name = "informationLoss" class = "java.lang.String">
@@ -395,6 +399,18 @@
             
             <textFieldExpression class = "java.lang.String">
                <![CDATA[$F{informationLoss}]]>
+            </textFieldExpression>
+         </textField>
+         
+         <textField>
+            <reportElement x = "414" y = "0" width = "121" height = "15" />
+            
+            <textElement textAlignment = "Center" verticalAlignment = "Middle">
+               <font size = "9" />
+            </textElement>
+            
+            <textFieldExpression class = "java.lang.String">
+               <![CDATA[$F{timeTaken}]]>
             </textFieldExpression>
          </textField>
       </band>

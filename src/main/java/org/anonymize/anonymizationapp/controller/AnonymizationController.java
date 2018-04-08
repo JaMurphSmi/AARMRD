@@ -145,6 +145,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import net.sf.jasperreports.engine.JRException;
+//hopefully for jasper report 
+import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
@@ -168,7 +170,7 @@ public class AnonymizationController extends AnonymizationBase {
 			"European Union", "France", "Germany", "India", "North America", "South America",
 			"United Kingdom", "United States"};//countries and regions for risk metrics
 	//also remove from anonymization object
-	private AnonymizationReport anonReport;
+	private AnonymizationReport anonReport = new AnonymizationReport();
 	
 	//may restrict all anonymization actions to the anonymization controller? not have multiple controllers?
 	
@@ -266,7 +268,7 @@ public class AnonymizationController extends AnonymizationBase {
 					      // The whole row is blank
 					   }
 					   else {
-					      for (int cellNum=row.getFirstCellNum(); cellNum<row.getLastCellNum(); cellNum++) {
+					      for (int cellNum=row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
 					         Cell cell = row.getCell(cellNum, Row.RETURN_BLANK_AS_NULL);
 					         if (cell == null) {
 					            // The cell is empty
@@ -305,7 +307,8 @@ public class AnonymizationController extends AnonymizationBase {
 	   }
 	   if(sourceData != null && hierChecks != null) {//to accommodate if the user wants to create hierarchies for a field
 		   //this is where integer field hierarchies are created
-		   dataRows = dataAspectsHelper.createDataRows(sourceData);
+		   
+		   
 		   //hierChecks will be used here
 		   for(int i = 0; i < hierChecks.length; ++i) {
 			 	System.out.println("The input index that need hierarchies are : " + hierChecks[i]);
@@ -335,9 +338,11 @@ public class AnonymizationController extends AnonymizationBase {
 				return "needHierarchies";
 			}
 	   }
-	    System.out.println("after creating the data successfully and all hierarchy aspects");	
+	   System.out.println("after creating the data successfully and all hierarchy aspects");
+	   dataRows = dataAspectsHelper.createDataRows(sourceData);
+	    System.out.println("created the dataRows");	
 		
-		System.out.println(">" + headerRow + "<");
+		System.out.println(">" + headerRow + "<");//very weird as this shows the file has been opened successfully...
 		
 		model.addAttribute("headerRow", headerRow);//only need to get the header once as it will do for the resulting dataset also
 		for (String colName : headerRow) {
@@ -423,7 +428,8 @@ public class AnonymizationController extends AnonymizationBase {
 				sourceData.getDefinition().setDataType(header, determineDataType(handle, i));
 				++i;
 			}
-				
+			handle = null;//garbage collect, potentially fix handle held issue?
+			
 		    // Create an instance of the anonymizer
 	        ARXAnonymizer anonymizer = new ARXAnonymizer();//create object
 	        ARXConfiguration anonymizationConfiguration = ARXConfiguration.create();//defining the privacy model
@@ -449,15 +455,7 @@ public class AnonymizationController extends AnonymizationBase {
 
 	        result = anonymizer.anonymize(sourceData, anonymizationConfiguration);
 	        
-	        // ===================================================
-	        // assigning values to the anonymization report object
-	        anonReport.setInformationLoss(result.getGlobalOptimum().getLowestScore() + " / " + result.getGlobalOptimum().getHighestScore());
-	        
-	        final DecimalFormat df1 = new DecimalFormat("#####0.00");
-	        final String sTotal = df1.format(result.getTime() / 1000d) + "s";
-	        
-	        anonReport.setTimeTaken(sTotal);
-	        // ===================================================
+	        handle = sourceData.getHandle();
 	        
 	        //// Display data collection
 	        Iterator<String[]> itHandle = handle.iterator();
@@ -525,9 +523,14 @@ public class AnonymizationController extends AnonymizationBase {
 			}
 	        ////// Display data collection
 	        
-	        printResult(result, sourceData);
+	        String[] stats = printResult(result, sourceData);
 	        // TODO : use the printResult method to return values that can be used for the report at the end
 			//throw into model for display	/// now adding statistical information about the sets
+	     // ===================================================
+	        // assigning values to the anonymization report object, use the print result method
+	        anonReport.setInformationLoss(stats[1]);
+	        anonReport.setTimeTaken(stats[0]);
+	        // ===================================================
 	        
 	        model.addAttribute("headerRow", headerRow);
 		    model.addAttribute("dataRows", dataRows);
@@ -702,6 +705,7 @@ public class AnonymizationController extends AnonymizationBase {
 		        inputStream.close();
 		        outStream.close();
 		        //GDPR compliance, user identity protection through deletion
+		        //downloading anonymized data set implies conclusion of transaction
 		        dataAspectsHelper.deleteFiles();
 		        sourceData = null;//destroy original data object to remove any possible traces
 		    }
@@ -887,10 +891,24 @@ public class AnonymizationController extends AnonymizationBase {
 	       return (int)(Math.round(value * 100)) + "%";
 	   }
 		   
-
+	   @RequestMapping("/doJasperReport")
 	   public void makeJasperReport() {
-	      String sourceFileName = 
-	         "C://tools/jasperreports-5.0.1/test/jasper_report_template.jasper";
+	      //used to first compile the report build
+		   String sourceFileName = "src/main/resources/anonReport.jrxml";
+		   String destinationFileName = "src/main/resources/anonReport.jasper";
+		   
+		   //check if file has been compiled already
+		   if(!new File(destinationFileName).exists()) {
+			   File jasperFile = new File(destinationFileName);
+			   try {
+				JasperCompileManager.compileReportToFile(sourceFileName, destinationFileName);
+			   } catch (JRException e) {
+				   e.printStackTrace();
+				   System.out.println("There was a problem");
+			   }
+		   }
+		   
+		   
 	      ArrayList<AnonymizationReport> anonRep = new ArrayList<AnonymizationReport>();//had to throw the anonRep object
 	      //into an arraylist as the JRBeanCollectionDataSource only takes collections
 	      //each object is considered a row, but filled with all info needed
@@ -899,7 +917,7 @@ public class AnonymizationController extends AnonymizationBase {
 	      JRBeanCollectionDataSource beanColDataSource =
 	      new JRBeanCollectionDataSource(anonRep);
 	
-	      Map<String,String> parameters = new HashMap<String,String>();
+	      Map<String,Object> parameters = new HashMap<String,Object>();
 	      /**
 	       * Creating parameters for some headings on risk report
 	       */
@@ -909,12 +927,34 @@ public class AnonymizationController extends AnonymizationBase {
 	
 	      try {
 	         JasperFillManager.fillReportToFile(
-	         sourceFileName, parameters, beanColDataSource);
+	         destinationFileName, parameters, beanColDataSource);
 	      } catch (JRException e) {
 	         e.printStackTrace();
 	      }
 	   }
 	   
+	   //Used to quickly determine the data type of each column in the dataset
+	   private static DataType<?> determineDataType(DataHandle handle, int column) {
+	       //System.out.println(" - Potential data types for attribute: "+handle.getAttributeName(column));
+	       List<Pair<DataType<?>, Double>> types = handle.getMatchingDataTypes(column);
+
+	       //After a substantial amount of testing, this is no longer needed, however prints
+	       //entries sorted by match percentage
+	       
+	       //for (Pair<DataType<?>, Double> entry : types) {
+	           //System.out.print("   * ");
+	           //System.out.print(entry.getKey().getDescription().getLabel());
+	           //if (entry.getKey().getDescription().hasFormat()) {
+	           //    System.out.print("[");
+	           //    System.out.print(((DataTypeWithFormat) entry.getKey()).getFormat());
+	           //    System.out.print("]");
+	           //}
+	           //System.out.print(": ");
+	           //System.out.println(entry.getValue());
+	       //}
+	       
+	       return types.get(0).getKey(); //first identified is usually the correct data type
+	   }
 		   
 	@SuppressWarnings("unused")
    @RequestMapping("/anonymize")
@@ -1225,32 +1265,7 @@ public class AnonymizationController extends AnonymizationBase {
                System.out.println(Arrays.toString(transformed.next()));
            }
        }
-       
-/*///////////////////////////////////////////////////// creating a data object from a data source object example 28
-       
-       DataSource source = DataSource.createCSVSource("src/main/resources/templates/data/test.csv", StandardCharsets.UTF_8, ';', true);
-       source.addColumn("age", DataType.INTEGER, true);			//dataset csv noted above has been removed
-     
-       Data sourceData = Data.create(source);
-       
-       sourceData.getDefinition().setAttributeType("age", getMoreAge());
-       
-       // Print to console
-       print(sourceData.getHandle());
-       System.out.println("\n");
-       
-       // Anonymize
-       ARXAnonymizer anonymizerize = new ARXAnonymizer();
-       ARXConfiguration configu = ARXConfiguration.create();
-       configu.addPrivacyModel(new KAnonymity(3));
-       configu.setMaxOutliers(0d);
-       ARXResult resulting = anonymizerize.anonymize(sourceData, configu);
-       
-       // Print results
-       System.out.println("Output from example 28, finally, written to file number 31:");
-       print(resulting.getOutput(false));
-       
-*///////////////////////////////////////////////////////////////////////////////////
+
 /*////////////////////////////////////////////////////////////
   ///////////////////////////////////// EXAMPLE 29
        //example 29, using the same dataset as others(the varying datasets is actually quite annoying to follow
@@ -1983,52 +1998,7 @@ public class AnonymizationController extends AnonymizationBase {
        System.out.println("   * Suppressed records: " + handle.getStatistics().getEquivalenceClassStatistics().getNumberOfOutlyingTuples());
 
    }
-   
-   //////////////// example 50
-   private static void solve(Data data, ARXCostBenefitConfiguration config, DataSubset subset) throws IOException {
-       
-       // Release
-       data.getHandle().release();
-       
-       // Configure
-       ARXConfiguration arxconfig = ARXConfiguration.create();
-       arxconfig.setCostBenefitConfiguration(config);
-       
-       // Create model for measuring publisher's benefit
-       MetricSDNMPublisherPayout maximizePublisherPayout = Metric.createPublisherPayoutMetric(true);
-       
-       // Create privacy model for the game-theoretic approach
-       //EXAMPLE 49, 52
-       //ProfitabilityJournalistNoAttack profitability = new ProfitabilityJournalistNoAttack(subset);
-       ProfitabilityJournalist profitability = new ProfitabilityJournalist(subset);
-       
-       // Configure ARX
-       arxconfig.setMaxOutliers(1d);
-       arxconfig.setQualityModel(maximizePublisherPayout);
-       arxconfig.addPrivacyModel(profitability);
-
-       // Anonymize
-       ARXAnonymizer anonymizer = new ARXAnonymizer();
-       ARXResult result = anonymizer.anonymize(data, arxconfig);
-       ARXNode node = result.getGlobalOptimum();
-       DataHandle handle = result.getOutput(node, false).getView();
-       
-       // Print stuff
-       System.out.println("Data example 50: " + data.getHandle().getView().getNumRows() + " records with " + data.getDefinition().getQuasiIdentifyingAttributes().size() + " quasi-identifiers");
-       System.out.println(" - Configuration: " + config.toString());
-       System.out.println(" - Policies available: " + result.getLattice().getSize());
-       System.out.println(" - Solution: " + Arrays.toString(node.getTransformation()));
-       System.out.println("   * Optimal: " + result.getLattice().isComplete());
-       System.out.println("   * Time needed: " + result.getTime() + "[ms]");
-       for (QualityMetadata<?> metadata : node.getLowestScore().getMetadata()) {
-           System.out.println("   * " + metadata.getParameter() + ": " + metadata.getValue());
-       }
-       System.out.println("   * Suppressed records: " + handle.getStatistics().getEquivalenceClassStatistics().getNumberOfOutlyingTuples());
-
-   }
-   
-   
-   
+    
 //take in file through variable means 
    // used for EXAMPLE 39
    
@@ -2139,31 +2109,6 @@ public class AnonymizationController extends AnonymizationBase {
    	}
    
    
-   /**
-    * Prints a list of matching data types
-    * @param handle
-    * @param column
-    */
-   private static DataType<?> determineDataType(DataHandle handle, int column) {
-       //System.out.println(" - Potential data types for attribute: "+handle.getAttributeName(column));
-       List<Pair<DataType<?>, Double>> types = handle.getMatchingDataTypes(column);
-
-       // Print entries sorted by match percentage
-       //for (Pair<DataType<?>, Double> entry : types) {
-           //System.out.print("   * ");
-           //System.out.print(entry.getKey().getDescription().getLabel());
-           //if (entry.getKey().getDescription().hasFormat()) {
-           //    System.out.print("[");
-           //    System.out.print(((DataTypeWithFormat) entry.getKey()).getFormat());
-           //    System.out.print("]");
-           //}
-           //System.out.print(": ");
-           //System.out.println(entry.getValue());
-       //}
-       return types.get(0).getKey(); //first identified is usually the correct data type
-   }
-   
-   
    private static void aggregate(String[] args, DataType<?> type){
        
        AggregateFunctionBuilder<?> builder = type.createAggregate();
@@ -2206,20 +2151,7 @@ public class AnonymizationController extends AnonymizationBase {
        data.add("45", "male", "81931", "NULL");
        return data;
    }
-   ///////////////////// for example 35
-   private static Data.DefaultData getData35() {
-       Data.DefaultData data = Data.create();
-       data.add("first name", "age", "gender", "code", "birth", "email-address", "SSN", "Bank", "Vehicle", "URL", "IP", "phone");
-       data.add("Max", "34", "male", "81667", "2008-09-02", "", "123-45-6789", "GR16 0110 1250 0000 0001 2300 695", "", "http://demodomain.com", "8.8.8.8", "+49 1234566");
-       data.add("Max", "45", "female", "81675", "2008-09-02", "user@arx.org", "", "", "WDD 169 007-1J-236589", "", "2001:db8::1428:57ab", "");
-       data.add("Max", "66", "male", "89375", "2008-09-02", "demo@email.com", "", "", "", "", "", "");
-       data.add("Max", "70", "female", "81931", "2008-09-02", "", "", "", "", "", "", "");
-       data.add("Max", "34", "female", "81931", "2008-09-02", "", "", "", "", "", "", "");
-       data.add("Max", "90", "male", "81931", "2008-09-02", "", "", "", "", "", "", "");
-       data.add("Max", "45", "male", "81931", "2008-09-02", "", "", "", "", "", "", "");
-       return data;
-   }
-   
+
    private static Data.DefaultData getData38() {
 	   final DefaultData data = Data.create();
 	   data.add("age", "gender", "zipcode");
@@ -2246,22 +2178,7 @@ public class AnonymizationController extends AnonymizationBase {
        data.add("45", "male", "81931");
        return data;
    }
-   
-   private static Data getData41() {
-	   DefaultData data = Data.create();
-       data.add("identifier", "name", "zip", "age", "nationality", "sen");
-       data.add("a", "Alice", "47906", "35", "USA", "0");
-       data.add("b", "Bob", "47903", "59", "Canada", "1");
-       data.add("c", "Christine", "47906", "42", "USA", "1");
-       data.add("d", "Dirk", "47630", "18", "Brazil", "0");
-       data.add("e", "Eunice", "47630", "22", "Brazil", "0");
-       data.add("f", "Frank", "47633", "63", "Peru", "1");
-       data.add("g", "Gail", "48973", "33", "Spain", "0");
-       data.add("h", "Harry", "48972", "47", "Bulgaria", "1");
-       data.add("i", "Iris", "48970", "52", "France", "1");
-       return data;
-   }
-   
+ 
    private static void printWarnings(HIPAAIdentifierMatch[] warnings) {
        if (warnings.length == 0) {
            System.out.println("No warnings");
@@ -2326,18 +2243,7 @@ public class AnonymizationController extends AnonymizationBase {
 	   age.add("73", ">=50", "*");
 	   return age;
    }
-   
-   private static Hierarchy getMoreAge() {
-	   DefaultHierarchy age = Hierarchy.create();
-       age.add("34", "<50", "*");
-       age.add("45", "<50", "*");
-       age.add("66", ">=50", "*");
-       age.add("70", ">=50", "*");
-       age.add("99", ">=50", "*");
-       age.add("NULL", "NULL", "*");
-	   return age;
-   }
-   
+  
    private static Hierarchy getAge() {
 	   DefaultHierarchy age = Hierarchy.create();
        age.add("29", "<=40", "*");
@@ -2351,21 +2257,7 @@ public class AnonymizationController extends AnonymizationBase {
        age.add("32", "<=40", "*");
        return age;
    }
-   
-   private static Hierarchy getAge41() {
-	   DefaultHierarchy age = Hierarchy.create();
-	   age.add("18", "1*", "<=40", "*");
-	   age.add("22", "2*", "<=40", "*");
-	   age.add("33", "3*", "<=40", "*");
-	   age.add("35", "3*", "<=40", "*");
-	   age.add("42", "4*", ">40", "*");
-	   age.add("47", "4*", ">40", "*");
-	   age.add("52", "5*", ">40", "*");
-	   age.add("59", "5*", ">40", "*");
-	   age.add("63", "6*", ">40", "*");
-	   return age;
-   }
-   
+
    private static Hierarchy getZip() {
 	   DefaultHierarchy zipcode = Hierarchy.create();
 	   zipcode.add("81667", "8166*", "816**", "81***", "8****", "*****");
@@ -2409,19 +2301,7 @@ public class AnonymizationController extends AnonymizationBase {
 	   zipcode.add("92922", "9292*", "929**", "92***", "9****", "*****");
 	   return zipcode;
    }
-   
-   private static Hierarchy getZip41() {
-	   DefaultHierarchy zip = Hierarchy.create();
-       zip.add("47630", "4763*", "476*", "47*", "4*", "*");
-       zip.add("47633", "4763*", "476*", "47*", "4*", "*");
-       zip.add("47903", "4790*", "479*", "47*", "4*", "*");
-       zip.add("47906", "4790*", "479*", "47*", "4*", "*");
-       zip.add("48970", "4897*", "489*", "48*", "4*", "*");
-       zip.add("48972", "4897*", "489*", "48*", "4*", "*");
-       zip.add("48973", "4897*", "489*", "48*", "4*", "*");
-       return zip;
-   }
-   
+ 
    private static Hierarchy getNation41() {
 	   DefaultHierarchy nationality = Hierarchy.create();
        nationality.add("Canada", "N. America", "America", "*");

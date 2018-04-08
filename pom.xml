@@ -103,11 +103,45 @@
 	</dependency>
     <!--  -->
     
-    <!-- https://mvnrepository.com/artifact/jasperreports/jasperreports -->
+    <!-- https://mvnrepository.com/artifact/commons-collections/commons-collections -->
 	<dependency>
-	    <groupId>jasperreports</groupId>
-	    <artifactId>jasperreports</artifactId>
-	    <version>3.5.3</version>
+	    <groupId>commons-collections</groupId>
+	    <artifactId>commons-collections</artifactId>
+	    <version>2.1</version>
+	</dependency>
+
+	<!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
+	<dependency>
+	    <groupId>commons-beanutils</groupId>
+	    <artifactId>commons-beanutils</artifactId>
+	    <version>1.9.2</version>
+	</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/commons-digester/commons-digester -->
+	<dependency>
+	    <groupId>commons-digester</groupId>
+	    <artifactId>commons-digester</artifactId>
+	</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-digester3 -->
+	<dependency>
+	    <groupId>org.apache.commons</groupId>
+	    <artifactId>commons-digester3</artifactId>
+	    <version>3.0</version>
+	</dependency>
+    
+    <!-- https://mvnrepository.com/artifact/ar.com.fdvs/DynamicJasper -->
+	<dependency>
+	    <groupId>ar.com.fdvs</groupId>
+	    <artifactId>DynamicJasper</artifactId>
+	    <version>5.0.6</version>
+	</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/com.lowagie/itext -->
+	<dependency>
+	    <groupId>com.lowagie</groupId>
+	    <artifactId>itext</artifactId>
+	    <version>2.1.7</version>
 	</dependency>
     
     <!-- https://mvnrepository.com/artifact/net.objecthunter/exp4j -->

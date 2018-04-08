@@ -116,7 +116,7 @@ table, th, td {
 			  			</span>
 					</div>
 					<br><br>
-					<input type="submit" value="Submit Your Files">
+					<input type="submit" class="button" value="Submit Your Files">
 			</form><br><br>
 			<form action="/returnSender" method="post">
 				<input type="submit" class="button" value="Return to Comparison"/> 
@@ -126,6 +126,7 @@ table, th, td {
 <div>
 	<c:if test="${not empty riskObject}">
 		<div style="float:center;margin-left: 100px;max-width:1050px;padding: 15px 15px 15px 15px;overflow: scrollable;">
+				<a href="/doJasperReport" class="button">Generate Report</a><br><br>
 				<c:if test="${not empty riskObject.threshold}">
 					Threshold Specified : ${riskObject.threshold}		
 				</c:if>
@@ -290,6 +291,21 @@ table, th, td {
 	        chart.draw(data, options);
   		</c:forEach>
     }
+    
 </script><!-- need to throw a lot more in here to mould it to correct format -->
+<script>
+$(document).ready(function(){
+	$("#makeJasperReport").click(function(){
+	    $.ajax({
+	        url : 'doJasperReport',
+	        method : 'GET',
+	        async : false,
+	        complete : function(data) {
+	            console.log(data.responseText);
+	        }
+	    });
+	});
+});
+</script>
 </body>
 </html>

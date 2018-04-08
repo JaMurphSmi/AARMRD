@@ -105,20 +105,22 @@ public abstract class AnonymizationBase {
      * @param result
      * @param data
      */
-    protected static void printResult(final ARXResult result, final Data data) {
-
+    protected static String[] printResult(final ARXResult result, final Data data) {
+    	String[] stats = new String[2];
         // Print time
         final DecimalFormat df1 = new DecimalFormat("#####0.00");
         final String sTotal = df1.format(result.getTime() / 1000d) + "s";
         System.out.println(" - Time needed: " + sTotal);
-
+        stats[0] = sTotal;
         // Extract
         final ARXNode optimum = result.getGlobalOptimum();
         final List<String> qis = new ArrayList<String>(data.getDefinition().getQuasiIdentifyingAttributes());
 
         if (optimum == null) {
             System.out.println(" - No solution found!");
-            return;
+            stats[0] = " - No solution found!";
+            stats[1] = " - No solution found!";
+            return stats;
         }
 
         // Initialize
@@ -146,14 +148,16 @@ public abstract class AnonymizationBase {
                 generalizations[i].insert(0, " ");
             }
         }
-
+        String infoLoss = result.getGlobalOptimum().getLowestScore() + " / " + result.getGlobalOptimum().getHighestScore();
         // Print
-        System.out.println(" - Information loss: " + result.getGlobalOptimum().getLowestScore() + " / " + result.getGlobalOptimum().getHighestScore());
+        System.out.println(" - Information loss: " + infoLoss );
+        stats[1] = infoLoss; 
         System.out.println(" - Optimal generalization");
         for (int i = 0; i < qis.size(); i++) {
             System.out.println("   * " + identifiers[i] + ": " + generalizations[i]);
         }
         System.out.println(" - Statistics");
         System.out.println(result.getOutput(result.getGlobalOptimum(), false).getStatistics().getEquivalenceClassStatistics());
+        return stats;
     }
 }

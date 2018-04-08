@@ -35,9 +35,12 @@ public class DataAspects{
 		String dataset = dataNameAndExtension[0];//format is [dataset name].[extension]
 		String extension = dataNameAndExtension[1];
 		
+		System.out.println("Set name is: " + dataset);
+		System.out.println("Extension is: " + extension);
+		
 		 Data data = DefaultData.create();//create empty object with full scope to satisfy errors
 	       if(extension.equals("csv")) {//to handle csv and excel files
-	    	   data = Data.create("src/main/resources/templates/data/" + dataset + "." + extension, StandardCharsets.UTF_8, ';');
+	    	   data = Data.create("src/main/resources/templates/data/" + fileName, StandardCharsets.UTF_8, ';');
 	       }
 	       /**
 	        * Xls and dbs cannot be used as the sequence of fields in a data set cannot be determined through hierarchy file names anymore
@@ -45,17 +48,17 @@ public class DataAspects{
 	        * ##Another reason is that not all hierarchies may be supplied for the data set
 	        */
 	       else if(extension.equals("xls") || extension.equals("xlsx")) {
-	    	   DataSource dataExcel = DataSource.createExcelSource("src/main/resources/templates/data/" + dataset + "." + extension, 0, true);
+	    	   DataSource dataExcel = DataSource.createExcelSource("src/main/resources/templates/data/" + fileName, 0, true);
 	    	   //need to specify column names in here before casting to type Data, so send field names shaved from
-	    	   
+	    	   System.out.println("Creating the Excel data object");
+	    	   System.out.println("Is it there " + dataExcel.toString());
 	    	   //dataExcel.
 	    	   //hierNames now in correct order due to pre-opening of file in main controller
-	    	   int i = 0;
 	    	   for(String hierName : hierNames) {
 	    		   dataExcel.addColumn(hierName);
-	    		   ++i;
 	    	   }
 	    	   data = Data.create(dataExcel);//input hierarchy files
+	    	   System.out.println("Is data object there? " + data.toString());
 	       }
 	       
 	       //try internal reference to method instead of included code, could cut codebase down by 100 or so
@@ -79,10 +82,11 @@ public class DataAspects{
 	           if (matcher.find()) {
 	               CSVHierarchyInput hier = new CSVHierarchyInput(file, StandardCharsets.UTF_8, ';');
 	               String attributeName = matcher.group(1);
+	               System.out.println("Attribute Name: " + attributeName);
 	               data.getDefinition().setAttributeType(attributeName, Hierarchy.create(hier.getHierarchy()));
 	           }
 	       }
-	       
+	       System.out.println("Was able to create the Data object inside the method");
 	       return data;
 	   }
 	//for db table handling
@@ -166,8 +170,8 @@ public class DataAspects{
 		
 		DataHandle handle = sourceData.getHandle();//acquiring data handle
 		
-		System.out.println("inHandle rows name is " + handle.getNumRows());
-	    System.out.println("inHandle columns name is " + handle.getNumColumns());
+		System.out.println("inHandle rows number is " + handle.getNumRows());
+	    System.out.println("inHandle columns number is " + handle.getNumColumns());
 
 	    Iterator<String[]> itHandle = handle.iterator();
 		String flubRow = Arrays.toString(itHandle.next());//get the header of the dataset to display in bold

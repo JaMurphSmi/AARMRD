@@ -14,6 +14,21 @@ public class AnonymizationReport {
 	private String informationLoss;
 	private String timeTaken;
 	
+	public AnonymizationReport() {
+		this.fileName = null;
+		this.country = null;
+		this.threshold = null;
+		this.prosecutorRecordsAtRisk = null;
+		this.prosecutorHighestRisk = null;
+		this.prosecutorSuccessRate = null;
+		this.journalistRecordsAtRisk = null;
+		this.journalistHighestRisk = null;
+		this.journalistSuccessRate = null;
+		this.marketerStat = null;
+		this.informationLoss = null;
+		this.timeTaken = null;
+	}
+	
 	public String getFileName() {
 		return fileName;
 	}
