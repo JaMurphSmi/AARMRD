@@ -1,7 +1,4 @@
 <?xml version = "1.0"?>
-<!DOCTYPE jasperReport PUBLIC
-   "//JasperReports//DTD Report Design//EN"
-   "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
 
 <jasperReport xmlns = "http://jasperreports.sourceforge.net/jasperreports"
    xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
