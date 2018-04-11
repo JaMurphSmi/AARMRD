@@ -149,7 +149,56 @@ For compareSet.jsp
 /* ==================================================
 For showRisks.jsp
 =================================================== */
+.buttonsR {
+	  background-color: ForestGreen;  
+	  border-radius: 5px;
+	  color: white;
+	  padding: .5em;
+	  text-decoration: none;
+	}
 
+.buttonsR:focus,
+.buttonsR:hover {
+	background-color: DarkGreen;
+}
+.tooltipsR {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltipsR .tooltiptext {
+    visibility: hidden;
+    width: 400px;
+    background-color: #555;
+    color: #fff;
+    text-align: left;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -200px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltipsR .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.tooltipsR:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
 /* ==================================================
 For error.jsp
 =================================================== */
