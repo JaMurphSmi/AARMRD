@@ -32,7 +32,7 @@
 					<table style="border-collapse: collapse;">
 						<tr>
 							<c:forEach items="${headerRow}" var="head">
-								<th align="center" style="width:35px;border:1px solid #ddd;background-color: #e16830;">
+								<th id="dataHead" align="center">
 									${head}
 								</th>
 							</c:forEach>
@@ -40,7 +40,7 @@
 						    <c:forEach items="${dataRows}" var="dataRow">
 							    <tr>
 							    	<c:forEach items="${dataRow}" var="dataItem">
-									    <td align="center" style="border:1px solid #d6aa44;">
+									    <td id="dataBody" align="center">
 									       	${dataItem}     
 									    </td>
 									</c:forEach>    
@@ -50,7 +50,7 @@
 				</div>
 		</div>	
 		<br>
-		<div style="float:left;margin-left: 100px;padding:10px;border:3px solid;border-color:#d5ce66;">
+		<div id="detailOptionsContainer">
 			<h2>Set the Attribute details for your data set!</h2>
 			<div class="tooltipsAD">&#10068;
   			<span class="tooltiptext">
