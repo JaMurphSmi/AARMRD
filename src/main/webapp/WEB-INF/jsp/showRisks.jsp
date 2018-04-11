@@ -109,14 +109,14 @@
 				<br><br><br>
 				<!-- from here down is all risk metrics -->
 				<c:if test="${not empty riskObject.dataSetInputDistributionMetrics && not empty riskObject.dataSetOutputDistributionMetrics}">
-					<div align="center" style="width:1455px;">
-						<div style="border-color:green;margin-left:50px;float:left;width:700px;overflow:hidden;">
+					<div id="riskGraphDiv" align="center">
+						<div id="riskInnerDivLeft">
 							Input Data Set Value Distribution Statistics <br><br>
 							<!-- make the whole table in a loop? --> 
 							<c:forEach items="${riskObject.dataSetInputDistributionMetrics}" var="inputMapEntry">
-								<div style="float:left;width:700px;overflow:hidden;">
-									<div style="float:left;width:225px;overflow:auto;">
-										<table style="float: left;">
+								<div id="riskInnerDivLeftItem">
+									<div id="riskInnerDivFreqTable">
+										<table id="riskTable">
 											<tr>
 												<th colspan="2"><c:out value="${inputMapEntry.key}"/></th>
 											</tr>
@@ -137,12 +137,12 @@
 								</div>
 							</c:forEach>
 						</div>
-						<div style="border-color:green;float:left;width:700px;overflow:hidden;">
+						<div id="riskInnerDivRight">
 							 Output Data Set Value Distribution Statistics <br><br>
 							<c:forEach items="${riskObject.dataSetOutputDistributionMetrics}" var="outputMapEntry">
-								<div style="float:left;width:700px;overflow:hidden;">
-									<div style="float:left;width:225px;overflow:auto;">
-									<table style="float: left;">
+								<div id="riskInnerDivRightItem">
+									<div id="riskInnerDivFreqTable">
+									<table id="riskTable">
 										<tr>
 											<th colspan="2"><c:out value="${outputMapEntry.key}"/></th>
 										</tr>

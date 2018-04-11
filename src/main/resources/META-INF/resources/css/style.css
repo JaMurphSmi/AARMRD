@@ -227,7 +227,44 @@ For showRisks.jsp
 	padding: 15px 15px 15px 15px;
 	overflow: scrollable;
 }
-#
+#riskGraphDiv {
+	width:1455px;
+}
+#riskInnerDivLeft {
+	border-color:green;
+	margin-left:50px;
+	float:left;
+	width:700px;
+	overflow:hidden;
+}
+#riskInnerDivLeftItem {
+	float:left;
+	width:700px;
+	overflow:hidden;
+}
+#riskInnerDivFreqTable {
+	float:left;
+	width:225px;
+	overflow:auto;
+}
+#riskTable {
+	float: left;
+}
+#riskDistributionGraph {
+	float:left;
+}
+#riskInnerDivRight {
+	 border-color:green;
+	 float:left;
+	 width:700px;
+	 overflow:hidden;
+}
+#riskInnerDivRightItem {
+	float:left;
+	width:700px;
+	overflow:hidden;
+}
+#riskInnerDivFreqTable
 /* ==================================================
 For error.jsp
 =================================================== */
