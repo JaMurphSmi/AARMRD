@@ -17,7 +17,7 @@
 	  <h2>Your Data is missing some hierarchies</h2>
 	 <div>
 	<div>
-		<div id="nHContainer" >
+		<div id="nHContainer">
 			<h2>Would you like to create hierarchies for these data fields?</h2>
 			<h3>Caution!</h3> AARMRD can automatically construct hierarchies for fields that are numbers <i>only</i>  ie age, zipcode.<br>
 			Fields containing text may cause an error and corrupt your attempt to anonymize. If text field contains sensitive<br>
