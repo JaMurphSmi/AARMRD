@@ -9,15 +9,15 @@
 <link rel="stylesheet" type="text/css" href="css/style.css" />
 <title>AARMRD-Need Hierarchies</title>
 </head>
-<body  style="background-color:#faf6b8;">
-  <div style="z-index: 10;position: absolute;right: 30px;top: 0px;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
+<body>
+  <div id="logoTop"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
   <h1>Some Attribute Hierarchies Missing</h1><br><br><br>
   <hr>
-	  <div id="nHMessage" style="margin-left:50px">
+	  <div id="nHMessage">
 	  <h2>Your Data is missing some hierarchies</h2>
 	 <div>
 	<div>
-		<div style="float:left;margin-left: 100px;padding:10px;border:3px solid;border-color:#d5ce66;">
+		<div id="nHContainer" >
 			<h2>Would you like to create hierarchies for these data fields?</h2>
 			<h3>Caution!</h3> AARMRD can automatically construct hierarchies for fields that are numbers <i>only</i>  ie age, zipcode.<br>
 			Fields containing text may cause an error and corrupt your attempt to anonymize. If text field contains sensitive<br>
