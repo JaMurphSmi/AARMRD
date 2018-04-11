@@ -11,64 +11,7 @@
 <link rel="stylesheet" href="css/style.css">
 <script type="text/javascript" src="js/app.js"></script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<style>
-.button {
-	  background-color: ForestGreen;  
-	  border-radius: 5px;
-	  color: white;
-	  padding: .5em;
-	  text-decoration: none;
-	}
 
-	.button:focus,
-	.button:hover {
-	  background-color: DarkGreen;
-	}
-
-.tooltip {
-    position: relative;
-    display: inline-block;
-    border-bottom: 1px dotted black;
-}
-
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: 400px;
-    background-color: #555;
-    color: #fff;
-    text-align: left;
-    border-radius: 6px;
-    padding: 5px 0;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -200px;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.tooltip .tooltiptext::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #555 transparent transparent transparent;
-}
-
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-}
-
-table, th, td {
-    border: 1px solid black;
-     border-collapse: collapse;
-}
-</style>
 <title>Risk Metrics</title>
 </head>
 <body>
@@ -77,10 +20,10 @@ table, th, td {
   	<hr>
 	<div style="overflow:hidden;">
 		<div style="float:left;margin-left: 100px;max-width:550px;height:400px;overflow:auto;">
-				<table style="border-collapse: collapse;">
+				<table id="tablesR">
 					<tr>
 						<c:forEach items="${headerRow}" var="head"><!-- maybe add a percentage column? -->
-							<th align="center" style="width:35px;border:1px solid #ddd;background-color: #e16830;">
+							<th id="thsR" align="center">
 								${head}
 							</th>
 						</c:forEach>
@@ -88,7 +31,7 @@ table, th, td {
 					    <c:forEach items="${anonyRows}" var="anonRow">
 						    <tr>
 						    	<c:forEach items="${anonRow}" var="anonItem">
-								    <td align="center" style="border:1px solid #d6aa44;">
+								    <td id="tdsR" align="center">
 								       	${anonItem}     
 								    </td>
 								</c:forEach>    
@@ -96,7 +39,7 @@ table, th, td {
 					    </c:forEach>
 				</table>
 		</div>
-		<div style="border-style:ridge;border-color:green;float:left;margin-left:100px;margin-top:50px; padding: 25px 25px 25px 25px;max-width:550px;">
+		<div id="setRiskDetails">
 			<h3>Set your Risk Assessment Details</h3>			
 			<form action="/analyseRisks" method="POST">
 				<label for="populationRegion">Select Region : </label>
@@ -116,17 +59,17 @@ table, th, td {
 			  			</span>
 					</div>
 					<br><br>
-					<input type="submit" class="button" value="Submit Your Files">
+					<input type="submit" class="buttonsR" value="Submit Your Files">
 			</form><br><br>
 			<form action="/returnSender" method="post">
-				<input type="submit" class="button" value="Return to Comparison"/> 
+				<input type="submit" class="buttonsR" value="Return to Comparison"/> 
 			</form>
 		</div>
 	</div>
 <div>
 	<c:if test="${not empty riskObject}">
-		<div style="float:center;margin-left: 100px;max-width:1050px;padding: 15px 15px 15px 15px;overflow: scrollable;">
-				<a href="/doJasperReport" class="button">Generate Report</a><br><br>
+		<div id="theRiskyDiv">
+				<a href="/doJasperReport" class="buttonsR">Generate Report</a><br><br>
 				<c:if test="${not empty riskObject.threshold}">
 					Threshold Specified : ${riskObject.threshold}		
 				</c:if>

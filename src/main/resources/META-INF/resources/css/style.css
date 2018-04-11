@@ -199,6 +199,35 @@ For showRisks.jsp
     visibility: visible;
     opacity: 1;
 }
+#tablesR {
+    border: 1px solid black;
+     border-collapse: collapse;
+}
+#thsR {
+	width:35px;
+	border:1px solid #ddd;
+	background-color: #e16830;
+}
+#tdsR {
+	 border:1px solid #d6aa44;
+} 
+#setRiskDetails {
+	border-style:ridge;
+	border-color:green;
+	float:left;
+	margin-left:100px;
+	margin-top:50px;
+	padding: 25px 25px 25px 25px;
+	max-width:550px;
+}
+#theRiskyDiv {
+	float:center;
+	margin-left: 100px;
+	max-width:1050px;
+	padding: 15px 15px 15px 15px;
+	overflow: scrollable;
+}
+#
 /* ==================================================
 For error.jsp
 =================================================== */
