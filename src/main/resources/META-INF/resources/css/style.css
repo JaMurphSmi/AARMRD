@@ -1,8 +1,35 @@
 /* ==================================================
 For all screens
+
+	
 =================================================== */
 body {
-	background-color:#9ecfed;
+	background-color:#0e70e7;
+	background-image: url("https://i.imgur.com/bFvPjP8.png");
+}
+
+h1 {
+	text-align: center;
+	color: #f4dc24;
+	font-size: 3em;
+    margin-top: 0.67em;
+    margin-bottom: 0.67em;
+    margin-left: 50px;
+	text-shadow: 0 1px 0 #7c7514,
+	             0 2px 0 #7a7c14,
+	             0 3px 0 #7a7818,
+	             0 4px 0 #808222,
+	             0 5px 0 #959500,
+	             0 6px 1px rgba(0,0,0,.1),
+	             0 0 5px rgba(0,0,0,.1),
+	             0 1px 3px rgba(0,0,0,.3),
+	             0 3px 5px rgba(0,0,0,.2),
+	             0 5px 10px rgba(0,0,0,.25),
+	             0 10px 10px rgba(0,0,0,.2),
+	             0 20px 20px rgba(0,0,0,.15);
+}
+#blerb {
+	color: #f4dc24;
 }
 /* ==================================================
 For index.jsp
@@ -10,13 +37,13 @@ For index.jsp
 .americasNextTopDiv {
 	z-index: 10;
 	position: absolute;
-	right: 0;
-	top: 0;
+	right: 10px;
+	top: 10pxS;
 }
 .inputFile {
 	width:600px;
 	border-radius: 15px;
-	margin:100px 150px 25px 350px;
+	margin:75px 150px 25px 350px;
 	border-style:ridge;
 	border-color:green;
 }
@@ -32,23 +59,45 @@ For index.jsp
 	padding: 20px;
 }
 
-#data {
-    width: 600px;
-    float: left;
-    height: 300px;
-    border-style: groove; 
-    border-color: coral; 
-	border-width: 3px;
-    
+.inputForFile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
 }
-#hierarchy {
-    width: 600px;
-    float: left;
-    height: 300px;
-    border-style: groove; 
-    border-color: coral; 
-	border-width: 3px;
+.inputForFile + label {
+    font-size: 1em;
+    font-weight: 500;
+    color: white;
+    background-color: #356fce;
+    display: inline-block;
+    padding-top: 2px;
+    padding-right: 2px;
+    padding-bottom: 2px;
+    padding-left: 2px;
+    border-width: 3px;
+    border-style: outset;
+    border-color: #000080;
 }
+
+.inputForFile:focus + label,
+.inputForFile + label:hover {
+    background-color: #283988;
+    border-width: 3px;
+    border-style: outset;
+    border-color: #000080;
+    display: inline-block;
+}
+.inputForFile + label {
+	cursor: pointer; /* "hand" cursor */
+}
+
+.inputForFile + label * {
+	pointer-events: none;
+}
+
 /* ==================================================
 For setAnonDetails.jsp
 =================================================== */
@@ -268,3 +317,9 @@ For showRisks.jsp
 /* ==================================================
 For error.jsp
 =================================================== */
+#tableErr td {
+	vertical-align:top;
+	border-collapse:collapse;
+	border:solid 1px #888;
+	padding:10px;	
+}

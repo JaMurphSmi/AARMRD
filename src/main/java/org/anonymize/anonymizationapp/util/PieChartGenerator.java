@@ -43,7 +43,7 @@ public class PieChartGenerator {
 	    ((PiePlot) chart.getPlot()).setLabelGenerator(labelGenerator);
 	    
 	    try {
-			ChartUtilities.saveChartAsJPEG(new File("src/main/webapp/resources/static/images/"+ theTitle +".png"),chart,400, 300);
+			ChartUtilities.saveChartAsJPEG(new File("src/main/resources/META-INF/resources/images/"+ theTitle +".png"),chart,400, 300);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

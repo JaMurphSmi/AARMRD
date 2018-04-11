@@ -98,11 +98,11 @@
     opacity: 1;
 }
 </style>
-<title>Spring Boot</title>
+<title>Compare Sets</title>
 </head>
 <body style="background-color:#faf6b8;">
  <div style="z-index: 10;position: absolute;right: 30px;top: 0px;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
-  <h3>Anonymization Results</h3>
+  <h1>Anonymization Results</h1>
 <div style="float:left;height=400px;max-width=1050px;overflow=hidden;">
   	<br>
   	<c:if test="${not empty errorMessage}"><div>${errorMessage}</div></c:if>

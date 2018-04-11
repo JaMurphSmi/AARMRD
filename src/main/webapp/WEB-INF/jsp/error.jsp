@@ -8,28 +8,16 @@
 <link rel="stylesheet" type="text/css" href="css/style.css" />
 <script type="text/javascript" src="js/app.js"></script>
 <style>
-.americasNextTopDiv {
-	z-index: 10;
-	position: absolute;
-	right: 0;
-	top: 0;
-}
-
-table td{
-vertical-align:top;
-border:solid 1px #888;
-padding:10px;
-}
 </style>
 <title>Spring Boot - Error</title>
 </head>
-<body style="background-color:#faf6b8;">
+<body>
 	<div class="americasNextTopDiv"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
   <h1>Error</h1>
   <hr>
   <div align=center>You have encountered an error<br>
   apologies for inconvenience caused</div>
-  <table>
+  <table id="tableErr">
         <tr>
             <td>Date</td>
             <td>${timestamp}</td>
@@ -56,7 +44,7 @@ padding:10px;
                 <pre>${trace}</pre>
             </td>
         </tr>
-    </table>
+    </table><br><br>
   <div class="form">
     <form action="/" method="post" onsubmit="return validate()">
       <table>
