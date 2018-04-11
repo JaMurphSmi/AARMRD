@@ -105,21 +105,6 @@
       <band height = "23">
          
          <staticText>
-            <reportElement mode = "Opaque" x = "0" y = "3" width = "535" height = "15"
-               backcolor = "#70A9A9" />
-            
-            <box>
-               <bottomPen lineWidth = "1.0" lineColor = "#CCCCCC" />
-            </box>
-            
-            <textElement />
-				
-            <text>
-               <![CDATA[]]>
-            </text>
-         </staticText>
-         
-         <staticText>
             <reportElement x = "414" y = "3" width = "121" height = "15" />
             
             <textElement textAlignment = "Center" verticalAlignment = "Middle">
@@ -154,7 +139,7 @@
          </staticText>
          
          <staticText>
-            <reportElement x = "414" y = "3" width = "121" height = "15" />
+            <reportElement x = "414" y = "130" width = "121" height = "15" />
             
             <textElement textAlignment = "Center" verticalAlignment = "Middle">
                <font isBold = "true" />
@@ -166,7 +151,7 @@
          </staticText>
          
          <staticText>
-            <reportElement x = "414" y = "3" width = "121" height = "15" />
+            <reportElement x = "414" y = "300" width = "121" height = "15" />
             
             <textElement textAlignment = "Center" verticalAlignment = "Middle">
                <font isBold = "true" />
@@ -178,7 +163,7 @@
          </staticText>
          
          <staticText>
-            <reportElement x = "414" y = "3" width = "121" height = "15" />
+            <reportElement x = "414" y = "230" width = "121" height = "15" />
             
             <textElement textAlignment = "Center" verticalAlignment = "Middle">
                <font isBold = "true" />
@@ -254,21 +239,6 @@
 
    <detail>
       <band height = "16">
-         
-         <staticText>
-            <reportElement mode = "Opaque" x = "0" y = "0" width = "535" height = "14"
-               backcolor = "#E5ECF9" />
-            
-            <box>
-               <bottomPen lineWidth = "0.25" lineColor = "#CCCCCC" />
-            </box>
-            
-            <textElement />
-				
-            <text>
-               <![CDATA[]]>
-            </text>
-         </staticText>
          
          <textField>
             <reportElement x = "414" y = "0" width = "121" height = "15" />

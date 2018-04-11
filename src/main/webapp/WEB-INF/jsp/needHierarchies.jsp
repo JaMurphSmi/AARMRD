@@ -6,14 +6,14 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/static/css/style.css" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
 <title>AARMRD-Need Hierarchies</title>
 </head>
 <body  style="background-color:#faf6b8;">
   <div style="z-index: 10;position: absolute;right: 30px;top: 0px;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
   <h1>Some Attribute Hierarchies Missing</h1><br><br><br>
   <hr>
-	  <div style="margin-left:50px">
+	  <div id="nHMessage" style="margin-left:50px">
 	  <h2>Your Data is missing some hierarchies</h2>
 	 <div>
 	<div>

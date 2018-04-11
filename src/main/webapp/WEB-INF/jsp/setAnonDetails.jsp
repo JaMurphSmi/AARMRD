@@ -6,51 +6,14 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/static/css/style.css" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
 <style>
-.tooltip {
-    position: relative;
-    display: inline-block;
-    border-bottom: 1px dotted black;
-}
 
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: 650px;
-    background-color: #555;
-    color: #fff;
-    text-align: left;
-    border-radius: 6px;
-    padding: 5px 0;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -325px;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.tooltip .tooltiptext::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #555 transparent transparent transparent;
-}
-
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-}
 </style>
 <title>AARMRD-Home</title>
 </head>
-<body  style="background-color:#faf6b8;">
-  <div style="z-index: 10;position: absolute;right: 30px;top: 0px;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
+<body>
+  <div id="topHead"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
   <h1>Set Anonymization Details</h1><br><br><br>
   <hr>
 	  <div style="margin-left:50px">
@@ -64,8 +27,8 @@
 	</table>
 	<br>
 	<div>
-		<div style="float:left;margin-left: 100px; max-width:550px;height:300px;overflow:hidden;">
-				<div style="overflow:auto;height:300px;">
+		<div id="selectDetails">
+				<div id="selectDetailsInner">
 					<table style="border-collapse: collapse;">
 						<tr>
 							<c:forEach items="${headerRow}" var="head">
@@ -89,7 +52,7 @@
 		<br>
 		<div style="float:left;margin-left: 100px;padding:10px;border:3px solid;border-color:#d5ce66;">
 			<h2>Set the Attribute details for your data set!</h2>
-			<div class="tooltip">&#10068;
+			<div class="tooltipsAD">&#10068;
   			<span class="tooltiptext">
   			Listed below are all fields in your dataset. You can specify an anonymization algorithm for each of these fields.<br>
   			Facts about these algorithms : <br>

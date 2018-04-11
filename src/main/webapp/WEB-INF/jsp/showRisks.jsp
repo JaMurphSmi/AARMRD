@@ -8,8 +8,8 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<link rel="stylesheet" href="/resources/css/style.css">
-<script type="text/javascript" src="/resources/js/app.js"></script>
+<link rel="stylesheet" href="css/style.css">
+<script type="text/javascript" src="js/app.js"></script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <style>
 .button {

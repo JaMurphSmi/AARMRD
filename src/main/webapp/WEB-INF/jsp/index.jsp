@@ -7,29 +7,11 @@
 <head>
 
 <!-- Static content -->
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/static/css/style.css" />
-<script type="text/javascript" src="${pageContext.request.contextPath}/resources/static/js/app.js"></script>
-<style>
-.americasNextTopDiv {
-	z-index: 10;
-	position: absolute;
-	right: 0;
-	top: 0;
-}
-.inputFile {
-	width:600px;
-	border-radius: 15px;
-	margin:100px 150px 25px 350px;
-	border-style:ridge;
-	border-color:green;
-}
-.inputFile .tableDetails {
-	display : none;
-}
-</style><!-- put script in here to make changes to the view of the screen after choosing a file -->
+<link rel="stylesheet" href="css/style.css" type="text/css"/>
+<script src="js/app.js" type="text/javascript"></script>
 <title>AARMRD</title>
 </head>
-<body style="background-color:#faf6b8;">
+<body>
 	<div class="americasNextTopDiv"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
   <h1>AARMRD - Homepage</h1><br>
   Hello! Let's get started with your data anonymization, please select your data file and your hierarchy files for each field, then submit!<br>

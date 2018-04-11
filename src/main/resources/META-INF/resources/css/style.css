@@ -1,0 +1,124 @@
+/* ==================================================
+For all screens
+=================================================== */
+body {
+	background-color:#9ecfed;
+}
+/* ==================================================
+For index.jsp
+=================================================== */
+.americasNextTopDiv {
+	z-index: 10;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+.inputFile {
+	width:600px;
+	border-radius: 15px;
+	margin:100px 150px 25px 350px;
+	border-style:ridge;
+	border-color:green;
+}
+.inputFile .tableDetails {
+	display : none;
+}
+
+.form {
+	background-color:#faf497;
+	width: 400px;
+	height: 50px;
+	border-radius: 7px;
+	padding: 20px;
+}
+
+#data {
+    width: 600px;
+    float: left;
+    height: 300px;
+    border-style: groove; 
+    border-color: coral; 
+	border-width: 3px;
+    
+}
+#hierarchy {
+    width: 600px;
+    float: left;
+    height: 300px;
+    border-style: groove; 
+    border-color: coral; 
+	border-width: 3px;
+}
+/* ==================================================
+For setAnonDetails.jsp
+=================================================== */
+#topHead {
+	z-index: 10;
+	position: absolute;
+	right: 30px;
+	top: 0px;	
+}
+.tooltipsAD {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltipsAD .tooltiptext {
+    visibility: hidden;
+    width: 650px;
+    background-color: #555;
+    color: #fff;
+    text-align: left;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -325px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltipsAD .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.tooltipsAD:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+#selectDetails {
+	float:left;
+	margin-left: 100px; 
+	max-width:550px;
+	height:300px;
+	overflow:hidden;
+}
+#selectDetailsInner {
+	overflow:auto;
+	height:300px;
+}
+/* ==================================================
+For needHierarchies.jsp
+=================================================== */
+
+/* ==================================================
+For compareSet.jsp
+=================================================== */
+
+/* ==================================================
+For showRisks.jsp
+=================================================== */
+
+/* ==================================================
+For error.jsp
+=================================================== */
