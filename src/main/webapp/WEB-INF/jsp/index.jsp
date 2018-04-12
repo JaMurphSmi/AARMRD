@@ -43,7 +43,8 @@
 		  	</div>
 		  	<br>
 		  	<br>
-		  	<button type="submit" id="formSubmitButton value="Submit Your Files">Submit</button>
+		  	<button type="submit" id="formSubmitButton" value="Submit Your Files">Submit</button>
+		  	<!-- Had to remove the 'form' attribute from the button above to make it work -->
 	    </form>
 	    <br>
     </div>
