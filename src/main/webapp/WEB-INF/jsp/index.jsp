@@ -15,15 +15,17 @@
 <body>
 	<div class="americasNextTopDiv"><img src="https://i.imgur.com/DpvFqJW.png"/></div>
   <h1>AARMRD - Homepage</h1><br>
-  <p>Hello! Let's get started with your data anonymization, please select your data file ( which has a maximum size of 1GB) and your hierarchy file(s) for each field, then submit!</p>
+  <p id="blerb">&nbsp&nbsp&nbsp&nbsp&nbspHello! Let's get started with your data anonymization, please select your data file ( which has a maximum size of 1GB) and your hierarchy file(s) for each field, then submit!</p>
   <hr>
 	<div align="center" class="inputFile">
-	    <form action="uploadFiles" method="post" enctype="multipart/form-data">
-	    <p><b>Note</b> that AARMRD currently only produces a csv file separated by a ';' as the resulting file format</p>
+	    <form action="uploadFiles" name="fileForm" method="post" enctype="multipart/form-data">
+	    <p id="blerb"><b>Note</b> that AARMRD currently only produces a csv file separated by a ';' as the resulting file format</p>
 	    	<br>
 	    	<div id="import">
-		  		<input type="file" id="dataFile" name="dataFile" class="inputForFile" onchange="changeIt()">
-		  		<label for="dataFile"><strong>Choose Data File</strong></label>
+		  		<input type="file" id="dataFile" name="dataFile" class="inputForFile inputForFile1" onchange="changeIt()">
+		  		<label for="dataFile"><span id="dataSpan">Choose Data File</span></label>
+		  		<!-- if enough time, was going to attempt to implement use of db tables also, backend code in place also -->
+		  		<!-- not enough time to test thoroughly however -->
 		  		<div class="tableDetails" id="hiddenTable">
 		  			Details for JDBC : <br>
 			  		<label for="tableName">Table: </label>
@@ -36,23 +38,25 @@
 		  	</div>
 		  	<br><br>
 		  	<div id="import">
-		  		<input type="file" id="hierFiles" name="hierFiles" class="inputForFile" data-multiple-caption="{count} files selected" multiple="multiple">
-		  		<label for="hierFiles"><strong>Choose hierarchy file(s)</strong></label>
+		  		<input type="file" id="hierFiles" name="hierFiles" class="inputForFile inputForFile2" data-multiple-caption="{count} files selected" multiple="multiple">
+		  		<label for="hierFiles"><span id="hierSpan">Choose hierarchy file(s)</span></label>
 		  	</div>
 		  	<br>
 		  	<br>
-		  	<input type="submit" value="Submit Your Files">
+		  	<button type="submit" id="formSubmitButton value="Submit Your Files">Submit</button>
 	    </form>
 	    <br>
     </div>
 <script>
-var inputs = document.querySelectorAll( '#hierFile' );
-Array.prototype.forEach.call( inputs, function( input )
+//function to change the text displayed on input labels as files are chosen for them
+//good lord this was a nuisance to research
+var inputs = document.querySelectorAll('.inputForFile');
+Array.prototype.forEach.call(inputs, function(input)
 {
 	var label	 = input.nextElementSibling,
 		labelVal = label.innerHTML;
 
-	input.addEventListener('change', function( e )
+	input.addEventListener('change', function(e)
 	{
 		var fileName = '';
 		if(this.files && this.files.length > 1)
@@ -60,7 +64,7 @@ Array.prototype.forEach.call( inputs, function( input )
 		else
 			fileName = e.target.value.split('\\').pop();
 
-		if( fileName )
+		if(fileName)
 			label.querySelector('span').innerHTML = fileName;
 		else
 			label.innerHTML = labelVal;

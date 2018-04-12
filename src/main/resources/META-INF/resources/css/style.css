@@ -59,7 +59,7 @@ For index.jsp
 	padding: 20px;
 }
 
-.inputForFile {
+.inputForFile1 {
 	width: 0.1px;
 	height: 0.1px;
 	opacity: 0;
@@ -67,7 +67,7 @@ For index.jsp
 	position: absolute;
 	z-index: -1;
 }
-.inputForFile + label {
+.inputForFile1 + label {
     font-size: 1em;
     font-weight: 500;
     color: white;
@@ -82,22 +82,86 @@ For index.jsp
     border-color: #000080;
 }
 
-.inputForFile:focus + label,
-.inputForFile + label:hover {
+.inputForFile1:focus + label,
+.inputForFile1 + label:hover {
     background-color: #283988;
     border-width: 3px;
     border-style: outset;
     border-color: #000080;
     display: inline-block;
 }
-.inputForFile + label {
+.inputForFile1 + label {
 	cursor: pointer; /* "hand" cursor */
 }
 
-.inputForFile + label * {
+.inputForFile1 + label * {
 	pointer-events: none;
 }
 
+.inputForFile2 {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+.inputForFile2 + label {
+    font-size: 1em;
+    font-weight: 500;
+    color: white;
+    background-color: #356fce;
+    display: inline-block;
+    padding-top: 2px;
+    padding-right: 2px;
+    padding-bottom: 2px;
+    padding-left: 2px;
+    border-width: 3px;
+    border-style: outset;
+    border-color: #000080;
+}
+
+.inputForFile2:focus + label,
+.inputForFile2 + label:hover {
+    background-color: #283988;
+    border-width: 3px;
+    border-style: outset;
+    border-color: #000080;
+    display: inline-block;
+}
+.inputForFile2 + label {
+	cursor: pointer; /* "hand" cursor */
+}
+
+.inputForFile2 + label * {
+	pointer-events: none;
+}
+#formSubmitButton {
+  background: #3193d4;
+  background-image: -webkit-linear-gradient(top, #3193d4, #2277ab);
+  background-image: -moz-linear-gradient(top, #3193d4, #2277ab);
+  background-image: -ms-linear-gradient(top, #3193d4, #2277ab);
+  background-image: -o-linear-gradient(top, #3193d4, #2277ab);
+  background-image: linear-gradient(to bottom, #3193d4, #2277ab);
+  -webkit-border-radius: 6;
+  -moz-border-radius: 6;
+  border-radius: 6px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 20px;
+  padding: 10px 20px 10px 20px;
+  text-decoration: none;
+}
+
+#formSubmitButton:hover {
+  background: #3cb0fd;
+  background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+  background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+  background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+  background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+  background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+  text-decoration: none;
+}
 /* ==================================================
 For setAnonDetails.jsp
 =================================================== */

@@ -1,386 +1,255 @@
-<?xml version = "1.0"?>
-
-<jasperReport xmlns = "http://jasperreports.sourceforge.net/jasperreports"
-   xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation = "http://jasperreports.sourceforge.net/jasperreports
-   http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
-   name = "anonReport" pageWidth = "595"
-   pageHeight = "842" columnWidth = "515"
-   leftMargin = "40" rightMargin = "40" topMargin = "50" bottomMargin = "50">
-	
-   <parameter name = "ReportTitle" class = "java.lang.String"/>
-   <parameter name = "Author" class = "java.lang.String"/>
-
-   <queryString>
-      <![CDATA[]]>
-   </queryString>
-
-   <field name = "fileName" class = "java.lang.String">
-      <fieldDescription><![CDATA[fileName]]></fieldDescription>
-   </field>
-
-   <field name = "country" class = "java.lang.String">
-      <fieldDescription><![CDATA[country]]></fieldDescription>
-   </field>
-   
-   <field name = "threshold" class = "java.lang.String">
-      <fieldDescription><![CDATA[threshold]]></fieldDescription>
-   </field>
-   
-   <field name = "prosecutorRecordsAtRisk" class = "java.lang.String">
-      <fieldDescription><![CDATA[prosecutorRecordsAtRisk]]></fieldDescription>
-   </field>
-   
-   <field name = "prosecutorHighestRisk" class = "java.lang.String">
-      <fieldDescription><![CDATA[prosecutorHighestRisk]]></fieldDescription>
-   </field>
-   
-   <field name = "prosecutorSuccessRate" class = "java.lang.String">
-      <fieldDescription><![CDATA[prosecutorSuccessRate]]></fieldDescription>
-   </field>
-   
-   <field name = "journalistRecordsAtRisk" class = "java.lang.String">
-      <fieldDescription><![CDATA[journalistRecordsAtRisk]]></fieldDescription>
-   </field>
-   
-   <field name = "journalistHighestRisk" class = "java.lang.String">
-      <fieldDescription><![CDATA[journalistHighestRisk]]></fieldDescription>
-   </field>
-   
-   <field name = "journalistSuccessRate" class = "java.lang.String">
-      <fieldDescription><![CDATA[journalistSuccessRate]]></fieldDescription>
-   </field>
-   
-   <field name = "marketerStat" class = "java.lang.String">
-      <fieldDescription><![CDATA[marketerStat]]></fieldDescription>
-   </field>
-   
-   <field name = "informationLoss" class = "java.lang.String">
-      <fieldDescription><![CDATA[informationLoss]]></fieldDescription>
-   </field>
-   
-   <field name = "timeTaken" class = "java.lang.String">
-      <fieldDescription><![CDATA[timeTaken]]></fieldDescription>
-   </field>
-
-   <title>
-      <band height = "70">
-         
-         <line>
-            <reportElement x = "0" y = "0" width = "515" height = "1"/>
-         </line>
-         
-         <textField isBlankWhenNull = "true" bookmarkLevel = "1">
-            <reportElement x = "0" y = "10" width = "515" height = "30"/>
-           
-            <textElement textAlignment = "Center">
-               <font size = "22"/>
-            </textElement>
-            
-            <textFieldExpression class = "java.lang.String">
-               <![CDATA[$P{ReportTitle}]]>
-            </textFieldExpression>
-				
-            <anchorNameExpression>
-               <![CDATA["Title"]]>
-            </anchorNameExpression>
-         </textField>
-         
-         <textField isBlankWhenNull = "true">
-            <reportElement  x = "0" y = "40" width = "515" height = "20"/>
-            
-            <textElement textAlignment = "Center">
-               <font size = "10"/>
-            </textElement>
-            
-            <textFieldExpression class = "java.lang.String">
-               <![CDATA[$P{Author}]]>
-            </textFieldExpression>
-         </textField>
-      
-      </band>
-   </title>
-
-   <columnHeader>
-      <band height = "23">
-         
-         <staticText>
-            <reportElement x = "414" y = "3" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font isBold = "true" />
-            </textElement>
-            
-            <text>
-               <![CDATA[File Name]]>
-            </text>
-         </staticText>
-         
-         <staticText>
-            <reportElement x = "0" y = "3" width = "136" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font isBold = "true" />
-            </textElement>
-            
-            <text><![CDATA[Country]]></text>
-         </staticText>
-         
-         <staticText>
-            <reportElement x = "414" y = "3" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font isBold = "true" />
-            </textElement>
-            
-            <text>
-               <![CDATA[Threshold]]>
-            </text>
-         </staticText>
-         
-         <staticText>
-            <reportElement x = "414" y = "130" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font isBold = "true" />
-            </textElement>
-            
-            <text>
-               <![CDATA[Prosecutor Records at Risk]]>
-            </text>
-         </staticText>
-         
-         <staticText>
-            <reportElement x = "414" y = "300" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font isBold = "true" />
-            </textElement>
-            
-            <text>
-               <![CDATA[Prosecutor Highest Risk]]>
-            </text>
-         </staticText>
-         
-         <staticText>
-            <reportElement x = "414" y = "230" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font isBold = "true" />
-            </textElement>
-            
-            <text>
-               <![CDATA[Prosecutor Success Rate]]>
-            </text>
-         </staticText>
-         
-         <staticText>
-            <reportElement x = "414" y = "3" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font isBold = "true" />
-            </textElement>
-            
-            <text>
-               <![CDATA[Journalist Records at Risk]]>
-            </text>
-         </staticText>
-         
-         <staticText>
-            <reportElement x = "414" y = "3" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font isBold = "true" />
-            </textElement>
-            
-            <text>
-               <![CDATA[Journalist Highest Risk]]>
-            </text>
-         </staticText>
-         
-         <staticText>
-            <reportElement x = "414" y = "3" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font isBold = "true" />
-            </textElement>
-            
-            <text>
-               <![CDATA[Journalist Success Rate]]>
-            </text>
-         </staticText>
-         
-         <staticText>
-            <reportElement x = "414" y = "3" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font isBold = "true" />
-            </textElement>
-            
-            <text>
-               <![CDATA[Marketer Records at Risk]]>
-            </text>
-         </staticText>
-         
-         <staticText>
-            <reportElement x = "414" y = "3" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font isBold = "true" />
-            </textElement>
-            
-            <text>
-               <![CDATA[Information Loss]]>
-            </text>
-         </staticText>
-      
-      </band>
-   </columnHeader>
-
-   <detail>
-      <band height = "16">
-         
-         <textField>
-            <reportElement x = "414" y = "0" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font size = "9" />
-            </textElement>
-            
-            <textFieldExpression class = "java.lang.String">
-               <![CDATA[$F{fileName}]]>
-            </textFieldExpression>
-         </textField>
-         
-         <textField>
-            <reportElement x = "0" y = "0" width = "136" height = "15" />
-            <textElement textAlignment = "Center" verticalAlignment = "Middle" />
-            
-            <textFieldExpression class = "java.lang.String">
-               <![CDATA[$F{country}]]>
-            </textFieldExpression>
-         </textField>
-         
-         <textField>
-            <reportElement x = "414" y = "0" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font size = "9" />
-            </textElement>
-            
-            <textFieldExpression class = "java.lang.String">
-               <![CDATA[$F{threshold}]]>
-            </textFieldExpression>
-         </textField>
-         
-         <textField>
-            <reportElement x = "414" y = "0" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font size = "9" />
-            </textElement>
-            
-            <textFieldExpression class = "java.lang.String">
-               <![CDATA[$F{prosecutorRecordsAtRisk}]]>
-            </textFieldExpression>
-         </textField>
-         
-         <textField>
-            <reportElement x = "414" y = "0" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font size = "9" />
-            </textElement>
-            
-            <textFieldExpression class = "java.lang.String">
-               <![CDATA[$F{prosecutorHighestRisk}]]>
-            </textFieldExpression>
-         </textField>
-         
-         <textField>
-            <reportElement x = "414" y = "0" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font size = "9" />
-            </textElement>
-            
-            <textFieldExpression class = "java.lang.String">
-               <![CDATA[$F{prosecutorSuccessRate}]]>
-            </textFieldExpression>
-         </textField>
-
-		 <textField>
-            <reportElement x = "414" y = "0" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font size = "9" />
-            </textElement>
-            
-            <textFieldExpression class = "java.lang.String">
-               <![CDATA[$F{journalistRecordsAtRisk}]]>
-            </textFieldExpression>
-         </textField>
-         
-         <textField>
-            <reportElement x = "414" y = "0" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font size = "9" />
-            </textElement>
-            
-            <textFieldExpression class = "java.lang.String">
-               <![CDATA[$F{journalistHighestRisk}]]>
-            </textFieldExpression>
-         </textField>
-         
-         <textField>
-            <reportElement x = "414" y = "0" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font size = "9" />
-            </textElement>
-            
-            <textFieldExpression class = "java.lang.String">
-               <![CDATA[$F{journalistSuccessRate}]]>
-            </textFieldExpression>
-         </textField>
-         
-         <textField>
-            <reportElement x = "414" y = "0" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font size = "9" />
-            </textElement>
-            
-            <textFieldExpression class = "java.lang.String">
-               <![CDATA[$F{marketerStat}]]>
-            </textFieldExpression>
-         </textField>
-         
-         <textField>
-            <reportElement x = "414" y = "0" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font size = "9" />
-            </textElement>
-            
-            <textFieldExpression class = "java.lang.String">
-               <![CDATA[$F{informationLoss}]]>
-            </textFieldExpression>
-         </textField>
-         
-         <textField>
-            <reportElement x = "414" y = "0" width = "121" height = "15" />
-            
-            <textElement textAlignment = "Center" verticalAlignment = "Middle">
-               <font size = "9" />
-            </textElement>
-            
-            <textFieldExpression class = "java.lang.String">
-               <![CDATA[$F{timeTaken}]]>
-            </textFieldExpression>
-         </textField>
-      </band>
-   </detail>
-	
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="anonReport" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="50" bottomMargin="50" uuid="ff9475c3-6b8e-41a2-a90f-41a7e942208d">
+	<parameter name="ReportTitle" class="java.lang.String"/>
+	<parameter name="Author" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="fileName" class="java.lang.String">
+		<fieldDescription><![CDATA[fileName]]></fieldDescription>
+	</field>
+	<field name="country" class="java.lang.String">
+		<fieldDescription><![CDATA[country]]></fieldDescription>
+	</field>
+	<field name="threshold" class="java.lang.String">
+		<fieldDescription><![CDATA[threshold]]></fieldDescription>
+	</field>
+	<field name="prosecutorRecordsAtRisk" class="java.lang.String">
+		<fieldDescription><![CDATA[prosecutorRecordsAtRisk]]></fieldDescription>
+	</field>
+	<field name="prosecutorHighestRisk" class="java.lang.String">
+		<fieldDescription><![CDATA[prosecutorHighestRisk]]></fieldDescription>
+	</field>
+	<field name="prosecutorSuccessRate" class="java.lang.String">
+		<fieldDescription><![CDATA[prosecutorSuccessRate]]></fieldDescription>
+	</field>
+	<field name="journalistRecordsAtRisk" class="java.lang.String">
+		<fieldDescription><![CDATA[journalistRecordsAtRisk]]></fieldDescription>
+	</field>
+	<field name="journalistHighestRisk" class="java.lang.String">
+		<fieldDescription><![CDATA[journalistHighestRisk]]></fieldDescription>
+	</field>
+	<field name="journalistSuccessRate" class="java.lang.String">
+		<fieldDescription><![CDATA[journalistSuccessRate]]></fieldDescription>
+	</field>
+	<field name="marketerStat" class="java.lang.String">
+		<fieldDescription><![CDATA[marketerStat]]></fieldDescription>
+	</field>
+	<field name="informationLoss" class="java.lang.String">
+		<fieldDescription><![CDATA[informationLoss]]></fieldDescription>
+	</field>
+	<field name="timeTaken" class="java.lang.String">
+		<fieldDescription><![CDATA[timeTaken]]></fieldDescription>
+	</field>
+	<title>
+		<band height="70">
+			<line>
+				<reportElement x="0" y="0" width="515" height="1" uuid="c6b662c2-bf10-4cf8-8fb9-ca50d95a4f0c"/>
+			</line>
+			<textField isBlankWhenNull="true" bookmarkLevel="1">
+				<reportElement x="0" y="10" width="515" height="30" uuid="18e45e58-be86-4fa8-b09f-39d698f8d859"/>
+				<textElement textAlignment="Center">
+					<font size="22"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{ReportTitle}]]></textFieldExpression>
+				<anchorNameExpression><![CDATA["Title"]]></anchorNameExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="40" width="515" height="20" uuid="db481787-482b-4e26-a43d-52e552ea14d7"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{Author}]]></textFieldExpression>
+				<anchorNameExpression><![CDATA["Author"]]></anchorNameExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="23">
+			<staticText>
+				<reportElement x="414" y="3" width="121" height="15" uuid="ac727e63-ece1-4c1f-96cd-2743cadbd1a8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[
+               File Name
+            ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="3" width="136" height="15" uuid="89c09127-8d41-4548-bd68-e2203c705d95"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Country]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="414" y="3" width="121" height="15" uuid="f706766a-99b9-4d28-b879-ec2dde06fa62"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[
+               Threshold
+            ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="414" y="130" width="121" height="15" uuid="07fc233e-f2e0-4413-981e-f94535f8876f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[
+               Prosecutor Records at Risk
+            ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="414" y="300" width="121" height="15" uuid="44ee4dc9-df65-4fda-a146-5d8694c8246d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[
+               Prosecutor Highest Risk
+            ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="414" y="230" width="121" height="15" uuid="f39f6447-2c3d-4f73-b083-9cedfc5a5223"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[
+               Prosecutor Success Rate
+            ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="414" y="3" width="121" height="15" uuid="f44b19a6-ca46-4d90-96d0-6d951a38f5b5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[
+               Journalist Records at Risk
+            ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="414" y="3" width="121" height="15" uuid="d8bd2b40-7a47-4c0f-8ba0-f14cb03fa7df"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[
+               Journalist Highest Risk
+            ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="414" y="3" width="121" height="15" uuid="34150753-e554-4d5c-9460-3de6b3afb133"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[
+               Journalist Success Rate
+            ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="414" y="3" width="121" height="15" uuid="1834692f-d5a1-4d22-8e4c-ba935327df13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[
+               Marketer Records at Risk
+            ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="414" y="3" width="121" height="15" uuid="c653c8df-65c9-46ce-982d-8e67c1e74fba"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[
+               Information Loss
+            ]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16">
+			<textField>
+				<reportElement x="414" y="0" width="121" height="15" uuid="7311279d-6383-423c-ab89-04d43d5f7ed7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{fileName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="136" height="15" uuid="5e9b4837-95e6-4232-9885-44cb3b37410e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{country}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="414" y="0" width="121" height="15" uuid="be0b6c8b-a516-4d06-b979-d8e32fce998d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{threshold}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="414" y="0" width="121" height="15" uuid="5790f5ce-38be-4de5-8f52-e2b084941f00"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{prosecutorRecordsAtRisk}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="414" y="0" width="121" height="15" uuid="df77c41f-da40-4908-83f4-dacbe8d9b316"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{prosecutorHighestRisk}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="414" y="0" width="121" height="15" uuid="c51127f6-5b1f-424c-bca5-bfc3748556a0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{prosecutorSuccessRate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="414" y="0" width="121" height="15" uuid="400edf34-252a-4e95-815b-56a4b4e20bff"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{journalistRecordsAtRisk}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="414" y="0" width="121" height="15" uuid="625c0772-098f-4cc3-9939-020d6cc29289"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{journalistHighestRisk}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="414" y="0" width="121" height="15" uuid="4c7811b8-c761-45d4-a9ef-54d2d4300311"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{journalistSuccessRate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="414" y="0" width="121" height="15" uuid="816de70b-df88-4177-bde5-24fa44d2fb8d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{marketerStat}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="414" y="0" width="121" height="15" uuid="21f6969b-600b-4fa9-9f56-f484558ad34a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{informationLoss}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="414" y="0" width="121" height="15" uuid="5ea4a06e-ea1a-4963-9201-0ea2869f7917"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{timeTaken}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
 </jasperReport>
