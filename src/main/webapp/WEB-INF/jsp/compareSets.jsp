@@ -26,77 +26,6 @@
   background-color: DarkGreen;
 }
 
-.tooltip {
-    position: relative;
-    display: inline-block;
-    border-bottom: 1px dotted black;
-}
-
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: 400px;
-    background-color: #555;
-    color: #fff;
-    text-align: left;
-    border-radius: 6px;
-    padding: 5px 0;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -200px;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.tooltip .tooltiptext::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #555 transparent transparent transparent;
-}
-
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-}
-
-.tooltip .tooltiptext1 {
-    visibility: hidden;
-    width: 400px;
-    background-color: #555;
-    color: #fff;
-    text-align: left;
-    border-radius: 6px;
-    padding: 5px 0;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -200px;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.tooltip .tooltiptext1::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #555 transparent transparent transparent;
-}
-
-.tooltip:hover .tooltiptext1 {
-    visibility: visible;
-    opacity: 1;
-}
 </style>
 <title>Compare Sets</title>
 </head>
@@ -163,16 +92,16 @@
 			<input type="submit" class="button" value="Go To Risk Assessment"/> 
 		</form><br><br><br>
 		<button id="deleteDAH" class="button" >Delete Data and Hierarchies</button>
-		<div class="tooltip">&#10068;<br>
-				<span class="tooltiptext">
+		<div class="tooltipcompSets">&#10068;<br>
+				<span class="tooltiptext2">
 				  	This option is provided to adhere to the General Data Protection Regulation.<br> 
 				  	Clicking allows you to explicitly delete all content associated with your anonymization.<br>
 				  	This is also automatically performed when you download your new data file.
 				</span>
 		</div><br><br>
 			<a href="/downloadAnonymizedFile" class="button">Download Anonymized Data</a>
-			<div class="tooltip">&#10068;
-				<span class="tooltiptext1">
+			<div class="tooltipcompSets">&#10068;
+				<span class="tooltiptext3">
 				  	Note that for your data's security, and to comply with the General Data Protection Regulation<br>
 				  	Pressing this button concludes your service, and once your anonymized file is downloaded<br>
 				  	to your machine, all data you have uploaded for this transaction will be erased from the application

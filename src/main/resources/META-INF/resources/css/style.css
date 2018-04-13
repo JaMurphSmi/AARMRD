@@ -258,6 +258,79 @@ For needHierarchies.jsp
 /* ==================================================
 For compareSet.jsp
 =================================================== */
+.tooltipcompSets {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltipcompSets .tooltiptext2 {
+    visibility: hidden;
+    width: 400px;
+    background-color: #555;
+    color: #fff;
+    text-align: left;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -200px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltipcompSets .tooltiptext2::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.tooltipcompSets:hover .tooltiptext2 {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltipcompSets .tooltiptext3 {
+    visibility: hidden;
+    width: 400px;
+    background-color: #555;
+    color: #fff;
+    text-align: left;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -200px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltipcompSets .tooltiptext3::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.tooltipcompSets:hover .tooltiptext3 {
+    visibility: visible;
+    opacity: 1;
+}
+
+
 
 /* ==================================================
 For showRisks.jsp
@@ -326,12 +399,13 @@ For showRisks.jsp
 } 
 #setRiskDetails {
 	border-style:ridge;
-	border-color:green;
+	border-color:#000097;
 	float:left;
 	margin-left:100px;
 	margin-top:50px;
 	padding: 25px 25px 25px 25px;
 	max-width:550px;
+	overflow:visible;
 }
 #theRiskyDiv {
 	float:center;
@@ -343,41 +417,31 @@ For showRisks.jsp
 #riskGraphDiv {
 	width:1455px;
 }
-#riskInnerDivLeft {
-	border-color:green;
-	margin-left:50px;
+.riskInnerDivFreqTable {
 	float:left;
-	width:700px;
-	overflow:hidden;
-}
-#riskInnerDivLeftItem {
-	float:left;
-	width:700px;
-	overflow:hidden;
-}
-#riskInnerDivFreqTable {
-	float:left;
-	width:225px;
+	width:230px;
 	overflow:auto;
 }
-#riskTable {
-	float: left;
-}
-#riskDistributionGraph {
+.riskTable {
+	width:225px;
 	float:left;
 }
+#riskInnerDivLeft {
+	float:left;
+	width:700px;
+	overflow:hidden;
+}
 #riskInnerDivRight {
-	 border-color:green;
 	 float:left;
 	 width:700px;
 	 overflow:hidden;
 }
-#riskInnerDivRightItem {
+.riskInnerDivItem {
 	float:left;
 	width:700px;
 	overflow:hidden;
 }
-#riskInnerDivFreqTable
+
 /* ==================================================
 For error.jsp
 =================================================== */

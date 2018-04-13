@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="anonReport" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="50" bottomMargin="50" uuid="ff9475c3-6b8e-41a2-a90f-41a7e942208d">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<parameter name="ReportTitle" class="java.lang.String"/>
 	<parameter name="Author" class="java.lang.String"/>
 	<queryString>
@@ -43,7 +44,7 @@
 		<fieldDescription><![CDATA[timeTaken]]></fieldDescription>
 	</field>
 	<title>
-		<band height="70">
+		<band height="96">
 			<line>
 				<reportElement x="0" y="0" width="515" height="1" uuid="c6b662c2-bf10-4cf8-8fb9-ca50d95a4f0c"/>
 			</line>
@@ -63,193 +64,180 @@
 				<textFieldExpression><![CDATA[$P{Author}]]></textFieldExpression>
 				<anchorNameExpression><![CDATA["Author"]]></anchorNameExpression>
 			</textField>
+			<image>
+				<reportElement x="50" y="0" width="50" height="81" uuid="85356c8f-9b27-4ff3-abff-ab66321e11a0"/>
+				<imageExpression><![CDATA["C:/Users/jakem/eclipse-workspace/AnonymizationApp/src/main/resources/AARMRD_3.png"]]></imageExpression>
+			</image>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="440" y="10" width="131" height="31" uuid="b128c77e-c3fd-4615-bcba-55569789a8eb"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<columnHeader>
-		<band height="23">
+		<band height="225">
 			<staticText>
-				<reportElement x="414" y="3" width="121" height="15" uuid="ac727e63-ece1-4c1f-96cd-2743cadbd1a8"/>
+				<reportElement x="0" y="60" width="136" height="15" uuid="89c09127-8d41-4548-bd68-e2203c705d95"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[
-               File Name
-            ]]></text>
+				<text><![CDATA[Country:]]></text>
 			</staticText>
-			<staticText>
-				<reportElement x="0" y="3" width="136" height="15" uuid="89c09127-8d41-4548-bd68-e2203c705d95"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Country]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="414" y="3" width="121" height="15" uuid="f706766a-99b9-4d28-b879-ec2dde06fa62"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[
-               Threshold
-            ]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="414" y="130" width="121" height="15" uuid="07fc233e-f2e0-4413-981e-f94535f8876f"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[
-               Prosecutor Records at Risk
-            ]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="414" y="300" width="121" height="15" uuid="44ee4dc9-df65-4fda-a146-5d8694c8246d"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[
-               Prosecutor Highest Risk
-            ]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="414" y="230" width="121" height="15" uuid="f39f6447-2c3d-4f73-b083-9cedfc5a5223"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[
-               Prosecutor Success Rate
-            ]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="414" y="3" width="121" height="15" uuid="f44b19a6-ca46-4d90-96d0-6d951a38f5b5"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[
-               Journalist Records at Risk
-            ]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="414" y="3" width="121" height="15" uuid="d8bd2b40-7a47-4c0f-8ba0-f14cb03fa7df"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[
-               Journalist Highest Risk
-            ]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="414" y="3" width="121" height="15" uuid="34150753-e554-4d5c-9460-3de6b3afb133"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[
-               Journalist Success Rate
-            ]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="414" y="3" width="121" height="15" uuid="1834692f-d5a1-4d22-8e4c-ba935327df13"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[
-               Marketer Records at Risk
-            ]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="414" y="3" width="121" height="15" uuid="c653c8df-65c9-46ce-982d-8e67c1e74fba"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[
-               Information Loss
-            ]]></text>
-			</staticText>
-		</band>
-	</columnHeader>
-	<detail>
-		<band height="16">
 			<textField>
-				<reportElement x="414" y="0" width="121" height="15" uuid="7311279d-6383-423c-ab89-04d43d5f7ed7"/>
+				<reportElement x="80" y="30" width="121" height="15" uuid="5ea4a06e-ea1a-4963-9201-0ea2869f7917"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{fileName}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{timeTaken}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="0" width="136" height="15" uuid="5e9b4837-95e6-4232-9885-44cb3b37410e"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{country}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="414" y="0" width="121" height="15" uuid="be0b6c8b-a516-4d06-b979-d8e32fce998d"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{threshold}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="414" y="0" width="121" height="15" uuid="5790f5ce-38be-4de5-8f52-e2b084941f00"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{prosecutorRecordsAtRisk}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="414" y="0" width="121" height="15" uuid="df77c41f-da40-4908-83f4-dacbe8d9b316"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{prosecutorHighestRisk}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="414" y="0" width="121" height="15" uuid="c51127f6-5b1f-424c-bca5-bfc3748556a0"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{prosecutorSuccessRate}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="414" y="0" width="121" height="15" uuid="400edf34-252a-4e95-815b-56a4b4e20bff"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{journalistRecordsAtRisk}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="414" y="0" width="121" height="15" uuid="625c0772-098f-4cc3-9939-020d6cc29289"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{journalistHighestRisk}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="414" y="0" width="121" height="15" uuid="4c7811b8-c761-45d4-a9ef-54d2d4300311"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{journalistSuccessRate}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="414" y="0" width="121" height="15" uuid="816de70b-df88-4177-bde5-24fa44d2fb8d"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{marketerStat}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="414" y="0" width="121" height="15" uuid="21f6969b-600b-4fa9-9f56-f484558ad34a"/>
+				<reportElement x="320" y="30" width="121" height="15" uuid="21f6969b-600b-4fa9-9f56-f484558ad34a"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{informationLoss}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="414" y="0" width="121" height="15" uuid="5ea4a06e-ea1a-4963-9201-0ea2869f7917"/>
+				<reportElement x="369" y="180" width="121" height="15" uuid="816de70b-df88-4177-bde5-24fa44d2fb8d"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{timeTaken}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{marketerStat}]]></textFieldExpression>
 			</textField>
+			<textField>
+				<reportElement x="258" y="180" width="121" height="15" uuid="4c7811b8-c761-45d4-a9ef-54d2d4300311"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{journalistSuccessRate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="258" y="160" width="121" height="15" uuid="625c0772-098f-4cc3-9939-020d6cc29289"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{journalistHighestRisk}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="260" y="140" width="121" height="15" uuid="400edf34-252a-4e95-815b-56a4b4e20bff"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{journalistRecordsAtRisk}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="180" width="121" height="15" uuid="c51127f6-5b1f-424c-bca5-bfc3748556a0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{prosecutorSuccessRate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="160" width="121" height="15" uuid="df77c41f-da40-4908-83f4-dacbe8d9b316"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{prosecutorHighestRisk}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="118" y="140" width="121" height="15" uuid="5790f5ce-38be-4de5-8f52-e2b084941f00"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{prosecutorRecordsAtRisk}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="310" y="60" width="121" height="15" uuid="be0b6c8b-a516-4d06-b979-d8e32fce998d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{threshold}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="140" y="0" width="121" height="15" uuid="7311279d-6383-423c-ab89-04d43d5f7ed7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{fileName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="70" y="60" width="136" height="15" uuid="5e9b4837-95e6-4232-9885-44cb3b37410e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{country}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="136" height="15" uuid="2d5731b0-43c7-4e54-90c2-72a0692fe85e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[File Name:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="30" width="136" height="15" uuid="e4794875-6109-4a66-a48d-8896fc9b2706"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Time Taken:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="210" y="30" width="136" height="15" uuid="db3b7302-37ad-4b68-be29-62fead084706"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Information Loss:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="210" y="60" width="136" height="15" uuid="3c7b108a-cab6-43a7-80f5-fee9285855a6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Threshold Risk:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="115" width="136" height="15" uuid="90f3908f-a778-4ff2-8a75-4dd8992919a5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Prosecutor ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="250" y="115" width="136" height="15" uuid="47db5962-7e17-4d76-a9db-359253f15f07"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Journalist]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="361" y="115" width="136" height="15" uuid="150f9da5-0d2c-461f-9151-e3c435d2254d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Marketer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-18" y="140" width="136" height="15" uuid="8e98a796-f503-4a07-89c9-8333f7acace1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Records at Risk]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-20" y="160" width="136" height="15" uuid="45fe0459-0243-464e-b28d-c10a7d3ef680"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Highest Risk]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-18" y="180" width="136" height="15" uuid="e20cbaa8-a987-44fc-a1c4-51d8ae8b4f85"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Success Rate]]></text>
+			</staticText>
 		</band>
+	</columnHeader>
+	<detail>
+		<band height="183"/>
 	</detail>
 </jasperReport>

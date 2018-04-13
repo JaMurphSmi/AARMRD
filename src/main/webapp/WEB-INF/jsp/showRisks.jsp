@@ -18,54 +18,54 @@
  <div style="z-index: 10;position: absolute;right: 30px;top: 0px;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
 	<h1>Review Risk Metrics</h1><br>
   	<hr>
-	<div style="overflow:hidden;">
-		<div style="float:left;margin-left: 100px;max-width:550px;height:400px;overflow:auto;">
-				<table id="tablesR">
-					<tr>
-						<c:forEach items="${headerRow}" var="head"><!-- maybe add a percentage column? -->
-							<th id="thsR" align="center">
-								${head}
-							</th>
-						</c:forEach>
-					</tr>
-					    <c:forEach items="${anonyRows}" var="anonRow">
-						    <tr>
-						    	<c:forEach items="${anonRow}" var="anonItem">
-								    <td id="tdsR" align="center">
-								       	${anonItem}     
-								    </td>
-								</c:forEach>    
-						    </tr>
-					    </c:forEach>
-				</table>
+  	<div style="overflow:hidden;">
+			<div style="float:left;margin-left: 100px;max-width:550px;height:400px;overflow:auto;">
+					<table id="tablesR">
+						<tr>
+							<c:forEach items="${headerRow}" var="head"><!-- maybe add a percentage column? -->
+								<th id="thsR" align="center">
+									${head}
+								</th>
+							</c:forEach>
+						</tr>
+						    <c:forEach items="${anonyRows}" var="anonRow">
+							    <tr>
+							    	<c:forEach items="${anonRow}" var="anonItem">
+									    <td id="tdsR" align="center">
+									       	${anonItem}     
+									    </td>
+									</c:forEach>    
+							    </tr>
+						    </c:forEach>
+					</table>
+			</div>
+			<div id="setRiskDetails">
+				<h3>Set your Risk Assessment Details</h3>			
+				<form action="/analyseRisks" method="POST">
+					<label for="populationRegion">Select Region : </label>
+						<select name="populationRegion">
+							<c:forEach items="${countries}" var="country">
+								<option value="${country}">${country}</option>
+							</c:forEach>
+						</select>
+					<label for="THRESHOLD">Threshold : </label>
+						<input name="THRESHOLD" id="THRESHOLD" type="number" min="0" max="1" step="0.01"/>
+						<div class="tooltipsR">&#10068;
+				  			<span class="tooltiptext">
+				  			This page measures percentage risk of your dataset<br>
+				  			The country selection box denotes the region that you are testing against<br>
+				  			The threshold is the percentage risk that a record must not surpass, begins at 0, max 1(100%). ie threshold set to 0.5(50%)<br>
+				  			success if 47%, failure if 53%. It is to allow the user to control the risk posed to their records.
+				  			</span>
+						</div>
+						<br><br>
+						<input type="submit" class="buttonsR" value="Submit Your Files">
+				</form><br><br>
+				<form action="/returnSender" method="post">
+					<input type="submit" class="buttonsR" value="Return to Comparison"/> 
+				</form>
+			</div>
 		</div>
-		<div id="setRiskDetails">
-			<h3>Set your Risk Assessment Details</h3>			
-			<form action="/analyseRisks" method="POST">
-				<label for="populationRegion">Select Region : </label>
-					<select name="populationRegion">
-						<c:forEach items="${countries}" var="country">
-							<option value="${country}">${country}</option>
-						</c:forEach>
-					</select>
-				<label for="THRESHOLD">Threshold : </label>
-					<input name="THRESHOLD" id="THRESHOLD" type="number" min="0" max="1" step="0.01"/>
-					<div class="tooltip">&#10068;
-			  			<span class="tooltiptext">
-			  			This page measures percentage risk of your dataset<br>
-			  			The country selection box denotes the region that you are testing against<br>
-			  			The threshold is the percentage risk that a record must not surpass, begins at 0, max 1(100%). ie threshold set to 0.5(50%)<br>
-			  			success if 47%, failure if 53%. It is to allow the user to control the risk posed to their records.
-			  			</span>
-					</div>
-					<br><br>
-					<input type="submit" class="buttonsR" value="Submit Your Files">
-			</form><br><br>
-			<form action="/returnSender" method="post">
-				<input type="submit" class="buttonsR" value="Return to Comparison"/> 
-			</form>
-		</div>
-	</div>
 <div>
 	<c:if test="${not empty riskObject}">
 		<div id="theRiskyDiv">
@@ -78,7 +78,7 @@
 				</c:if>
 				<c:if test="${not empty riskObject.prosecutorStats && not empty riskObject.journalistStats && not empty riskObject.marketerStat}">
 					<h4>Attacker Models Statistics</h4> <br><br>
-					<table style="float: left;">
+					<table style="float:left;">
 						<tr>
 							<th></th>
 							<th>Prosecutor Attack Model</th>
@@ -106,7 +106,7 @@
 					</table>
 				</c:if>
 			</div>
-				<br><br><br>
+				<br><br><br><br><br><br>
 				<!-- from here down is all risk metrics -->
 				<c:if test="${not empty riskObject.dataSetInputDistributionMetrics && not empty riskObject.dataSetOutputDistributionMetrics}">
 					<div id="riskGraphDiv" align="center">
@@ -114,9 +114,9 @@
 							Input Data Set Value Distribution Statistics <br><br>
 							<!-- make the whole table in a loop? --> 
 							<c:forEach items="${riskObject.dataSetInputDistributionMetrics}" var="inputMapEntry">
-								<div id="riskInnerDivLeftItem">
-									<div id="riskInnerDivFreqTable">
-										<table id="riskTable">
+								<div class="riskInnerDivItem">
+									<div class="riskInnerDivFreqTable">
+										<table class="riskTable">
 											<tr>
 												<th colspan="2"><c:out value="${inputMapEntry.key}"/></th>
 											</tr>
@@ -140,23 +140,23 @@
 						<div id="riskInnerDivRight">
 							 Output Data Set Value Distribution Statistics <br><br>
 							<c:forEach items="${riskObject.dataSetOutputDistributionMetrics}" var="outputMapEntry">
-								<div id="riskInnerDivRightItem">
-									<div id="riskInnerDivFreqTable">
-									<table id="riskTable">
-										<tr>
-											<th colspan="2"><c:out value="${outputMapEntry.key}"/></th>
-										</tr>
-										<tr>
-											<td>Value</td>
-											<td>Frequency</td>
-										</tr>
-										<c:forEach items="${outputMapEntry.value}" var="outputMapValueEntry">
+								<div class="riskInnerDivItem">
+									<div class="riskInnerDivFreqTable">
+										<table class="riskTable">
 											<tr>
-												<td><c:out value="${outputMapValueEntry.key}"/></td>
-												<td><c:out value="${outputMapValueEntry.value}%"/></td>
+												<th colspan="2"><c:out value="${outputMapEntry.key}"/></th>
 											</tr>
-										</c:forEach>
-									</table>
+											<tr>
+												<td>Value</td>
+												<td>Frequency</td>
+											</tr>
+											<c:forEach items="${outputMapEntry.value}" var="outputMapValueEntry">
+												<tr>
+													<td><c:out value="${outputMapValueEntry.key}"/></td>
+													<td><c:out value="${outputMapValueEntry.value}%"/></td>
+												</tr>
+											</c:forEach>
+										</table>
 									</div>
 									&nbsp
 									<div style="float:left;" id="${outputMapEntry.key}_1"></div>
