@@ -16,7 +16,7 @@
 <h1>Login</h1>
 <hr>
 	<div class="armedGuard"><img src="https://i.imgur.com/lf2lect.png"/></div>
-  <div align=center>Halt! Before you enter, please let us know who we're dealing with</div>
+  <div align=center><p id="blerb"><strong>Halt! Before you enter, please let us know who we're dealing with</strong></p></div>
   <div class="loginForm">
     <form action="/home" method="post" onsubmit="return validate()">
     	<input name="orgName" type="text" value="Please enter your organization's name" required/>
