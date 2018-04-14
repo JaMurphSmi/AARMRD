@@ -394,6 +394,18 @@ public class AnonymizationController extends AnonymizationBase {
 			}
 			System.out.println("Possibly proved concept?");
 			
+			//creating all AlgorithmObjects and placing into collection for later report use
+			int index = 0;
+			for(String column : headerRow) {
+				AlgorithmObject algObject = new AlgorithmObject(column);
+				
+				algObject.setAlgorithm(modelsChosen[index]);
+				algObject.setValue(String.valueOf(valuesForModels[index]));
+				algObject.setAttributeType(attributesChosen[index]);
+				
+				algorithmStats.add(algObject);
+			}
+			
 			DataHandle handle = sourceData.getHandle();
 			int i = 0;
 			
