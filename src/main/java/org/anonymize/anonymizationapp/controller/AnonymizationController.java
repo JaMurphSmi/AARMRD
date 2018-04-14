@@ -109,6 +109,7 @@ import org.deidentifier.arx.risk.RiskModelPopulationUniqueness.PopulationUniquen
 import org.deidentifier.arx.risk.RiskModelSampleRisks;
 import org.deidentifier.arx.risk.RiskModelSampleSummary;
 import org.deidentifier.arx.risk.RiskModelSampleUniqueness;
+import org.anonymize.anonymizationapp.model.AlgorithmObject;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
 import org.anonymize.anonymizationapp.model.AnonymizationObject;
 import org.anonymize.anonymizationapp.model.AnonymizationReport;
@@ -161,6 +162,7 @@ public class AnonymizationController extends AnonymizationBase {
 			"United Kingdom", "United States"};//countries and regions for risk metrics
 	//also remove from anonymization object
 	private AnonymizationReport anonReport = new AnonymizationReport();
+	private ArrayList<AlgorithmObject> algorithmStats = new ArrayList<AlgorithmObject>();
 	
 	//may restrict all anonymization actions to the anonymization controller? not have multiple controllers?
 	

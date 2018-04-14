@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 //import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-//import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.util.HtmlUtils;
 import org.springframework.validation.BindingResult;
 import org.anonymize.anonymizationapp.dao.ExampleDaoImpl;
 import org.anonymize.anonymizationapp.model.ExampleObject;
@@ -29,12 +30,26 @@ import javax.validation.Valid;
 
 
 @Controller
-public class ReviewController {//potentially for utility AND risk analysis
-	final static Logger logger = LoggerFactory.getLogger(ReviewController.class);
+public class LoginController {//potentially for utility AND risk analysis
+	final static Logger logger = LoggerFactory.getLogger(LoginController.class);
 	@Autowired 
 	ExampleDaoImpl exampleDaoImpl;
 
-   @RequestMapping("/review")
+   @RequestMapping("/home") 
+   public String getDetails(@RequestParam("orgName") String orgName, @RequestParam("empName") String empName,
+		   Model model) {
+	   //using HtmlUtils to clean the user input from login screen, avoid XSS reflection, do not touch
+	   //a db to avoid potential persistent XSS and DOM based also
+	   orgName = HtmlUtils.htmlEscape(orgName);	  
+	   empName = HtmlUtils.htmlEscape(empName);
+	   
+	   
+	   model.addAttribute("orgName", orgName);
+	   model.addAttribute("empName", empName);
+	   return "index";
+   }
+	
+	@RequestMapping("/review")
    public String index(Model model) {
 	   model.addAttribute("revMessage", "This is where the reviews will be placed");
 	   
@@ -52,8 +67,7 @@ public class ReviewController {//potentially for utility AND risk analysis
 	     exampObject.setDateAccessed(new Date());
 	     exampObject.setPhotosSent("Http-dskjn.jeg");   
 	     
-	     //Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	     //model.sendUsername()//how to get the 
+	     
 	     String username = "user1";
 	     exampObject.setUsername(username);
 	     exampObject.setUserIp("180.0.101.126");
