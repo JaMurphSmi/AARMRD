@@ -1,9 +1,16 @@
 function validate() {
-	var name = document.getElementById("name").value;
-	if (name == '') {
-		alert('Please enter a valid name.');
+	var orgName = document.getElementById("orgName").value;
+	var empName = document.getElementById("empName").value;
+	if (orgName == '') {
+		alert('Please enter a valid organization name.');
 		return false;
-	} else {
+	} 
+	else if (empName == '') {
+		alert('Please enter a valid employee name.');
+		return false;
+	}
+	else {
 		return true;
 	}
+	
 }
