@@ -15,7 +15,8 @@
 <body>
 	<div class="americasNextTopDiv"><img src="https://i.imgur.com/DpvFqJW.png"/></div>
   <h1>AARMRD - Homepage</h1><br>
-  <p id="blerb">&nbsp&nbsp&nbsp&nbsp&nbspHello! Let's get started with your data anonymization, please select your data file ( which has a maximum size of 1GB) and your hierarchy file(s) for each field, then submit!</p>
+  <div id="blerbDiv"><p id="blerb">&nbsp&nbsp&nbsp&nbsp&nbspHello <c:out value="${empName}" escapeXml=true/> from <c:out value="${orgName}" escapeXml=true/>! 
+  <br><br>Let's get started with your data anonymization, please select your data file ( which has a maximum size of 1GB) and your hierarchy file(s) for each field, then submit!</p></div>
   <hr>
 	<div align="center" class="inputFile">
 	    <form action="uploadFiles" name="fileForm" method="post" enctype="multipart/form-data">

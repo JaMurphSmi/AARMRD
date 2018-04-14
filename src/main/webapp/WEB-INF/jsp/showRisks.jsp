@@ -69,7 +69,8 @@
 <div>
 	<c:if test="${not empty riskObject}">
 		<div id="theRiskyDiv">
-				<a href="/doJasperReport" class="buttonsR">Generate Report</a><br><br>
+				<button id="makeJasperReport" class="buttonsR" >Generate Report</button>
+				<br><br>
 				<c:if test="${not empty riskObject.threshold}">
 					Threshold Specified : ${riskObject.threshold}		
 				</c:if>
