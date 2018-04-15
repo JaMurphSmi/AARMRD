@@ -35,7 +35,7 @@ public class LoginController {//potentially for utility AND risk analysis
 	@Autowired 
 	ExampleDaoImpl exampleDaoImpl;
 
-   @RequestMapping("/home") 
+   @RequestMapping("/wakeme") 
    public String getDetails(@RequestParam("orgName") String orgName, @RequestParam("empName") String empName,
 		   Model model) {
 	   //using HtmlUtils to clean the user input from login screen, avoid XSS reflection, do not touch

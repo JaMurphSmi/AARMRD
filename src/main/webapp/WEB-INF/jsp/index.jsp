@@ -14,9 +14,9 @@
 </head>
 <body>
 	<div class="americasNextTopDiv"><img src="https://i.imgur.com/DpvFqJW.png"/></div>
-  <h1>AARMRD - Homepage</h1><br>
-  <div id="blerbDiv"><p id="blerb"><strong>&nbsp&nbsp&nbsp&nbsp&nbspHello <c:out value="${empName}" escapeXml=true/> from <c:out value="${orgName}" escapeXml=true/>! 
-  <br><br>Let's get started with your data anonymization, please select your data file ( which has a maximum size of 1GB) and your hierarchy file(s) for each field, then submit!</strong></p></div>
+  <h1>AARMRD - Homepage</h1>
+  <div id="blerbDiv"><p id="blerb"><strong>&nbsp&nbsp&nbsp&nbsp&nbspHello <c:if test="${empName ne null && orgName ne null}"><c:out value="${empName}" escapeXml="true"/> from <c:out value="${orgName}" escapeXml="true"/></c:if>!
+  <br>Let's get started with your data anonymization, please select your data file ( which has a maximum size of 1GB) and your hierarchy file(s) for each field, then submit!</strong></p></div>
   <hr>
 	<div align="center" class="inputFile">
 	    <form action="uploadFiles" name="fileForm" method="post" enctype="multipart/form-data">
@@ -42,9 +42,11 @@
 		  		<input type="file" id="hierFiles" name="hierFiles" class="inputForFile inputForFile2" data-multiple-caption="{count} files selected" multiple="multiple">
 		  		<label for="hierFiles"><span id="hierSpan">Choose hierarchy file(s)</span></label>
 		  	</div>
+		  	<input type="hidden" name="${_csrf.parameterName}"
+				value="${_csrf.token}" />
 		  	<br>
 		  	<br>
-		  	<button type="submit" id="formSubmitButton" value="Submit Your Files">Submit</button>
+		  	<button type="submit" class="formSubmitButton" value="Submit Your Files">Submit</button>
 		  	<!-- Had to remove the 'form' attribute from the button above to make it work -->
 	    </form>
 	    <br>

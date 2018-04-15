@@ -35,8 +35,7 @@ For login.jsp
 #auto margin both sides to assure centering on a variety of screen sizes
 =================================================== */
 .armedGuard {
-	margin-left:auto;
-    margin-right:auto;
+	margin-left: 48%;
 }
 
 .loginForm {
@@ -160,7 +159,7 @@ For index.jsp
 .inputForFile2 + label * {
 	pointer-events: none;
 }
-#formSubmitButton {
+.formSubmitButton {
   background: #3193d4;
   background-image: -webkit-linear-gradient(top, #3193d4, #2277ab);
   background-image: -moz-linear-gradient(top, #3193d4, #2277ab);
@@ -173,11 +172,11 @@ For index.jsp
   font-family: Arial;
   color: #ffffff;
   font-size: 20px;
-  padding: 10px 20px 10px 20px;
+  padding: 5px 5px 5px 5px;
   text-decoration: none;
 }
 
-#formSubmitButton:hover {
+.formSubmitButton:hover {
   background: #3cb0fd;
   background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
   background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
@@ -204,11 +203,13 @@ For setAnonDetails.jsp
 .tooltipsAD .tooltiptext {
     visibility: hidden;
     width: 650px;
-    background-color: #555;
+    background-color: #2c2ca0;
     color: #fff;
     text-align: left;
     border-radius: 6px;
-    padding: 5px 0;
+    border-width: 2px;
+    border-style: solid;
+    padding: 5px 5px 5px 5px;
     position: absolute;
     z-index: 1;
     bottom: 125%;
@@ -226,7 +227,7 @@ For setAnonDetails.jsp
     margin-left: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: #555 transparent transparent transparent;
+    border-color: #2c2ca0 transparent transparent transparent;
 }
 
 .tooltipsAD:hover .tooltiptext {
@@ -295,6 +296,8 @@ For compareSet.jsp
     color: #fff;
     text-align: left;
     border-radius: 6px;
+    border-width: 2px;
+    border-style: solid;
     padding: 5px 0;
     position: absolute;
     z-index: 1;
@@ -324,10 +327,12 @@ For compareSet.jsp
 .tooltipcompSets .tooltiptext3 {
     visibility: hidden;
     width: 400px;
-    background-color: #555;
+    background-color: #2c2ca0;
     color: #fff;
     text-align: left;
     border-radius: 6px;
+    border-width: 2px;
+    border-style: solid;
     padding: 5px 0;
     position: absolute;
     z-index: 1;
@@ -346,7 +351,7 @@ For compareSet.jsp
     margin-left: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: #555 transparent transparent transparent;
+    border-color: #2c2ca0 transparent transparent transparent;
 }
 
 .tooltipcompSets:hover .tooltiptext3 {
@@ -355,21 +360,49 @@ For compareSet.jsp
 }
 
 
+.button {
+  background-color: ForestGreen;  
+  border-radius: 5px;
+  color: white;
+  padding: .5em;
+  text-decoration: none;
+}
+
+.button:focus,
+.button:hover {
+  background-color: DarkGreen;
+}
+
 
 /* ==================================================
 For showRisks.jsp
 =================================================== */
 .buttonsR {
-	  background-color: ForestGreen;  
-	  border-radius: 5px;
-	  color: white;
-	  padding: .5em;
+	  background: #3193d4;
+	  background-image: -webkit-linear-gradient(top, #3193d4, #2277ab);
+	  background-image: -moz-linear-gradient(top, #3193d4, #2277ab);
+	  background-image: -ms-linear-gradient(top, #3193d4, #2277ab);
+	  background-image: -o-linear-gradient(top, #3193d4, #2277ab);
+	  background-image: linear-gradient(to bottom, #3193d4, #2277ab);
+	  -webkit-border-radius: 6;
+	  -moz-border-radius: 6;
+	  border-radius: 6px;
+	  font-family: Arial;
+	  color: #ffffff;
+	  font-size: 20px;
+	  padding: 5px 5px 5px 5px;
 	  text-decoration: none;
 	}
 
 .buttonsR:focus,
 .buttonsR:hover {
-	background-color: DarkGreen;
+	background: #3cb0fd;
+    background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+    text-decoration: none;
 }
 .tooltipsR {
     position: relative;
@@ -380,11 +413,13 @@ For showRisks.jsp
 .tooltipsR .tooltiptext {
     visibility: hidden;
     width: 400px;
-    background-color: #555;
+    background-color: #2c2ca0;
     color: #fff;
     text-align: left;
     border-radius: 6px;
-    padding: 5px 0;
+    border-width: 2px;
+    border-style: solid;
+    padding: 5px 5px 5px 5px;
     position: absolute;
     z-index: 1;
     bottom: 125%;
@@ -402,7 +437,7 @@ For showRisks.jsp
     margin-left: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: #555 transparent transparent transparent;
+    border-color: #2c2ca0 transparent transparent transparent;
 }
 
 .tooltipsR:hover .tooltiptext {

@@ -83,6 +83,8 @@
 						</form:select>
 						<br><br>
 					</c:forEach>
+					<input type="hidden" name="${_csrf.parameterName}"
+							value="${_csrf.token}" />
 					<input type="submit" value="Submit Your Values"></input>
 				<br><br>
 			</form:form>

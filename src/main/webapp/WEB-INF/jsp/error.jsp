@@ -47,6 +47,8 @@
     </table><br><br>
   <div class="form">
     <form action="/" method="post" onsubmit="return validate()">
+      <input type="hidden" name="${_csrf.parameterName}"
+				value="${_csrf.token}" />
       <table>
         <tr>
           <td>Return to Home</td>

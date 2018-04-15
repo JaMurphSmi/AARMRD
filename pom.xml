@@ -36,47 +36,68 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- JSTL tag lib -->
-    <dependency>
-      <groupId>javax.servlet.jsp.jstl</groupId>
-      <artifactId>javax.servlet.jsp.jstl-api</artifactId>
-      <version>1.2.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>taglibs</groupId>
-      <artifactId>standard</artifactId>
-      <version>1.1.2</version>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
+		
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+		
+		<!-- adding spring boot security to the application -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+  		</dependency>
+	    <dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+	    </dependency>
+	    <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+	    
+		<!-- JSTL tag lib -->
+	    <dependency>
+	      <groupId>javax.servlet.jsp.jstl</groupId>
+	      <artifactId>javax.servlet.jsp.jstl-api</artifactId>
+	      <version>1.2.1</version>
+	    </dependency>
+	
+	    <dependency>
+	      <groupId>taglibs</groupId>
+	      <artifactId>standard</artifactId>
+	      <version>1.1.2</version>
+	    </dependency>
+	    <dependency>
+	        <groupId>org.springframework.boot</groupId>
+	        <artifactId>spring-boot-starter-data-jpa</artifactId>
+	    </dependency>
         
     <!-- newest additions to the pom -->
     
     <dependency>
 	   <groupId>org.springframework</groupId>
 	   <artifactId>spring-context-support</artifactId>
-	   </dependency>
+	</dependency>
     <dependency>
 	   <groupId>org.springframework</groupId>
 	   <artifactId>spring-aop</artifactId>
-	   </dependency>
+	</dependency>
     
     <!-- Dependencies for Hibernate and ORM  -->  
-  <dependency>
-   <groupId>com.h2database</groupId>
-   <artifactId>h2</artifactId>
-      </dependency>
-  <dependency>
-   <groupId>org.springframework</groupId>
-   <artifactId>spring-orm</artifactId>
-   </dependency>
-  <dependency>
-   <groupId>org.hibernate</groupId>
-   <artifactId>hibernate-entitymanager</artifactId>
-   </dependency>
+  	<dependency>
+	   <groupId>com.h2database</groupId>
+	   <artifactId>h2</artifactId>
+    </dependency>
+  	<dependency>
+	   <groupId>org.springframework</groupId>
+	   <artifactId>spring-orm</artifactId>
+    </dependency>
+    <dependency>
+	   <groupId>org.hibernate</groupId>
+	   <artifactId>hibernate-entitymanager</artifactId>
+    </dependency>
   
   <!-- newest additions to the pom file -->
     

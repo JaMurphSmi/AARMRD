@@ -15,7 +15,7 @@
 <title>Risk Metrics</title>
 </head>
 <body>
- <div style="z-index: 10;position: absolute;right: 30px;top: 0px;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
+ <div class="americasNextTopDiv"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
 	<h1>Review Risk Metrics</h1><br>
   	<hr>
   	<div style="overflow:hidden;">
@@ -58,10 +58,14 @@
 				  			success if 47%, failure if 53%. It is to allow the user to control the risk posed to their records.
 				  			</span>
 						</div>
+						<input type="hidden" name="${_csrf.parameterName}"
+								value="${_csrf.token}" />
 						<br><br>
 						<input type="submit" class="buttonsR" value="Submit Your Files">
 				</form><br><br>
 				<form action="/returnSender" method="post">
+					<input type="hidden" name="${_csrf.parameterName}"
+							value="${_csrf.token}" />
 					<input type="submit" class="buttonsR" value="Return to Comparison"/> 
 				</form>
 			</div>
@@ -69,7 +73,7 @@
 <div>
 	<c:if test="${not empty riskObject}">
 		<div id="theRiskyDiv">
-				<button id="makeJasperReport" class="buttonsR" >Generate Report</button>
+				<button id="generateReport" class="buttonsR" >Generate Risk Report</button>
 				<br><br>
 				<c:if test="${not empty riskObject.threshold}">
 					Threshold Specified : ${riskObject.threshold}		
@@ -169,6 +173,19 @@
 	</c:if>
 </div>	
 <script type="text/javascript">
+$(document).ready(function(){
+	$("#generateReport").click(function(){
+	    $.ajax({
+	        url : 'doJasperReport',
+	        method : 'GET',
+	        async : false,
+	        complete : function(data) {
+	            console.log(data.responseText);
+	        }
+	    });
+	});
+});
+
     // Load the Visualization API and the piechart package.
     google.load('visualization', '1.0', {
         'packages' : [ 'corechart' ]
@@ -237,19 +254,5 @@
     }
     
 </script><!-- need to throw a lot more in here to mould it to correct format -->
-<script>
-$(document).ready(function(){
-	$("#makeJasperReport").click(function(){
-	    $.ajax({
-	        url : 'doJasperReport',
-	        method : 'GET',
-	        async : false,
-	        complete : function(data) {
-	            console.log(data.responseText);
-	        }
-	    });
-	});
-});
-</script>
 </body>
 </html>

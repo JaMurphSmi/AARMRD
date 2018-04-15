@@ -11,22 +11,6 @@
 <link rel="stylesheet" type="text/css" href="css/style.css" />
 <script type="text/javascript" src="js/app.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<style>
-
-.button {
-  background-color: ForestGreen;  
-  border-radius: 5px;
-  color: white;
-  padding: .5em;
-  text-decoration: none;
-}
-
-.button:focus,
-.button:hover {
-  background-color: DarkGreen;
-}
-
-</style>
 <title>Compare Sets</title>
 </head>
 <body style="background-color:#faf6b8;">
@@ -90,8 +74,10 @@
 	<div style="float:left;margin:25px 25px 25px 50px;border:3px solid;border-color:#d5ce66;">
 		<form action="/goToRiskPage" method="post">
 			<input type="submit" class="button" value="Go To Risk Assessment"/> 
+			<input type="hidden" name="${_csrf.parameterName}"
+				value="${_csrf.token}" />
 		</form><br><br><br>
-		<button id="deleteDAH" class="button" >Delete Data and Hierarchies</button>
+		<button id="deleteDAH" class="buttonsR" >Delete Data and Hierarchies</button>
 		<div class="tooltipcompSets">&#10068;<br>
 				<span class="tooltiptext2">
 				  	This option is provided to adhere to the General Data Protection Regulation.<br> 
@@ -99,7 +85,7 @@
 				  	This is also automatically performed when you download your new data file.
 				</span>
 		</div><br><br>
-			<a href="/downloadAnonymizedFile" class="button">Download Anonymized Data</a>
+			<a href="/downloadAnonymizedFile" class="buttonsR">Download Anonymized Data</a>
 			<div class="tooltipcompSets">&#10068;
 				<span class="tooltiptext3">
 				  	Note that for your data's security, and to comply with the General Data Protection Regulation<br>
@@ -107,14 +93,16 @@
 				  	to your machine, all data you have uploaded for this transaction will be erased from the application
 				</span>
 			</div><br><br>
-		  <div class="form">
-		    <form action="/" method="post">
-		      <input id="deleteDAHAF" type="submit" class="button" value="Begin Again/Upload New Files">
+		  <div>
+		    <form action="/home" method="post">
+		      <input id="deleteDAHAF" type="submit" class="buttonsR" value="Begin Again/Upload New Files">
 		    </form>
 		  </div><br><br>
-		  <div class="form">
+		  <div>
 		    <form action="/uploadFiles" method="post">
-		      <input type="submit" class="button" value="Use Original File Again(Hierarchies are saved)">
+		      <input type="submit" id="canBeNullifiedByDelete" class="buttonsR" value="Use Original File Again(Hierarchies are saved)">
+		      <input type="hidden" name="${_csrf.parameterName}"
+				value="${_csrf.token}" />
 		    </form>
 		  </div>
 	</div>

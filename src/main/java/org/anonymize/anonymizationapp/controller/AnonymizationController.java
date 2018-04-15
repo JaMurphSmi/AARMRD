@@ -126,6 +126,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -133,6 +135,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.HtmlUtils;
 
 //hopefully for jasper report
 import net.sf.jasperreports.engine.JRException; 
@@ -166,16 +169,48 @@ public class AnonymizationController extends AnonymizationBase {
 	
 	//may restrict all anonymization actions to the anonymization controller? not have multiple controllers?
 	
+	private final InMemoryUserDetailsManager inMemoryUserDetailsManager;
+	
 	@Autowired
 	private DataAspects dataAspectsHelper;
 
 	@Autowired
 	private PieChartGenerator pieChartGenerator;
 	
+	//preconfig to house a global object of user details for verification
+	@Autowired
+    public AnonymizationController(InMemoryUserDetailsManager inMemoryUserDetailsManager) {
+       this.inMemoryUserDetailsManager = inMemoryUserDetailsManager;
+    }
+	
 	
    @RequestMapping("/")
    public String index() {
-      return "index";
+      return "login";
+   }
+   
+   @RequestMapping("/login")
+   public String login() {
+      return "login";
+   }
+   
+   @RequestMapping("/home") 
+   public String getDetails(@RequestParam(value="orgName", required=false) String orgName, @RequestParam(value="empName", required=false) String empName,
+		   Model model) {
+	   //using HtmlUtils to clean the user input from login screen, avoid XSS reflection, do not touch
+	   //a db to avoid potential persistent XSS and DOM based also
+	   orgName = HtmlUtils.htmlEscape(orgName);	  
+	   empName = HtmlUtils.htmlEscape(empName);
+	   
+	   //orgName will be the shared password between employees in same establishment
+	   //empName will be their unique identifier
+	   if(orgName != null && empName != null) {
+		   inMemoryUserDetailsManager.createUser(User.withUsername(empName).password(orgName).roles("USER").build());
+		   //if the org & emp names are available, add to the model
+		   model.addAttribute("orgName", orgName);
+		   model.addAttribute("empName", empName);
+	   }
+	   return "index";
    }
    
    // will be a page to handle the uploading of files
@@ -405,6 +440,10 @@ public class AnonymizationController extends AnonymizationBase {
 				
 				algorithmStats.add(algObject);
 			}
+			
+			aggregate(new String[]{"xaaa", "xxxbbb", "xxcccc"}, DataType.STRING);
+		    aggregate(new String[]{"1", "2", "5", "11", "12", "3"}, DataType.STRING);
+		    aggregate(new String[]{"1", "2", "5", "11", "12", "3"}, DataType.INTEGER);
 			
 			DataHandle handle = sourceData.getHandle();
 			int i = 0;
@@ -1218,7 +1257,6 @@ public class AnonymizationController extends AnonymizationBase {
        intervalBased();
        orderBased();
        dates();
-       loadStore();
 /// to here seems to be a constant   
        
        aggregate(new String[]{"xaaa", "xxxbbb", "xxcccc"}, DataType.STRING);
@@ -2531,43 +2569,6 @@ public class AnonymizationController extends AnonymizationBase {
        System.out.println("");
    }
    
-   /**
-    * Shows how to load and store hierarchy specifications.
-    */
-   private static void loadStore() {
-       try {
-           HierarchyBuilderRedactionBased<?> builder = HierarchyBuilderRedactionBased.create(Order.RIGHT_TO_LEFT,
-                                                                                             Order.RIGHT_TO_LEFT,
-                                                                                             ' ', '*');
-           builder.save("test.ahs");
-           
-           HierarchyBuilder<?> loaded = HierarchyBuilder.create("test.ahs");
-           if (loaded.getType() == Type.REDACTION_BASED) {
-               
-               builder = (HierarchyBuilderRedactionBased<?>)loaded;
-               
-               System.out.println("-------------------------");
-               System.out.println("REDACTION-BASED HIERARCHY");
-               System.out.println("-------------------------");
-               System.out.println("");
-               System.out.println("SPECIFICATION");
-               
-               // Print info about resulting groups
-               System.out.println("Resulting levels: "+Arrays.toString(builder.prepare(getExampleData())));
-               
-               System.out.println("");
-               System.out.println("RESULT");
-               
-               // Print resulting hierarchy
-               printArray(builder.build().getHierarchy());
-               System.out.println("");
-           } else {
-               System.out.println("Incompatible type of builder");
-           }
-       } catch (IOException e) {
-           e.printStackTrace();
-       }
-   }
    
    /**
     * Exemplifies the use of the order-based builder.
