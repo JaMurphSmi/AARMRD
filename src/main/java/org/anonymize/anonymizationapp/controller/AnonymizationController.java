@@ -921,15 +921,11 @@ public class AnonymizationController extends AnonymizationBase {
 				   e.printStackTrace();
 			   }
 		   }
-		   
-		 //had to throw the anonRep object into an arraylist as the
-		 //JRBeanCollectionDataSource only takes collections each
-		 //object is considered a row, but filled with all info needed
-	      ArrayList<AnonymizationReport> anonRep = new ArrayList<AnonymizationReport>();
+		 
 	      
-	      anonRep.add(anonReport);
+	      //create the data source using the array of field records
 	      JRBeanCollectionDataSource beanColDataSource =
-	      new JRBeanCollectionDataSource(anonRep);
+	      new JRBeanCollectionDataSource(algorithmStats);
 	
 	      Map<String,Object> parameters = new HashMap<String,Object>();
 	      /**
@@ -937,6 +933,17 @@ public class AnonymizationController extends AnonymizationBase {
 	       */
 	      parameters.put("ReportTitle", "Anonymization Risk Report");
 	      parameters.put("Author", "Provided by AARMRD");
+	      parameters.put("fileName", anonReport.getFileName());
+	      parameters.put("timeTaken", anonReport.getTimeTaken());
+	      parameters.put("country", anonReport.getCountry());
+	      parameters.put("informationLoss", anonReport.getInformationLoss());
+	      parameters.put("journalistHighestRisk", anonReport.getJournalistHighestRisk());
+	      parameters.put("journalistRecordsAtRisk", anonReport.getJournalistRecordsAtRisk());
+	      parameters.put("journalistSuccessRate", anonReport.getJournalistSuccessRate());
+	      parameters.put("prosecutorHighestRisk", anonReport.getProsecutorHighestRisk());
+	      parameters.put("prosecutorRecordsAtRisk", anonReport.getProsecutorRecordsAtRisk());
+	      parameters.put("prosecutorSuccessRate", anonReport.getProsecutorSuccessRate());
+	      parameters.put("marketerStat", anonReport.getMarketerStat());
 	      
 	      
 	      if(!new File(jrprintFile).exists()) {
