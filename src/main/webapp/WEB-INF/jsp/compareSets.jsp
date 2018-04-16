@@ -18,21 +18,21 @@
   <h1>Anonymization Results</h1>
 <div style="float:left;height=400px;max-width=1050px;overflow=hidden;">
   	<br>
-  	<c:if test="${not empty errorMessage}"><div>${errorMessage}</div></c:if>
+  	<c:if test="${not empty errorMessage}"><div><p class="yellow">${errorMessage}</p></div></c:if>
 			<table>
 			    <tr>
-			        <td>Data FileName</td>
-			        <td>${fileName}</td>
+			        <td><p class="yellow">Data FileName</p></td>
+			        <td><p class="yellow">${fileName}</p></td>
 			    </tr>
-			    <tr>File contents</tr>
+			    <tr><p class="yellow">File contents</p></tr>
 			</table>
 		<c:if test="${not empty dataRows}">
 		<div style="float:left;margin-left: 100px; max-width:425px;height:400px;overflow:auto;">
 			<table style="border-collapse: collapse;">
 				<tr>
 					<c:forEach items="${headerRow}" var="head">
-						<th align="center" style="width:50px;border:1px solid #ddd;background-color: #e16830;">
-							${head}
+						<th align="center" class="cSDTH">
+							<p class="tableText">${head}</p>
 						</th>
 					</c:forEach>
 				</tr>
@@ -40,7 +40,7 @@
 					    <tr>
 					    	<c:forEach items="${dataRow}" var="dataItem">
 							    <td align="center" style="border:1px solid #d6aa44;">
-							       	${dataItem}     
+							       	<p class="tableText">${dataItem}</p>     
 							    </td>
 							</c:forEach>    
 					    </tr>
@@ -62,7 +62,7 @@
 					<tr>
 						<c:forEach items="${anonyRow}" var="anony">
 							<td align="center" style="border:1px solid #d6aa44;">
-								${anony}
+								<p class="tableText">${anony}</p>
 							</td>
 						</c:forEach>
 					</tr>
@@ -71,9 +71,9 @@
 		</div>
 		</c:if>
 </div>
-	<div style="float:left;margin:25px 25px 25px 50px;border:3px solid;border-color:#d5ce66;">
+	<div style="float:right;margin:25px 25px 25px 50px;padding:10px 10px 10px 10px;border:3px solid;border-color:#d5ce66;">
 		<form action="/goToRiskPage" method="post">
-			<input type="submit" class="button" value="Go To Risk Assessment"/> 
+			<input type="submit" class="buttonsR" value="Go To Risk Assessment"/> 
 			<input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" />
 		</form><br><br><br>
@@ -84,7 +84,7 @@
 				  	Clicking allows you to explicitly delete all content associated with your anonymization.<br>
 				  	This is also automatically performed when you download your new data file.
 				</span>
-		</div><br><br>
+		</div><br>
 			<a href="/downloadAnonymizedFile" class="buttonsR">Download Anonymized Data</a>
 			<div class="tooltipcompSets">&#10068;
 				<span class="tooltiptext3">
@@ -100,7 +100,7 @@
 		  </div><br><br>
 		  <div>
 		    <form action="/uploadFiles" method="post">
-		      <input type="submit" id="canBeNullifiedByDelete" class="buttonsR" value="Use Original File Again(Hierarchies are saved)">
+		      <input type="submit" id="canBeNullifiedByDelete" class="buttonsR" value="Use Same Data Again">
 		      <input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" />
 		    </form>
@@ -117,6 +117,8 @@ $(document).ready(function(){
 	            console.log(data.responseText);
 	        }
 	    });
+	    $("#deleteDAH").prop("disabled",true);
+	    $("#canBeNullifiedByDelete").prop("disabled",true);
 	});
 });
 $(document).ready(function(){

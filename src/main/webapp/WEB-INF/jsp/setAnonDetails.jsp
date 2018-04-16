@@ -30,7 +30,7 @@
 						<tr>
 							<c:forEach items="${headerRow}" var="head">
 								<th id="dataHead" align="center">
-									${head}
+									<p class="tableText">${head}</p>
 								</th>
 							</c:forEach>
 						</tr>
@@ -38,7 +38,7 @@
 							    <tr>
 							    	<c:forEach items="${dataRow}" var="dataItem">
 									    <td id="dataBody" align="center">
-									       	${dataItem}     
+									       	<p class="tableText">${dataItem}</p>     
 									    </td>
 									</c:forEach>    
 							    </tr>
@@ -90,8 +90,5 @@
 			</form:form>
 		</div>
 	</div>
-<script>
-
-</script>
 </body>
 </html>

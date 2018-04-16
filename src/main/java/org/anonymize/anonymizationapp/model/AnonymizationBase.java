@@ -100,7 +100,7 @@ public abstract class AnonymizationBase {
     }
     
     /**
-     * Prints the result.
+     * Prints the ARXResult object.
      *
      * @param result
      * @param data
@@ -126,8 +126,8 @@ public abstract class AnonymizationBase {
         // Initialize
         final StringBuffer[] identifiers = new StringBuffer[qis.size()];
         final StringBuffer[] generalizations = new StringBuffer[qis.size()];
-        int lengthI = 0;
-        int lengthG = 0;
+        int lenIdentifier = 0;
+        int lenGeneralization = 0;
         for (int i = 0; i < qis.size(); i++) {
             identifiers[i] = new StringBuffer();
             generalizations[i] = new StringBuffer();
@@ -135,23 +135,25 @@ public abstract class AnonymizationBase {
             generalizations[i].append(optimum.getGeneralization(qis.get(i)));
             if (data.getDefinition().isHierarchyAvailable(qis.get(i)))
                 generalizations[i].append("/").append(data.getDefinition().getHierarchy(qis.get(i))[0].length - 1);
-            lengthI = Math.max(lengthI, identifiers[i].length());
-            lengthG = Math.max(lengthG, generalizations[i].length());
+            lenIdentifier = Math.max(lenIdentifier, identifiers[i].length());
+            lenGeneralization = Math.max(lenGeneralization, generalizations[i].length());
         }
 
         // Padding
         for (int i = 0; i < qis.size(); i++) {
-            while (identifiers[i].length() < lengthI) {
+            while (identifiers[i].length() < lenIdentifier) {
                 identifiers[i].append(" ");
             }
-            while (generalizations[i].length() < lengthG) {
+            while (generalizations[i].length() < lenGeneralization) {
                 generalizations[i].insert(0, " ");
             }
         }
-        String infoLoss = result.getGlobalOptimum().getLowestScore() + " / " + result.getGlobalOptimum().getHighestScore();
+        String infoLossTotal = result.getGlobalOptimum().getLowestScore() + " / " + result.getGlobalOptimum().getHighestScore();
         // Print
-        System.out.println(" - Information loss: " + infoLoss );
-        stats[1] = infoLoss; 
+        System.out.println(" - Information loss: " + infoLossTotal );
+        String infoLossMinor = result.getGlobalOptimum().getLowestScore() + "";
+        
+        stats[1] = infoLossMinor; 
         System.out.println(" - Optimal generalization");
         for (int i = 0; i < qis.size(); i++) {
             System.out.println("   * " + identifiers[i] + ": " + generalizations[i]);

@@ -29,22 +29,44 @@ h1 {
 #blerb {
 	color: #f4dc24;
 }
+
+.tableText{
+	color: #f4dc24;
+}
 /* ==================================================
 For login.jsp
 #last minute addition
 #auto margin both sides to assure centering on a variety of screen sizes
 =================================================== */
 .armedGuard {
-	margin-left: 48%;
+	margin-left: 47%;
 }
 
 .loginForm {
 	background:rgba(22,22,165,0.5);
-	width: 400px;
-	height: 50px;
+	width: 350px;
+	height: 125px;
+	margin-left: 450px;
 	border-radius: 4px;
 	border-style: ridge;
 	padding: 20px;
+}
+
+.loginSubmit {
+	margin-left:150px;
+}
+
+#blerbDiv {
+	margin-left:150px;	
+	padding-left:50px;
+}
+
+#innerLoginForm {
+	margin-left: 20px;
+}
+
+.text {
+	color: #ffffff;
 }
 
 /* ==================================================
@@ -236,13 +258,14 @@ For setAnonDetails.jsp
 }
 #selectDetails {
 	float:left;
-	margin-left: 100px; 
+	margin-left: 50px; 
 	max-width:550px;
 	height:300px;
 	overflow:hidden;
 }
 #selectDetailsInner {
 	overflow:auto;
+	max-width:548px;
 	height:300px;
 }
 #dataHead {
@@ -283,6 +306,12 @@ For needHierarchies.jsp
 /* ==================================================
 For compareSet.jsp
 =================================================== */
+.cSDTH {
+	width:50px;
+	border:1px solid #ddd;
+	background-color: #e16830;
+}
+
 .tooltipcompSets {
     position: relative;
     display: inline-block;
@@ -377,6 +406,18 @@ For compareSet.jsp
 /* ==================================================
 For showRisks.jsp
 =================================================== */
+.srTh {
+	max-width:50px;
+	border:1px solid #f0f0f0;
+	background-color: #3a99f8;
+}
+
+.srTd {
+	max-width:50px;
+	border:1px solid #d6aa44;
+	background-color: #040797;
+}
+
 .buttonsR {
 	  background: #3193d4;
 	  background-image: -webkit-linear-gradient(top, #3193d4, #2277ab);
@@ -405,8 +446,8 @@ For showRisks.jsp
     text-decoration: none;
 }
 .tooltipsR {
-    position: relative;
-    display: inline-block;
+    position: absolute;
+    right:90px;
     border-bottom: 1px dotted black;
 }
 

@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataAspects{
 	//to create the data and hierarchies in one step	
-	public Data createDataAndHierarchies(final String fileName, final List<String> hierNames) throws IOException {
+	public Data createDataAndHierarchies(final String empOrg, final String fileName, final List<String> hierNames) throws IOException {
 
 		String[] dataNameAndExtension = fileName.split("\\.");
 		String dataset = dataNameAndExtension[0];//format is [dataset name].[extension]
@@ -40,7 +40,7 @@ public class DataAspects{
 		
 		 Data data = DefaultData.create();//create empty object with full scope to satisfy errors
 	       if(extension.equals("csv")) {//to handle csv and excel files
-	    	   data = Data.create("src/main/resources/templates/data/" + fileName, StandardCharsets.UTF_8, ';');
+	    	   data = Data.create("src/main/resources/templates/data/" + empOrg + "/" + fileName, StandardCharsets.UTF_8, ';');
 	       }
 	       /**
 	        * Xls and dbs cannot be used as the sequence of fields in a data set cannot be determined through hierarchy file names anymore
@@ -48,7 +48,7 @@ public class DataAspects{
 	        * ##Another reason is that not all hierarchies may be supplied for the data set
 	        */
 	       else if(extension.equals("xls") || extension.equals("xlsx")) {
-	    	   DataSource dataExcel = DataSource.createExcelSource("src/main/resources/templates/data/" + fileName, 0, true);
+	    	   DataSource dataExcel = DataSource.createExcelSource("src/main/resources/templates/data/" + empOrg + "/" + fileName, 0, true);
 	    	   //need to specify column names in here before casting to type Data, so send field names shaved from
 	    	   System.out.println("Creating the Excel data object");
 	    	   System.out.println("Is it there " + dataExcel.toString());
@@ -74,7 +74,7 @@ public class DataAspects{
 	           }
 	       };
 	       // Create definition, hierarchies will always be .csv
-	       File testDir = new File("src/main/resources/templates/hierarchy/");
+	       File testDir = new File("src/main/resources/templates/hierarchy/" + empOrg + "/");
 	       File[] genHierFiles = testDir.listFiles(hierarchyFilter);
 	       Pattern pattern = Pattern.compile("_hierarchy_(.*?).csv");
 	       for (File file : genHierFiles) {//need to determine how to identify which attributes have no hierarchy supplied
@@ -90,7 +90,7 @@ public class DataAspects{
 	       return data;
 	   }
 	//for db table handling
-	public Data createDataAndHierarchies(final String fileName, final List<String> hierNames, String table) throws IOException, SQLException {
+	public Data createDataAndHierarchies(final String empOrg, final String fileName, final List<String> hierNames, String table) throws IOException, SQLException {
 
 		String[] dataNameAndExtension = fileName.split("\\.");
 		String dataset = dataNameAndExtension[0];//format is [dataset name].[extension]
@@ -98,7 +98,7 @@ public class DataAspects{
 		
 		 Data data = DefaultData.create();//create empty object with full scope to satisfy errors
 		 if(extension.equals("db")) {
-			DataSource dataDatabase = DataSource.createJDBCSource("src/main/resources/templates/data/" + dataset + "." + extension, table);
+			DataSource dataDatabase = DataSource.createJDBCSource("src/main/resources/templates/data/" + empOrg + "/" + dataset + "." + extension, table);
 			data = Data.create(dataDatabase);
 		 }
 		// Read generalization hierarchies
@@ -113,7 +113,7 @@ public class DataAspects{
 	           }
 	       };
 	       // Create definition, hierarchies will always be .csv
-	       File testDir = new File("src/main/resources/templates/hierarchy/");
+	       File testDir = new File("src/main/resources/templates/hierarchy/" + empOrg + "/");
 	       File[] genHierFiles = testDir.listFiles(hierarchyFilter);
 	       Pattern pattern = Pattern.compile("_hierarchy_(.*?).csv");
 	       for (File file : genHierFiles) {
@@ -127,7 +127,7 @@ public class DataAspects{
 		 return data;
 	}
 	//eventually intending to implement db file catering 
-	public Data createDataAndHierarchies(final String fileName, final List<String> hierNames, String table, String user, String password) throws IOException, SQLException {
+	public Data createDataAndHierarchies(final String empOrg, final String fileName, final List<String> hierNames, String table, String user, String password) throws IOException, SQLException {
 
 		String[] dataNameAndExtension = fileName.split("\\.");
 		String dataset = dataNameAndExtension[0];//format is [dataset name].[extension]
@@ -135,7 +135,7 @@ public class DataAspects{
 		
 		 Data data = DefaultData.create();//create empty object with full scope to satisfy errors
 		 if(extension.equals("db")) {
-			DataSource dataDatabase = DataSource.createJDBCSource("src/main/resources/templates/data/" + dataset + "." + extension, user, password, table);
+			DataSource dataDatabase = DataSource.createJDBCSource("src/main/resources/templates/data/" + empOrg + "/" + dataset + "." + extension, user, password, table);
 			data = Data.create(dataDatabase);
 		 }
 		// Read generalization hierarchies
@@ -150,7 +150,7 @@ public class DataAspects{
 	           }
 	       };
 	       // Create definition, hierarchies will always be .csv
-	       File testDir = new File("src/main/resources/templates/hierarchy/");
+	       File testDir = new File("src/main/resources/templates/hierarchy/" + empOrg + "/");
 	       File[] genHierFiles = testDir.listFiles(hierarchyFilter);
 	       Pattern pattern = Pattern.compile("_hierarchy_(.*?).csv");
 	       for (File file : genHierFiles) {
@@ -243,29 +243,91 @@ public class DataAspects{
 	    return builder;
 	}
 	
-	public void deleteFiles() throws IOException, FileNotFoundException {
+	public void deleteFiles(String empOrg) throws IOException, FileNotFoundException {
 		//try/catch block for deleting the data file
 		try {
-		File dataDelete = new File("src/main/resources/templates/data");
+		File dataDelete = new File("src/main/resources/templates/data/" + empOrg + "/");
 	    FileUtils.cleanDirectory(dataDelete);
+	    FileUtils.deleteDirectory(dataDelete);
 		}
 		catch(FileNotFoundException failure) {
 			System.out.println("Deleting data file failed : " + failure.getLocalizedMessage());
 		}
 		//try/catch block for deleting the hierarchy files
 		try {
-	    File hierarchyDelete = new File("src/main/resources/templates/hierarchy");
+	    File hierarchyDelete = new File("src/main/resources/templates/hierarchy/" + empOrg + "/");
 	    FileUtils.cleanDirectory(hierarchyDelete);
+	    FileUtils.deleteDirectory(hierarchyDelete);
 		}
 		catch(FileNotFoundException failure) {
 			System.out.println("Deleting hierarchy file failed : " + failure.getLocalizedMessage());
 		}
 	}   
+	
 	//delete anonymized file from directory, may be used later on
-	public void deleteAnonFile(String anonymizedFile) throws IOException, FileNotFoundException {
+		public void deleteAnonFile(String empOrg) throws IOException, FileNotFoundException {
+			//very simple, name the file to be destroyed, it will be
+			File outputDataDelete = new File("src/main/resources/templates/outputs/" + empOrg + "/");
+			try {
+				FileUtils.cleanDirectory(outputDataDelete);
+				System.out.println("Output Data has been cleared");
+			} catch (FileNotFoundException failure) {
+				System.out.println("Output Data may have already been cleared");
+			}
+		}
+	
+	//delete anonymized file from directory, may be used later on
+	public void deleteAllFiles(String empOrg) throws IOException, FileNotFoundException {
 		//very simple, name the file to be destroyed, it will be
-		File dataDelete = new File("src/main/resources/templates/outputs/" + anonymizedFile);
-	    boolean success = dataDelete.delete();
-	    System.out.println("Success is : " + success);
+		File outputDataDelete = new File("src/main/resources/templates/outputs/" + empOrg + "/");
+	    File hierarchyDelete = new File("src/main/resources/templates/hierarchy/" + empOrg + "/");
+	    File dataDelete = new File("src/main/resources/templates/data/" + empOrg + "/");
+	    File imageDelete = new File("src/main/resources/META-INF/resources/images/" + empOrg + "/");
+		try {
+			if (outputDataDelete.isDirectory()) {
+		        if (outputDataDelete.list().length > 0) {
+		        	System.out.println("Output Data needs to be cleared");
+		        	FileUtils.cleanDirectory(outputDataDelete);
+		        	//FileUtils.deleteDirectory(outputDataDelete);
+		        } else {
+		        	System.out.println("Output Data just needs to be deleted");
+		        	//FileUtils.deleteDirectory(outputDataDelete);
+		        }
+			}
+			if (hierarchyDelete.isDirectory()) {
+		        if (hierarchyDelete.list().length > 0) {
+		        	System.out.println("Hierarchy Data needs to be cleared");
+		        	FileUtils.cleanDirectory(hierarchyDelete);
+		        	//FileUtils.deleteDirectory(hierarchyDelete);
+		        } else {
+		        	System.out.println("Hierarchy Data just needs to be deleted");
+		        	//FileUtils.deleteDirectory(hierarchyDelete);
+		        }
+			}
+			if (dataDelete.isDirectory()) {
+		        if (dataDelete.list().length > 0) {
+		        	System.out.println("Main Data needs to be cleared");
+		        	FileUtils.cleanDirectory(dataDelete);
+		        	//FileUtils.deleteDirectory(dataDelete);
+		        } else {
+		        	System.out.println("Main Data just needs to be deleted");
+		        	FileUtils.deleteDirectory(dataDelete);
+		        }
+			}
+			if (imageDelete.isDirectory()) {
+		        if (imageDelete.list().length > 0) {
+		        	System.out.println("Image Data needs to be cleared");
+		        	FileUtils.cleanDirectory(imageDelete);
+		        	FileUtils.deleteDirectory(imageDelete);
+		        } else {
+		        	System.out.println("Image Data just needs to be deleted");
+		        	//FileUtils.deleteDirectory(imageDelete);
+		        }
+			}
+	    } 
+	    catch(FileNotFoundException failure) {
+	    	System.out.println("Deleting all files failed : " + failure.getLocalizedMessage());
+	    }
+	    System.out.println("Finished deleting");
 	}  
 }

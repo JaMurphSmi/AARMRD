@@ -10,6 +10,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <link rel="stylesheet" href="css/style.css">
 <script type="text/javascript" src="js/app.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 
 <title>Risk Metrics</title>
@@ -18,6 +19,15 @@
  <div class="americasNextTopDiv"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
 	<h1>Review Risk Metrics</h1><br>
   	<hr>
+  	<!-- styled to float over the submit box -->
+  	<div class="tooltipsR">&#10068;
+		<span class="tooltiptext">
+			This page measures percentage risk of your dataset<br>
+			The country selection box denotes the region that you are testing against<br>
+			The threshold is the percentage risk that a record must not surpass, begins at 0, max 1(100%). ie threshold set to 0.5(50%)<br>
+			success if 47%, failure if 53%. It is to allow the user to control the risk posed to their records.
+		</span>
+	</div>
   	<div style="overflow:hidden;">
 			<div style="float:left;margin-left: 100px;max-width:550px;height:400px;overflow:auto;">
 					<table id="tablesR">
@@ -50,14 +60,6 @@
 						</select>
 					<label for="THRESHOLD">Threshold : </label>
 						<input name="THRESHOLD" id="THRESHOLD" type="number" min="0" max="1" step="0.01"/>
-						<div class="tooltipsR">&#10068;
-				  			<span class="tooltiptext">
-				  			This page measures percentage risk of your dataset<br>
-				  			The country selection box denotes the region that you are testing against<br>
-				  			The threshold is the percentage risk that a record must not surpass, begins at 0, max 1(100%). ie threshold set to 0.5(50%)<br>
-				  			success if 47%, failure if 53%. It is to allow the user to control the risk posed to their records.
-				  			</span>
-						</div>
 						<input type="hidden" name="${_csrf.parameterName}"
 								value="${_csrf.token}" />
 						<br><br>
@@ -83,30 +85,30 @@
 				</c:if>
 				<c:if test="${not empty riskObject.prosecutorStats && not empty riskObject.journalistStats && not empty riskObject.marketerStat}">
 					<h4>Attacker Models Statistics</h4> <br><br>
-					<table style="float:left;">
+					<table style="float:left;border-collapse: collapse;">
 						<tr>
 							<th></th>
-							<th>Prosecutor Attack Model</th>
-							<th>Journalist Attack Model</th>
-							<th>Marketer Attack Model</th>
+							<th class="sRTh"><p class="tableText">Prosecutor Attack Model</p></th>
+							<th class="sRTh"><p class="tableText">Journalist Attack Model</p></th>
+							<th class="sRTh"><p class="tableText">Marketer Attack Model</p></th>
 						</tr>
 						<tr>
-							<td>Records at Risk</td>
-							<td>${riskObject.prosecutorStats[0]}</td>
-							<td>${riskObject.journalistStats[0]}</td>
+							<td class="sRTh"><p class="tableText">Records at Risk</p></td>
+							<td class="srTd"><p class="tableText">${riskObject.prosecutorStats[0]}</p></td>
+							<td class="srTd"><p class="tableText">${riskObject.journalistStats[0]}</p></td>
 							<td></td>
 						</tr>
 						<tr>
-							<td>Highest Risk</td>
-							<td>${riskObject.prosecutorStats[1]}</td>
-							<td>${riskObject.journalistStats[1]}</td>
+							<td class="sRTh"><p class="tableText">Highest Risk</td>
+							<td><p class="tableText">${riskObject.prosecutorStats[1]}</p></td>
+							<td class="srTd"><p class="tableText">${riskObject.journalistStats[1]}</p></td>
 							<td></td>
 						</tr>
 						<tr>
-							<td>Success Rate</td>
-							<td>${riskObject.prosecutorStats[2]}</td>
-							<td>${riskObject.journalistStats[2]}</td>
-							<td>${riskObject.marketerStat}</td>
+							<td class="sRTh"><p class="tableText">Success Rate</td>
+							<td class="srTd"><p class="tableText">${riskObject.prosecutorStats[2]}</p></td>
+							<td class="srTd"><p class="tableText">${riskObject.journalistStats[2]}</p></td>
+							<td class="srTd"><p class="tableText">${riskObject.marketerStat}</p></td>
 						</tr>
 					</table>
 				</c:if>
@@ -173,18 +175,6 @@
 	</c:if>
 </div>	
 <script type="text/javascript">
-$(document).ready(function(){
-	$("#generateReport").click(function(){
-	    $.ajax({
-	        url : 'doJasperReport',
-	        method : 'GET',
-	        async : false,
-	        complete : function(data) {
-	            console.log(data.responseText);
-	        }
-	    });
-	});
-});
 
     // Load the Visualization API and the piechart package.
     google.load('visualization', '1.0', {
@@ -254,5 +244,28 @@ $(document).ready(function(){
     }
     
 </script><!-- need to throw a lot more in here to mould it to correct format -->
+<script>
+$(document).ready(function(){
+	$("#generateReport").click(function(){
+	    $.ajax({
+	        url : 'makeJasperReport',
+	        method : 'GET',
+	        async : false,
+	        complete : function(data) {
+	            console.log(data.responseText);
+	        }
+	    });
+	}).then(function() {
+		$.ajax({
+			url : 'doPDFDownload',
+			method : 'GET',
+			async : false,
+			complete : function(data) {
+				console.log(data.responseText);
+			}
+		});
+	});
+});
+</script>
 </body>
 </html>

@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PieChartGenerator {
 	
-	public void makePieChart(String theTitle, HashMap<String, String> pieValues) {
+	public void makePieChart(String empOrg, String theTitle, HashMap<String, String> pieValues) {
 
 	    // Create dataset
 	    
@@ -43,7 +43,7 @@ public class PieChartGenerator {
 	    ((PiePlot) chart.getPlot()).setLabelGenerator(labelGenerator);
 	    
 	    try {
-			ChartUtilities.saveChartAsJPEG(new File("src/main/resources/META-INF/resources/images/"+ theTitle +".png"),chart,400, 300);
+			ChartUtilities.saveChartAsJPEG(new File("src/main/resources/META-INF/resources/images/" + empOrg + "/" + theTitle +".png"),chart,400, 300);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
