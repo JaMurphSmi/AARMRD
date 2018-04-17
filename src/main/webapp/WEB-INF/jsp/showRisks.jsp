@@ -14,20 +14,13 @@
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 
 <title>Risk Metrics</title>
+<link rel="icon" href="https://i.imgur.com/AEUtoVg.png" sizes="32x32" type="image/png">
 </head>
 <body>
  <div class="americasNextTopDiv"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
 	<h1>Review Risk Metrics</h1><br>
   	<hr>
   	<!-- styled to float over the submit box -->
-  	<div class="tooltipsR">&#10068;
-		<span class="tooltiptext">
-			This page measures percentage risk of your dataset<br>
-			The country selection box denotes the region that you are testing against<br>
-			The threshold is the percentage risk that a record must not surpass, begins at 0, max 1(100%). ie threshold set to 0.5(50%)<br>
-			success if 47%, failure if 53%. It is to allow the user to control the risk posed to their records.
-		</span>
-	</div>
   	<div style="overflow:hidden;">
 			<div style="float:left;margin-left: 100px;max-width:550px;height:400px;overflow:auto;">
 					<table id="tablesR">
@@ -42,7 +35,7 @@
 							    <tr>
 							    	<c:forEach items="${anonRow}" var="anonItem">
 									    <td id="tdsR" align="center">
-									       	${anonItem}     
+									       	<p class="tableText">${anonItem}</p>     
 									    </td>
 									</c:forEach>    
 							    </tr>
@@ -70,27 +63,37 @@
 							value="${_csrf.token}" />
 					<input type="submit" class="buttonsR" value="Return to Comparison"/> 
 				</form>
+				<div class="tooltipsR">&#10068;
+					<span class="tooltiptext">
+						This page measures percentage risk of your dataset<br>
+						The country selection box denotes the region that you are testing against<br>
+						The threshold is the percentage risk that a record must not surpass, begins at 0, max 1(100%). ie threshold set to 0.5(50%)<br>
+						success if 47%, failure if 53%. It is to allow the user to control the risk posed to their records.
+					</span>
+				</div>
 			</div>
 		</div>
 <div>
 	<c:if test="${not empty riskObject}">
 		<div id="theRiskyDiv">
-				<button id="generateReport" class="buttonsR" >Generate Risk Report</button>
+				<button id="generateReport" class="buttonsR" onclick="makeDownloadButtonEnabled()">Generate Risk Report</button>
+				&nbsp&nbsp 
+				<a href="/doPDFDownload" class="buttonsR">Download Risk Report</a>
 				<br><br>
 				<c:if test="${not empty riskObject.threshold}">
-					Threshold Specified : ${riskObject.threshold}		
+					<p class="tableText">Threshold Specified : ${riskObject.threshold}</p>		
 				</c:if>
 				<c:if test="${not empty riskObject.country}">
-					Country : ${riskObject.country} <br><br><br>
+					<p class="tableText">Country : ${riskObject.country}</p><br><br>
 				</c:if>
 				<c:if test="${not empty riskObject.prosecutorStats && not empty riskObject.journalistStats && not empty riskObject.marketerStat}">
-					<h4>Attacker Models Statistics</h4> <br><br>
+					<h4>Attacker Models Statistics</h4> 
 					<table style="float:left;border-collapse: collapse;">
 						<tr>
 							<th></th>
-							<th class="sRTh"><p class="tableText">Prosecutor Attack Model</p></th>
-							<th class="sRTh"><p class="tableText">Journalist Attack Model</p></th>
-							<th class="sRTh"><p class="tableText">Marketer Attack Model</p></th>
+							<th class="sRTh"><p class="tableText">Prosecutor Model</p></th>
+							<th class="sRTh"><p class="tableText">Journalist Model</p></th>
+							<th class="sRTh"><p class="tableText">Marketer Model</p></th>
 						</tr>
 						<tr>
 							<td class="sRTh"><p class="tableText">Records at Risk</p></td>
@@ -99,13 +102,13 @@
 							<td></td>
 						</tr>
 						<tr>
-							<td class="sRTh"><p class="tableText">Highest Risk</td>
-							<td><p class="tableText">${riskObject.prosecutorStats[1]}</p></td>
+							<td class="sRTh"><p class="tableText">Highest Risk</p></td>
+							<td class="srTd"><p class="tableText">${riskObject.prosecutorStats[1]}</p></td>
 							<td class="srTd"><p class="tableText">${riskObject.journalistStats[1]}</p></td>
 							<td></td>
 						</tr>
 						<tr>
-							<td class="sRTh"><p class="tableText">Success Rate</td>
+							<td class="sRTh"><p class="tableText">Success Rate</p></td>
 							<td class="srTd"><p class="tableText">${riskObject.prosecutorStats[2]}</p></td>
 							<td class="srTd"><p class="tableText">${riskObject.journalistStats[2]}</p></td>
 							<td class="srTd"><p class="tableText">${riskObject.marketerStat}</p></td>
@@ -255,17 +258,13 @@ $(document).ready(function(){
 	            console.log(data.responseText);
 	        }
 	    });
-	}).then(function() {
-		$.ajax({
-			url : 'doPDFDownload',
-			method : 'GET',
-			async : false,
-			complete : function(data) {
-				console.log(data.responseText);
-			}
-		});
-	});
+	});									
 });
+</script>
+<script type="text/javascript">
+function makeDownloadButtonEnabled() {
+	document.getElementById('downloadReport').disabled = false;
+}
 </script>
 </body>
 </html>

@@ -265,11 +265,12 @@ public class DataAspects{
 	}   
 	
 	//delete anonymized file from directory, may be used later on
-		public void deleteAnonFile(String empOrg) throws IOException, FileNotFoundException {
+		public void deleteAnonFile(String fullPath) throws IOException, FileNotFoundException {
 			//very simple, name the file to be destroyed, it will be
-			File outputDataDelete = new File("src/main/resources/templates/outputs/" + empOrg + "/");
+			File outputDataDelete = new File(fullPath);
 			try {
 				FileUtils.cleanDirectory(outputDataDelete);
+				FileUtils.deleteDirectory(outputDataDelete);
 				System.out.println("Output Data has been cleared");
 			} catch (FileNotFoundException failure) {
 				System.out.println("Output Data may have already been cleared");

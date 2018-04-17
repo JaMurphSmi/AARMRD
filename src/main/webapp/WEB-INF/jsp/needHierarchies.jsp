@@ -8,6 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <link rel="stylesheet" type="text/css" href="css/style.css" />
 <title>AARMRD-Need Hierarchies</title>
+<link rel="icon" href="https://i.imgur.com/AEUtoVg.png" sizes="32x32" type="image/png">
 </head>
 <body>
   <div id="logoTop"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
@@ -18,10 +19,10 @@
 	 <div>
 	<div>
 		<div id="nHContainer">
-			<h2>Would you like to create hierarchies for these data fields?</h2>
+			<p id="blerb"><h2>Would you like to create hierarchies for these data fields?</h2>
 			<h3>Caution!</h3> AARMRD can automatically construct hierarchies for fields that are numbers <i>only</i>  ie age, zipcode.<br>
 			Fields containing text may cause an error and corrupt your attempt to anonymize. If text field contains sensitive<br>
-			information, it is recommended to simply set attribute as "identifying" on the next screen.<br><br><br>
+			information, it is recommended to simply set attribute as "identifying" on the next screen.</p><br><br><br>
 			
 			<form action="uploadFiles" method="POST"><!-- return to the upload method to finish data creation -->
 					<c:forEach items="${headerRow}" var="head" varStatus="fieldNumber">
@@ -32,7 +33,7 @@
 					</c:forEach>
 					<input type="hidden" name="${_csrf.parameterName}"
 							value="${_csrf.token}" />
-					<input type="submit" value="Create These Hierarchies"></input>
+					<input type="submit" class="formSubmitButton loginSubmit" value="Create These Hierarchies"></input>
 				<br><br>
 			</form>
 		</div>

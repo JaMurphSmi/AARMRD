@@ -6,17 +6,13 @@ public class AnonymizationObject {
 	
 	private String fileName;
 	
-	// The field names of a given dataset, length of this used to dynamically create the correct length
-	//private String[] theHeaderRow;//array in each case, ie 5 fields, array length 5, 100 fields, array length 100
-	
-	// the enum of algorithms available, may not be used for a specific thing ever, might just add a string list of models either
-	//private AnonModel anonModels;
-	
 	// the array of models chosen from the select boxes in the view, each select hopefully pathed to an index position
 	private String[] modelsChosen;
 	
 	// the array of values used for the selected models
 	private double[] valuesForModels;
+	
+	private double[] extraForModels;
 	
 	private String[] attributesChosen;
 	
@@ -30,6 +26,7 @@ public class AnonymizationObject {
 	public AnonymizationObject(String fileName, int theHeaderRowLength) {
 		this.setFileName(fileName);
 		this.setValuesForModels(new double[(theHeaderRowLength)]);//may be an awful way of initializing, but eh
+		this.setExtraForModels(new double[(theHeaderRowLength)]);//this field is for values requiring more than one definition
 		this.setAttributesChosen(new String[theHeaderRowLength]);//initialize with length of the headerRow, to ensure correct number of array positions created
 		this.setModelsChosen(new String[theHeaderRowLength]);
 	}
@@ -64,5 +61,13 @@ public class AnonymizationObject {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+
+	public double[] getExtraForModels() {
+		return extraForModels;
+	}
+
+	public void setExtraForModels(double[] extraForModels) {
+		this.extraForModels = extraForModels;
 	}
 }

@@ -10,20 +10,21 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 //import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
+import javax.crypto.Cipher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,15 +41,14 @@ import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.DataType;
 import org.deidentifier.arx.aggregates.StatisticsFrequencyDistribution;
 //import org.deidentifier.arx.aggregates.StatisticsQuality;//does not exist in the current jar
-import org.deidentifier.arx.criteria.DPresence;
 import org.deidentifier.arx.criteria.DistinctLDiversity;
-import org.deidentifier.arx.criteria.EDDifferentialPrivacy;
-import org.deidentifier.arx.criteria.HierarchicalDistanceTCloseness;
+import org.deidentifier.arx.criteria.EnhancedBLikeness;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.deidentifier.arx.criteria.OrderedDistanceTCloseness;
-import org.deidentifier.arx.criteria.KMap;
+import org.deidentifier.arx.criteria.EqualDistanceTCloseness;
 import org.deidentifier.arx.criteria.EntropyLDiversity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
+import org.deidentifier.arx.criteria.BasicBLikeness;
 import org.deidentifier.arx.risk.RiskEstimateBuilder;
 import org.deidentifier.arx.risk.RiskModelSampleSummary;
 import org.anonymize.anonymizationapp.model.AlgorithmObject;
@@ -57,6 +57,7 @@ import org.anonymize.anonymizationapp.model.AnonymizationObject;
 import org.anonymize.anonymizationapp.model.AnonymizationReport;
 import org.anonymize.anonymizationapp.model.RiskObject;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.RandomStringUtils;
 // ARX related stuff 
 import org.apache.commons.math3.util.Pair;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -99,6 +100,7 @@ public class AnonymizationController extends AnonymizationBase {
 	private String empName;//name of employee
 	private String empOrg;//string concatenation of the two, in employee->organization order
 	private String sourceDataFileName;//global filename of the raw data, used to overcome restarts
+	private List<String> hierarchyDataFiles = new ArrayList<String>();
 	private String anonymizedDataFileName;//global anonymized dataset file name, for download purposeses
 	private List<String[]> dataRows = new ArrayList<String[]>();//extract to global variables to allow access in entire application
 	private List<String[]> anonyRows = new ArrayList<String[]>();
@@ -151,10 +153,9 @@ public class AnonymizationController extends AnonymizationBase {
 	   emplName = HtmlUtils.htmlEscape(emplName);
 	   
 	   //generate secret key for filestructureaspects immediately 
-	   byte[] array = new byte[32]; // length is bounded to 32 long, for secret key for encryption
-	   new Random().nextBytes(array);
-	   String generatedString = new String(array, Charset.forName("UTF-8"));
+	   String generatedString = RandomStringUtils.randomAlphanumeric(16);
 	   
+	   System.out.println(generatedString.length());
 	   //fileStructureAspects.setSecret(generatedString);//should be unique for each user?
 	   this.secret = generatedString;
 	   generatedString = null;
@@ -172,6 +173,8 @@ public class AnonymizationController extends AnonymizationBase {
 		   
 		   empOrg = empName + orgName;
 		   empOrg = empOrg.replace(' ', '_');//avoid errors with spaces in directory
+		   
+		   
 		   
 		   //jasper directory
 		   File dir = new File("src/main/resources/"+ empOrg);
@@ -222,14 +225,15 @@ public class AnonymizationController extends AnonymizationBase {
 			fos.write(dataFile.getBytes());
 			fos.close();
 			
-			//fileStructureAspects
 			//////////////////// finished doing stuff for Data
 			
 			////////////////////creating the hierarchies in file path
 			//adding extra functionality for 'lack of hierarchy' comparison list
 			for(MultipartFile mulFile: hierFiles) {
 				String fileName = mulFile.getOriginalFilename();
-				File convertedHierFile = new File("src/main/resources/templates/hierarchy/" + empOrg + "/" + fileName);
+				String filePath = "src/main/resources/templates/hierarchy/" + empOrg + "/" + fileName;
+				File convertedHierFile = new File(filePath);
+				
 				System.out.println("hierfileName is : " + fileName);
 				convertedHierFile.createNewFile();
 				
@@ -239,6 +243,7 @@ public class AnonymizationController extends AnonymizationBase {
 				
 				String[] tempArray = fileName.split("[\\_\\.]");//split by underscore and dot		  0         1         2
 				hierFileList.add(tempArray[2]);//add file name to list for display reasons further on [dataset]_hierarchy_[column]
+				hierarchyDataFiles.add(filePath);
 			}//removing the headerRow from this, need to make it in proper order
 			
 			headerRow.clear();//zero out header row to avoid duplicate field headers in tables
@@ -246,6 +251,7 @@ public class AnonymizationController extends AnonymizationBase {
 			
 			if(checkExtension[1].equals("csv")) {
 				//needed to keep the order of fields correct
+				
 				BufferedReader fileReader = new BufferedReader(new FileReader("src/main/resources/templates/data/" + empOrg + "/" + sourceDataFileName));
 				
 				try {
@@ -314,11 +320,18 @@ public class AnonymizationController extends AnonymizationBase {
 				System.out.println("creating a data object from table with credentials Table Name :" + table + ", userName : " + userName + ", password : " + password);
 				sourceData = dataAspectsHelper.createDataAndHierarchies(empOrg, sourceDataFileName, headerRow, table, userName, password);
 			}
+
+			File dataEncryptFile = new File("src/main/resources/templates/data/" + empOrg + "/" + sourceDataFileName);
+			//finally encrypt files while not in use
+			/*fileStructureAspects.fileEnDeCrypt(Cipher.ENCRYPT_MODE, secret, dataEncryptFile, dataEncryptFile);
+			for (String path : hierarchyDataFiles) {
+				File hierPath = new File(path);
+				fileStructureAspects.fileEnDeCrypt(Cipher.ENCRYPT_MODE, secret, hierPath, hierPath);
+			}*/
 	   }
 	   if(sourceData != null && hierChecks != null) {//to accommodate if the user wants to create hierarchies for a field
 		   //this is where integer field hierarchies are created
-		   
-		   
+
 		   //hierChecks will be used here
 		   for(int i = 0; i < hierChecks.length; ++i) {
 			 	System.out.println("The input index that need hierarchies are : " + hierChecks[i]);
@@ -350,7 +363,7 @@ public class AnonymizationController extends AnonymizationBase {
 	   }
 	   System.out.println("after creating the data successfully and all hierarchy aspects");
 	   dataRows = dataAspectsHelper.createDataRows(sourceData);
-	    System.out.println("created the dataRows");	
+	   System.out.println("created the dataRows");	
 		
 		System.out.println(">" + headerRow + "<");//very weird as this shows the file has been opened successfully...
 		
@@ -364,7 +377,9 @@ public class AnonymizationController extends AnonymizationBase {
 		//other variables instantiated as empty arrays based on the now constant header.length()
 		AnonymizationObject anonForm = new AnonymizationObject(sourceDataFileName, headerRow.size());//constant for an individual user
 		//////// use header row to allow user to set individual algorithms for each field
-		String[] models = {"k-anonymity","l-diversity","t-closeness"};//remove delta presence for now,"δ-presence"};
+		String[] models = {"k-anonymity","l-diversity", "recursive cl-diversity",
+				"entropy l-diversity", "t-closeness", "enhanced b likeness", "basic b likeness",
+				"equal distance t-closeness"};//remove delta presence for now,"δ-presence"};
 		String[] attributeTypes = {"Identifying", "Quasi-Identifying", "Sensitive", "Insensitive"}; 
 		for (String mod : models) {
 			System.out.println(mod + ",");//testing if models in array
@@ -394,6 +409,7 @@ public class AnonymizationController extends AnonymizationBase {
 			String[] modelsChosen = anonForm.getModelsChosen();
 			String[] attributesChosen = anonForm.getAttributesChosen();
 			double[] valuesForModels = anonForm.getValuesForModels();
+			double[] extraValues = anonForm.getExtraForModels();
 			//System.out.println(dataset);
 			//System.out.println(extension);
 			for(String aColumn : headerRow) {
@@ -407,10 +423,15 @@ public class AnonymizationController extends AnonymizationBase {
 			for(double aValue : valuesForModels) {
 				System.out.println("The value is: " + aValue);
 			}
+			System.out.println("Printing extra values");
+			for(double extra : extraValues) {
+				System.out.println("The attribute is: " + extra);
+			}
 			System.out.println("Printing attribute types chosen");
 			for(String anAttribute : attributesChosen) {
 				System.out.println("The attribute is: " + anAttribute);
 			}
+			
 			System.out.println("Possibly proved concept?");
 			
 			//creating all AlgorithmObjects and placing into collection for later report use
@@ -435,15 +456,15 @@ public class AnonymizationController extends AnonymizationBase {
 					sourceData.getDefinition().setAttributeType(header, AttributeType.IDENTIFYING_ATTRIBUTE);
 					System.out.println("Set the attribute value to identifying for: " + header);
 				}
-				else if(attributesChosen[i].equals("Quasi-Identifying")){
+				else if(attributesChosen[i].equals("Quasi-Identifying")){//field affected by k-anonymity if defined for any field
 					sourceData.getDefinition().setAttributeType(header, AttributeType.QUASI_IDENTIFYING_ATTRIBUTE);
 					System.out.println("Set the attribute value to quasi-identifying for: " + header);
 				}
-				else if(attributesChosen[i].equals("Sensitive")){
+				else if(attributesChosen[i].equals("Sensitive")){//sole field affected by one algorithm declaration
 					sourceData.getDefinition().setAttributeType(header, AttributeType.SENSITIVE_ATTRIBUTE);
 					System.out.println("Set the attribute value to sensitive for: " + header);
 				}
-				else if((attributesChosen[i].equals("Insensitive"))){
+				else if((attributesChosen[i].equals("Insensitive"))){//not affected by any algorithm
 					sourceData.getDefinition().setAttributeType(header, AttributeType.INSENSITIVE_ATTRIBUTE);
 					System.out.println("Set the attribute value to insensitive for: " + header);
 				}
@@ -460,15 +481,32 @@ public class AnonymizationController extends AnonymizationBase {
 	        
 	        //specifying everything variable to do with an anonymization, and the anonymizationConfiguration
 	        for(String header : headerRow) {//can be run anywhere from 1 to x times per dataset size
-	        	if(modelsChosen[i].equals("k-anonymity")){//can eventually be a large number of algorithms
-	        		anonymizationConfiguration.addPrivacyModel(new KAnonymity((int)valuesForModels[i]));//for whole dataset, not tied to attribute
+	        	if (modelsChosen[i].equals("k-anonymity")){//will hopefully eventually be a large number of algorithms
+	        		anonymizationConfiguration.addPrivacyModel(new KAnonymity((int)valuesForModels[i]));//for all quasi-identifying fields
 	        	}
-	        	else if (modelsChosen[i].equals("l-diversity")) {
+	        	else if (modelsChosen[i].equals("l-diversity")) {//for particular sensitive fields
 	        		anonymizationConfiguration.addPrivacyModel(new DistinctLDiversity(header, (int)valuesForModels[i]));
 	        	}
-	        	else if (modelsChosen[i].equals("t-closeness")) {
+	        	else if (modelsChosen[i].equals("t-closeness")) {//for particular sensitive fields
 	        		anonymizationConfiguration.addPrivacyModel(new OrderedDistanceTCloseness(header, valuesForModels[i]));
 	        	}
+	        	else if (modelsChosen[i].equals("recursive cl-diversity")) {//for particular sensitive fields
+	        		anonymizationConfiguration.addPrivacyModel(new RecursiveCLDiversity(header, valuesForModels[i], (int) extraValues[i]));
+	        	}
+	        	else if (modelsChosen[i].equals("entropy l-diversity")) {//for particular sensitive fields
+	        		anonymizationConfiguration.addPrivacyModel(new EntropyLDiversity(header, valuesForModels[i]));
+	        	}
+	        	else if (modelsChosen[i].equals("enhanced b likeness")) {//for particular sensitive fields
+	        		anonymizationConfiguration.addPrivacyModel(new EnhancedBLikeness(header, valuesForModels[i]));
+	        	}
+	        	else if (modelsChosen[i].equals("basic b likeness")) {//for particular sensitive fields
+	        		anonymizationConfiguration.addPrivacyModel(new BasicBLikeness(header, valuesForModels[i]));
+	        	}
+	        	else if (modelsChosen[i].equals("equal distance t-closeness")) {//for particular sensitive fields
+	        		anonymizationConfiguration.addPrivacyModel(new EqualDistanceTCloseness(header, valuesForModels[i]));
+	        	}
+	        	
+	        	
 	        	++i;//needed sentinel i to control algorithm aspect
 	        }
 	        //anonymizationConfiguration.addPrivacyModel(new KAnonymity(2));//add privacy model, with supplied severity
@@ -515,9 +553,8 @@ public class AnonymizationController extends AnonymizationBase {
 	        anonymizedDataFileName = dataSetName + "_anonymized.csv";//anonymized file will always be in a csv format for now
 	        anonReport.setFileName(anonymizedDataFileName);
 	        result.getOutput(false).save("src/main/resources/templates/outputs/" + empOrg + "/" + anonymizedDataFileName, ';');
-	        //### Reanonymizing copies the above file back into the data file, need to restore hierarchies though
-	        // maybe leave the hierarchies as part of the application but remove the original data for the user's protection?
-	        
+	        File anonFile = new File("src/main/resources/templates/outputs/" + empOrg + "/" + anonymizedDataFileName);
+	        fileStructureAspects.fileEnDeCrypt(Cipher.ENCRYPT_MODE, secret, anonFile, anonFile);
 	        //attempting to implement some utility metrics, just printing atm
 	        /*for (ARXNode[] level : result.getLattice().getLevels()) {
 	            for (ARXNode node : level) {
@@ -691,13 +728,13 @@ public class AnonymizationController extends AnonymizationBase {
 		
 		// TODO : integrate this
 		//method that allows the user to delete the anonymized file from the application
-				@RequestMapping("/deleteAnonymizedData")//available on first page? to allow users to cancel securely, remove all traces
-				public void deleteAnonymizedData(@RequestParam("deleteName") String deleteName) throws IOException {
+				@RequestMapping("/deleteDataAndHierarchiesAnonymizedFile")//available on first page? to allow users to cancel securely, remove all traces
+				public void deleteAnonymizedData() throws IOException {
 					//when work complete and user wants record gone, need to remove from file system
 					try {//will need to search through directory to get list for combo box
-						deleteName = deleteName + ".csv";
+						String deleteName = "src/main/resources/templates/outputs/" + empOrg + "/";
 						System.out.println("Just before delete");
-						dataAspectsHelper.deleteAnonFile(empOrg);
+						dataAspectsHelper.deleteAnonFile(deleteName);
 						System.out.println("Just after delete");
 					}
 					catch (IOException failure) {
@@ -715,8 +752,12 @@ public class AnonymizationController extends AnonymizationBase {
 		        ServletContext context = request.getServletContext();
 		        
 		        // construct the complete absolute path of the file
-		        String fullPath = "src/main/resources/templates/outputs/" + empOrg + "/" + anonymizedDataFileName;      
+		        String fullPath = "src/main/resources/templates/outputs/" + empOrg + "/" + anonymizedDataFileName;  
+		        
 		        File downloadFile = new File(fullPath);
+		        // quickly decrypt before downloading
+		        fileStructureAspects.fileEnDeCrypt(Cipher.DECRYPT_MODE, secret, downloadFile, downloadFile);
+		        
 		        FileInputStream inputStream = new FileInputStream(downloadFile);
 		         
 		        // get MIME type of the file
@@ -993,8 +1034,6 @@ public class AnonymizationController extends AnonymizationBase {
 	    	  File jasperFile = new File(jrprintFile);
 	    	  try {
 	    		  JasperFillManager.fillReportToFile(jasperFileName, jrprintFile, parameters, beanColDataSource);
-	    		  //JasperFillManager.fillReportToFile(jasperReport, destFileName, parameters);
-		          //JasperFillManager.fillReportToFile(jasperFileName, parameters, beanColDataSource);
 		      } 
 		      catch (JRException e) {
 		    	 System.out.println("There was a problem creating \\.jrprint");
@@ -1021,7 +1060,8 @@ public class AnonymizationController extends AnonymizationBase {
 	 
 	   }
 	   
-	 //create report file for user to download   
+	 //create report file for user to download  
+	   @RequestMapping("/doPDFDownload")
 	    public void doPDFDownload(HttpServletRequest request,
 	            HttpServletResponse response) throws IOException {
 	    	// get absolute path of the application
@@ -1063,5 +1103,13 @@ public class AnonymizationController extends AnonymizationBase {
 	 
 	        inputStream.close();
 	        outStream.close();
+	        
+	        try {
+	        	File deleteFile = new File("src/main/resources/" + empOrg + "/");
+				FileUtils.cleanDirectory(deleteFile);
+			    FileUtils.deleteDirectory(deleteFile);
+			  } catch (IOException e) {
+				e.printStackTrace();
+			  }
 	   }
 }

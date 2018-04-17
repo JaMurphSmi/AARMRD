@@ -12,20 +12,15 @@
 <script type="text/javascript" src="js/app.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <title>Compare Sets</title>
+<link rel="icon" href="https://i.imgur.com/AEUtoVg.png" sizes="32x32" type="image/png">
 </head>
 <body style="background-color:#faf6b8;">
  <div style="z-index: 10;position: absolute;right: 30px;top: 0px;"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
   <h1>Anonymization Results</h1>
 <div style="float:left;height=400px;max-width=1050px;overflow=hidden;">
   	<br>
-  	<c:if test="${not empty errorMessage}"><div><p class="yellow">${errorMessage}</p></div></c:if>
-			<table>
-			    <tr>
-			        <td><p class="yellow">Data FileName</p></td>
-			        <td><p class="yellow">${fileName}</p></td>
-			    </tr>
-			    <tr><p class="yellow">File contents</p></tr>
-			</table>
+  	<c:if test="${not empty errorMessage}"><div><p class="tableText">${errorMessage}</p></div></c:if>
+			
 		<c:if test="${not empty dataRows}">
 		<div style="float:left;margin-left: 100px; max-width:425px;height:400px;overflow:auto;">
 			<table style="border-collapse: collapse;">
@@ -77,30 +72,41 @@
 			<input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" />
 		</form><br><br><br>
-		<button id="deleteDAH" class="buttonsR" >Delete Data and Hierarchies</button>
 		<div class="tooltipcompSets">&#10068;<br>
 				<span class="tooltiptext2">
 				  	This option is provided to adhere to the General Data Protection Regulation.<br> 
 				  	Clicking allows you to explicitly delete all content associated with your anonymization.<br>
 				  	This is also automatically performed when you download your new data file.
 				</span>
-		</div><br>
-			<a href="/downloadAnonymizedFile" class="buttonsR">Download Anonymized Data</a>
+		</div>
+		<button id="deleteDAH" class="buttonsR" onclick="makeRepeatButtonsDisabled()">Delete Data and Hierarchies</button>
+		<br><br>
 			<div class="tooltipcompSets">&#10068;
 				<span class="tooltiptext3">
 				  	Note that for your data's security, and to comply with the General Data Protection Regulation<br>
 				  	Pressing this button concludes your service, and once your anonymized file is downloaded<br>
 				  	to your machine, all data you have uploaded for this transaction will be erased from the application
 				</span>
-			</div><br><br>
+			</div>
+			<a href="/downloadAnonymizedFile" class="buttonsR" onclick="makeRepeatButtonsDisabled()">Download Anonymized Data</a>
+			<br><br>
 		  <div>
-		    <form action="/home" method="post">
+		    <form action="/login" method="post">
 		      <input id="deleteDAHAF" type="submit" class="buttonsR" value="Begin Again/Upload New Files">
+		    	<input type="hidden" name="${_csrf.parameterName}"
+				  value="${_csrf.token}" />
 		    </form>
 		  </div><br><br>
 		  <div>
 		    <form action="/uploadFiles" method="post">
 		      <input type="submit" id="canBeNullifiedByDelete" class="buttonsR" value="Use Same Data Again">
+		      <input type="hidden" name="${_csrf.parameterName}"
+				value="${_csrf.token}" />
+		    </form>
+		  </div>
+		  <div>
+		  <form action="/logout" method="post">
+		      <input type="submit" class="buttonsR" value="Logout">
 		      <input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" />
 		    </form>
@@ -117,8 +123,6 @@ $(document).ready(function(){
 	            console.log(data.responseText);
 	        }
 	    });
-	    $("#deleteDAH").prop("disabled",true);
-	    $("#canBeNullifiedByDelete").prop("disabled",true);
 	});
 });
 $(document).ready(function(){
@@ -133,6 +137,12 @@ $(document).ready(function(){
 		});
 	});
 });
+</script>
+<script>
+function makeRepeatButtonsDisabled(){
+	document.getElementById("deleteDAH").disabled = true;
+	document.getElementById("canBeNullifiedByDelete").disabled = true;
+}
 </script>
 </body>
 </html>

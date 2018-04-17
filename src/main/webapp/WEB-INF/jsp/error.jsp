@@ -9,7 +9,8 @@
 <script type="text/javascript" src="js/app.js"></script>
 <style>
 </style>
-<title>Spring Boot - Error</title>
+<title>Fatal Error</title>
+<link rel="icon" href="https://i.imgur.com/AEUtoVg.png" sizes="32x32" type="image/png">
 </head>
 <body>
 	<div class="americasNextTopDiv"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
@@ -17,45 +18,45 @@
   <hr>
   <div align=center>You have encountered an error<br>
   apologies for inconvenience caused</div>
-  <table id="tableErr">
-        <tr>
-            <td>Date</td>
-            <td>${timestamp}</td>
-        </tr>
-        <tr>
-            <td>Error</td>
-            <td>${error}</td>
-        </tr>
-        <tr>
-            <td>Status</td>
-            <td>${status}</td>
-        </tr>
-        <tr>
-            <td>Message</td>
-            <td>${message}</td>
-        </tr>
-        <tr>
-            <td>Exception</td>
-            <td>${exception}</td>
-        </tr>
-        <tr>
-            <td>Trace</td>
-            <td>
-                <pre>${trace}</pre>
-            </td>
-        </tr>
-    </table><br><br>
   <div class="form">
     <form action="/" method="post" onsubmit="return validate()">
       <input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" />
       <table>
         <tr>
-          <td>Return to Home</td>
-          <td><input type="submit" value="Return"></td>
+          <td><p class="tableText">Return to Home</p></td>
+          <td><input type="submit" class="formSubmitButton loginSubmit" value="Return"></td>
         </tr>
       </table>
     </form>
   </div>
+  <table id="tableErr">
+        <tr>
+            <td><p class="tableText">Date</p></td>
+            <td><p class="tableText">${timestamp}</p></td>
+        </tr>
+        <tr>
+            <td><p class="tableText">Error</p></td>
+            <td><p class="tableText">${error}</p></td>
+        </tr>
+        <tr>
+            <td><p class="tableText">Status</p></td>
+            <td><p class="tableText">${status}</p></td>
+        </tr>
+        <tr>
+            <td><p class="tableText">Message</td>
+            <td><p class="tableText">${message}</p></td>
+        </tr>
+        <tr>
+            <td><p class="tableText">Exception</p></td>
+            <td><p class="tableText">${exception}</p></td>
+        </tr>
+        <tr>
+            <td><p class="tableText">Trace</p></td>
+            <td>
+                <pre><p class="tableText">${trace}</p></pre>
+            </td>
+        </tr>
+    </table><br><br>
 </body>
 </html>

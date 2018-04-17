@@ -18,7 +18,7 @@ import org.deidentifier.arx.DataHandle;
  *
  * @author Fabian Prasser
  * @author Florian Kohlmayer
- * @utilized by Jake Murphy Smith
+ * @utilized and edited by Jake Murphy Smith
  */
 public abstract class AnonymizationBase {
 
