@@ -34,7 +34,7 @@
 		<fieldDescription><![CDATA[attributeType]]></fieldDescription>
 	</field>
 	<title>
-		<band height="377">
+		<band height="334">
 			<line>
 				<reportElement x="0" y="0" width="515" height="1" uuid="c6b662c2-bf10-4cf8-8fb9-ca50d95a4f0c"/>
 			</line>
@@ -252,10 +252,10 @@
 		</band>
 	</title>
 	<columnHeader>
-		<band height="68"/>
+		<band height="20"/>
 	</columnHeader>
 	<detail>
-		<band height="183">
+		<band height="40">
 			<staticText>
 				<reportElement x="369" y="-15" width="136" height="15" uuid="0d46f301-9e03-433e-82fe-8cb0e0eeb34e"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">

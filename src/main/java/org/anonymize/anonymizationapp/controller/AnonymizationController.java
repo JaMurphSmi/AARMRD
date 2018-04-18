@@ -199,6 +199,13 @@ public class AnonymizationController extends AnonymizationBase {
 	   return "index";
    }
    
+   @RequestMapping("/hadAnError")
+   public String getError(Model model) {
+	   model.addAttribute("empName", empName);
+	   model.addAttribute("orgName", orgName);
+	   return "index";
+   }
+   
    // will be a page to handle the uploading of files
    // making dataFiles and hierFiles not required to allow user to return to here without returning to the upload screen
    @RequestMapping("/uploadFiles")//only take in the files, establish data fields first, then allow user to select attribute types, algos etc
@@ -513,8 +520,15 @@ public class AnonymizationController extends AnonymizationBase {
 	        
 	        anonymizationConfiguration.setMaxOutliers(0d);
 
-	        result = anonymizer.anonymize(sourceData, anonymizationConfiguration);
-	        
+	        try {
+	        	result = anonymizer.anonymize(sourceData, anonymizationConfiguration);
+	        }
+	        catch (IOException e) {
+	        	e.printStackTrace();
+	        	model.addAttribute("empName", empName);
+	        	model.addAttribute("orgName", orgName);
+	        	return "index";
+	        }
 	        handle = sourceData.getHandle();
 	        
 	        //// Display data collection
@@ -554,7 +568,7 @@ public class AnonymizationController extends AnonymizationBase {
 	        anonReport.setFileName(anonymizedDataFileName);
 	        result.getOutput(false).save("src/main/resources/templates/outputs/" + empOrg + "/" + anonymizedDataFileName, ';');
 	        File anonFile = new File("src/main/resources/templates/outputs/" + empOrg + "/" + anonymizedDataFileName);
-	        fileStructureAspects.fileEnDeCrypt(Cipher.ENCRYPT_MODE, secret, anonFile, anonFile);
+	        //fileStructureAspects.fileEnDeCrypt(Cipher.ENCRYPT_MODE, secret, anonFile, anonFile);
 	        //attempting to implement some utility metrics, just printing atm
 	        /*for (ARXNode[] level : result.getLattice().getLevels()) {
 	            for (ARXNode node : level) {

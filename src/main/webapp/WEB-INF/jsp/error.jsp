@@ -9,7 +9,7 @@
 <script type="text/javascript" src="js/app.js"></script>
 <style>
 </style>
-<title>Fatal Error</title>
+<title>AARMRD Fatal Error</title>
 <link rel="icon" href="https://i.imgur.com/AEUtoVg.png" sizes="32x32" type="image/png">
 </head>
 <body>
@@ -19,7 +19,7 @@
   <div align=center>You have encountered an error<br>
   apologies for inconvenience caused</div>
   <div class="form">
-    <form action="/" method="post" onsubmit="return validate()">
+    <form action="/hadAnEror" method="post" onsubmit="return validate()">
       <input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" />
       <table>
