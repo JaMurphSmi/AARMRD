@@ -141,7 +141,9 @@ $(document).ready(function(){
 <script>
 function makeRepeatButtonsDisabled(){
 	document.getElementById("deleteDAH").disabled = true;
+	document.getElementById("deleteDAH").style.background = #7a7a7a; 
 	document.getElementById("canBeNullifiedByDelete").disabled = true;
+	document.getElementById("canBeNullifiedByDelete").style.background = #7a7a7a
 }
 </script>
 </body>
