@@ -55,7 +55,14 @@
 						<input name="THRESHOLD" id="THRESHOLD" type="number" min="0" max="1" step="0.01"/>
 						<input type="hidden" name="${_csrf.parameterName}"
 								value="${_csrf.token}" />
-						<br><br>
+						<div class="tooltipsR">&#10068;
+							<span class="tooltiptext">
+								This page measures percentage risk of your dataset<br>
+								The country selection box denotes the region that you are testing against<br>
+								The threshold is the percentage risk that a record must not surpass, begins at 0, max 1(100%). ie threshold set to 0.5(50%)<br>
+								success if 47%, failure if 53%. It is to allow the user to control the risk posed to their records.
+							</span>
+						</div><br><br>
 						<input type="submit" class="buttonsR" value="Submit Your Files">
 				</form><br><br>
 				<form action="/returnSender" method="post">
@@ -63,14 +70,7 @@
 							value="${_csrf.token}" />
 					<input type="submit" class="buttonsR" value="Return to Comparison"/> 
 				</form>
-				<div class="tooltipsR">&#10068;
-					<span class="tooltiptext">
-						This page measures percentage risk of your dataset<br>
-						The country selection box denotes the region that you are testing against<br>
-						The threshold is the percentage risk that a record must not surpass, begins at 0, max 1(100%). ie threshold set to 0.5(50%)<br>
-						success if 47%, failure if 53%. It is to allow the user to control the risk posed to their records.
-					</span>
-				</div>
+				
 			</div>
 		</div>
 <div>

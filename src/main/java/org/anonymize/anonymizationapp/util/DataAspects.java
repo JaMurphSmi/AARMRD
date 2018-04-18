@@ -177,7 +177,7 @@ public class DataAspects{
 		String flubRow = Arrays.toString(itHandle.next());//get the header of the dataset to display in bold
 		
 		int i = 1;
-		while((itHandle.hasNext()) && (i % 801 != 0)) {
+		while((itHandle.hasNext()) && (i % 201 != 0)) {
 			String row = Arrays.toString(itHandle.next());
 			String[] dataTemp = row.split("[\\[\\],]");//all data needs formatting to remove empty columns
 			String[] data = new String[dataTemp.length - 1];

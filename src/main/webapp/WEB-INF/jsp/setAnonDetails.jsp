@@ -17,13 +17,6 @@
   <hr>
 	  <div style="margin-left:50px">
 	  <h2>Your Submitted File Contents</h2>
-	 <div>
-	<table>
-	    <tr>
-	        <td><p class="tableText">Data FileName</p></td>
-	        <td><p class="tableText">${fileName}</p></td>
-	    </tr>
-	</table>
 	<br>
 	<div>
 		<div id="selectDetails">
@@ -48,7 +41,7 @@
 					</table>
 				</div>
 		</div>	
-		<br>
+		<br><br><br>
 		<div id="detailOptionsContainer">
 			<h2>Set the Attribute details for your data set!</h2>
 			<div class="tooltipsAD">&#10068;
