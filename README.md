@@ -5,14 +5,18 @@ Author: Jake Murphy Smith
 
 This Spring-Boot application is intended to provide users with access to a variety of utilities that provide and compliment the operation of data anonymization. This application is focused specifically at the anonymization of medical data for the purpose of secure distribution to third parties.  
   
+If you download this project file structure to your desktop, it is an easy effort to run it, simply navigate to the root of the containing directory and enter the command mvn spring-boot:run  
+The application should begin to build, and after ~20 seconds the application should be built to  
+"https://localhost:8443". Upon loading this url you will be presented with the default login screen of the Spring-Boot-Security module. The username will be simply "user" and the password will  
+be the procedurally generated string held in the command logs (usually visible within the screen)  
+
+Once this is done, the user may proceed to the application itself and begin their anonymization ventures
+  
 To implement the anonymization functionality it is intended to make use of the open-source ARX Deidentification API library available @: https://github.com/arx-deidentifier/arx
 ARX (C) 2012-2017 Fabian Prasser, Florian Kohlmayer and Contributors.  
   
 In the future it is also hoped to incorporate other anonymization suites to extend functionality and diversify options.  
-
-****How to run  
-To run AARMRD, when you have the files folder copied to their machine(desktop for easiest access, they should open a cmd command line  
-You should then navigate to the folder containing AARMRD's files. Once here it's just a case of typing "mvn spring-boot:run" Without Quotes.  
+  
 
 ****File Format Notes:  
   

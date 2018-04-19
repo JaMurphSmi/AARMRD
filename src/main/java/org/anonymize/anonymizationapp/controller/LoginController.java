@@ -35,6 +35,10 @@ public class LoginController {//potentially for utility AND risk analysis
 	@Autowired 
 	ExampleDaoImpl exampleDaoImpl;
 
+	
+	
+
+	
    @RequestMapping("/wakeme") 
    public String getDetails(@RequestParam("orgName") String orgName, @RequestParam("empName") String empName,
 		   Model model) {

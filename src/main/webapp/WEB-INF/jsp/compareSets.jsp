@@ -22,7 +22,7 @@
   	<c:if test="${not empty errorMessage}"><div><p class="tableText">${errorMessage}</p></div></c:if>
 			
 		<c:if test="${not empty dataRows}">
-		<div style="float:left;margin-left: 25px; max-width:425px;height:400px;overflow:auto;">
+		<div id="origin" style="float:left;margin-left: 25px; max-width:425px;height:400px;overflow:auto;">
 			<table style="border-collapse: collapse;">
 				<tr>
 					<c:forEach items="${headerRow}" var="head">
@@ -44,7 +44,7 @@
 		</div>
 		</c:if>
 		<c:if test="${not empty anonyRows}">
-		<div style="float:left;margin-left: 25px; max-width:425px;height:400px;overflow:auto;">
+		<div id="culmination" style="float:left;margin-left: 25px; max-width:425px;height:400px;overflow:auto;">
 			<table style="border-collapse: collapse;">
 				<tr>
 					<c:forEach items="${headerRow}" var="head">
@@ -136,6 +136,26 @@ $(document).ready(function(){
 			}
 		});
 	});
+});
+</script>
+<script>
+$("#origin").on("scroll",function(){
+    $("#culmination:not(this)").scrollTop($(this).scrollTop());
+});
+</script>
+<script>
+$("#culmination").on("scroll",function(){
+    $("#origin:not(this)").scrollTop($(this).scrollTop());
+});
+</script>
+<script>
+$("#origin").on("scroll",function(){
+    $("#culmination:not(this)").scrollLeft($(this).scrollLeft());
+});
+</script>
+<script>
+$("#culmination").on("scroll",function(){
+    $("#origin:not(this)").scrollLeft($(this).scrollLeft());
 });
 </script>
 <script>

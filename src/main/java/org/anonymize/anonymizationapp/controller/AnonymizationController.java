@@ -76,6 +76,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.HtmlUtils;
@@ -139,11 +140,7 @@ public class AnonymizationController extends AnonymizationBase {
    public String index() {
       return "login";
    }
-   
-   @RequestMapping("/login")
-   public String login() {
-      return "login";
-   }
+  
    
    @RequestMapping("/home") 
    public String getDetails(@RequestParam(value="orgName", required=false) String orgaName, @RequestParam(value="empName", required=false) String emplName,

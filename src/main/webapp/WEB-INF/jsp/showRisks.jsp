@@ -79,7 +79,7 @@
 		<div id="theRiskyDiv">
 				<button id="generateReport" class="buttonsR" onclick="makeDownloadButtonEnabled()">Generate Risk Report</button>
 				&nbsp&nbsp 
-				<div style="display:none;"><a href="/doPDFDownload" id="downloadButton" class="buttonsR">Download Risk Report</a></div>
+				<div id="downloadButton" style="display:none;"><a href="/doPDFDownload" class="buttonsR">Download Risk Report</a></div>
 				<br><br>
 				<c:if test="${not empty riskObject.threshold}">
 					<p class="tableText">Threshold Specified : ${riskObject.threshold}</p>		
