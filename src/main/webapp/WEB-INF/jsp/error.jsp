@@ -19,12 +19,12 @@
   <div align=center><p class="tableText">You have encountered an error<br>
   apologies for inconvenience caused</p></div>
   <div class="form">
-    <form action="/hadAnEror" method="post" onsubmit="return validate()">
+    <form action="/hadAnError" method="post" onsubmit="return validate()">
       <input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" />
       <table>
         <tr>
-          <td><p class="tableText">Looks like there's something I forgot to account for!</p></td>
+          <td><p class="tableText">Looks like there's something I forgot!</p></td>
           <td><input type="submit" class="formSubmitButton loginSubmit" value="Return"></td>
         </tr>
       </table>

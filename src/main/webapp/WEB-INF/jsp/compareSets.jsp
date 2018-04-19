@@ -71,7 +71,7 @@
 			<input type="submit" class="buttonsR" value="Go To Risk Assessment"/> 
 			<input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" />
-		</form><br><br><br>
+		</form><br>
 		<div class="tooltipcompSets">&#10068;<br>
 				<span class="tooltiptext2">
 				  	This option is provided to adhere to the General Data Protection Regulation.<br> 
@@ -91,19 +91,19 @@
 			<a href="/downloadAnonymizedFile" class="buttonsR" onclick="makeRepeatButtonsDisabled()">Download Anonymized Data</a>
 			<br><br>
 		  <div>
-		    <form action="/login" method="post">
+		    <form action="/" method="post">
 		      <input id="deleteDAHAF" type="submit" class="buttonsR" value="Begin Again/Upload New Files">
 		    	<input type="hidden" name="${_csrf.parameterName}"
 				  value="${_csrf.token}" />
 		    </form>
-		  </div><br><br>
+		  </div><br>
 		  <div>
 		    <form action="/uploadFiles" method="post">
 		      <input type="submit" id="canBeNullifiedByDelete" class="buttonsR" value="Use Same Data Again">
 		      <input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" />
 		    </form>
-		  </div>
+		  </div><br>
 		  <div>
 		  <form action="/logout" method="post">
 		      <input type="submit" class="buttonsR" value="Logout">
@@ -141,9 +141,9 @@ $(document).ready(function(){
 <script>
 function makeRepeatButtonsDisabled(){
 	document.getElementById("deleteDAH").disabled = true;
-	document.getElementById("deleteDAH").style.background = #7a7a7a; 
+	document.getElementById("deleteDAH").style.background = '#7a7a7a'; 
 	document.getElementById("canBeNullifiedByDelete").disabled = true;
-	document.getElementById("canBeNullifiedByDelete").style.background = #7a7a7a
+	document.getElementById("canBeNullifiedByDelete").style.background = '#7a7a7a';
 }
 </script>
 </body>

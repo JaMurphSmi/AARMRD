@@ -556,17 +556,7 @@ For showRisks.jsp
 	overflow: scrollable;
 }
 #riskGraphDiv {
-	width:1455px;
-}
-.riskInnerDivFreqTable {
-	float:left;
-	width:230px;
-	overflow:scrollable;
-}
-.riskTable {
-	width:225px;
-	height:275px;
-	float:left;
+	width:1355px;
 }
 #riskInnerDivLeft {
 	float:left;
@@ -575,13 +565,34 @@ For showRisks.jsp
 }
 #riskInnerDivRight {
 	 float:left;
-	 width:700px;
+	 width:600px;
 	 overflow:hidden;
 }
+
+.riskTable {
+	width:225px;
+	height:275px;
+	float:left;
+	border-collapse: collapse;
+}
+
 .riskInnerDivItem {
 	float:left;
-	width:700px;
+	width:635px;
+	height: 300px;
 	overflow:hidden;
+}
+
+.riskInnerDivFreqTable {
+	float:left;
+	width:230px;
+	height:300px;
+	overflow:auto;
+}
+
+.cellsSR {
+	border:solid 1px #eaea00;
+	color: #eaea00;
 }
 
 /* ==================================================

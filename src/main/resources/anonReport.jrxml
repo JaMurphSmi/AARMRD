@@ -30,11 +30,14 @@
 	<field name="value" class="java.lang.String">
 		<fieldDescription><![CDATA[value]]></fieldDescription>
 	</field>
+	<field name="secValue" class="java.lang.String">
+		<fieldDescription><![CDATA[secValue]]></fieldDescription>
+	</field>
 	<field name="attributeType" class="java.lang.String">
 		<fieldDescription><![CDATA[attributeType]]></fieldDescription>
 	</field>
 	<title>
-		<band height="287">
+		<band height="350">
 			<line>
 				<reportElement x="0" y="0" width="515" height="1" uuid="c6b662c2-bf10-4cf8-8fb9-ca50d95a4f0c"/>
 			</line>
@@ -249,69 +252,88 @@
 				<textFieldExpression><![CDATA[$P{Employee}]]></textFieldExpression>
 				<anchorNameExpression><![CDATA["Employee"]]></anchorNameExpression>
 			</textField>
+			<textField>
+				<reportElement x="-30" y="10" width="60" height="50" uuid="35017d11-da5c-481a-b1a6-564a44dd4af9"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<columnHeader>
-		<band height="20"/>
-	</columnHeader>
-	<detail>
-		<band height="16">
+		<band height="28">
 			<staticText>
-				<reportElement x="369" y="-15" width="136" height="15" uuid="0d46f301-9e03-433e-82fe-8cb0e0eeb34e"/>
+				<reportElement mode="Opaque" x="406" y="8" width="128" height="15" forecolor="#FFFFFF" backcolor="#70CF79" uuid="0d46f301-9e03-433e-82fe-8cb0e0eeb34e"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Attribute Type]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="250" y="0" width="121" height="15" uuid="3f1f7916-da11-453f-a8b6-c5fb72d910ae"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{value}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="136" y="0" width="121" height="15" uuid="d4426964-aff0-4b50-bc48-31c96ab43321"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{algorithm}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="12" y="0" width="121" height="15" uuid="d091db1b-fc6f-498b-9274-7a1b9bf1277a"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{fieldName}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="370" y="0" width="121" height="15" uuid="a0895585-aaad-4ac4-996d-6a7fd2c9ea93"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{attributeType}]]></textFieldExpression>
-			</textField>
 			<staticText>
-				<reportElement x="-3" y="-15" width="136" height="15" uuid="90f3908f-a778-4ff2-8a75-4dd8992919a5"/>
+				<reportElement mode="Opaque" x="-2" y="8" width="136" height="15" forecolor="#FFFFFF" backcolor="#70CF79" uuid="90f3908f-a778-4ff2-8a75-4dd8992919a5"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Field]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="122" y="-15" width="136" height="15" uuid="47db5962-7e17-4d76-a9db-359253f15f07"/>
+				<reportElement mode="Opaque" x="109" y="8" width="136" height="15" forecolor="#FFFFFF" backcolor="#70CF79" uuid="47db5962-7e17-4d76-a9db-359253f15f07"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Algorithm]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="240" y="-15" width="136" height="15" uuid="150f9da5-0d2c-461f-9151-e3c435d2254d"/>
+				<reportElement mode="Opaque" x="210" y="8" width="136" height="15" forecolor="#FFFFFF" backcolor="#70CF79" uuid="150f9da5-0d2c-461f-9151-e3c435d2254d"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Value]]></text>
 			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="295" y="8" width="136" height="15" forecolor="#FFFFFF" backcolor="#70CF79" uuid="560ca118-73bb-416b-b854-57f45b7ba980"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[2nd Value]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30">
+			<textField>
+				<reportElement x="220" y="2" width="121" height="15" uuid="3f1f7916-da11-453f-a8b6-c5fb72d910ae"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{value}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="2" width="121" height="15" uuid="d4426964-aff0-4b50-bc48-31c96ab43321"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{algorithm}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="2" width="121" height="15" uuid="d091db1b-fc6f-498b-9274-7a1b9bf1277a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{fieldName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="409" y="2" width="113" height="15" uuid="a0895585-aaad-4ac4-996d-6a7fd2c9ea93"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{attributeType}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="295" y="2" width="121" height="15" uuid="189094c9-2d58-44ca-aa2d-cf4cc06519db"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{secValue}]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 </jasperReport>

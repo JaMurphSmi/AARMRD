@@ -857,7 +857,7 @@ public class AnonymizationController extends AnonymizationBase {
 				    tempFreq = f.format(frequency[j]*100.0);
 				    inputValuesClean.put(values[j], tempFreq);
 				}
-				pieChartGenerator.makePieChart(empOrg, header, inputValuesClean);
+				//pieChartGenerator.makePieChart(empOrg, header, inputValuesClean);
 				System.out.println();
 			inputDistributions.put(header, inputValues);
 			// Print frequencies
@@ -876,7 +876,7 @@ public class AnonymizationController extends AnonymizationBase {
 				    tempFreq = f.format(frequency[j]*100.0);
 				    outputValuesClean.put(values[j], tempFreq);
 				}
-				pieChartGenerator.makePieChart(empOrg,header+"_1",outputValuesClean);
+				//pieChartGenerator.makePieChart(empOrg,header+"_1",outputValuesClean);
 				System.out.println();
 				outputDistributions.put(header, outputValues);
 				++i;

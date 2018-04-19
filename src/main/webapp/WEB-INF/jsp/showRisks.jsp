@@ -26,15 +26,15 @@
 					<table id="tablesR">
 						<tr>
 							<c:forEach items="${headerRow}" var="head"><!-- maybe add a percentage column? -->
-								<th id="cADTH" align="center">
-									${head}
+								<th class="cADTH" align="center">
+									<p class="tableText">${head}</p>
 								</th>
 							</c:forEach>
 						</tr>
 						    <c:forEach items="${anonyRows}" var="anonRow">
 							    <tr>
 							    	<c:forEach items="${anonRow}" var="anonItem">
-									    <td id="tdsR" align="center">
+									    <td class="cellsSR" align="center">
 									       	<p class="tableText">${anonItem}</p>     
 									    </td>
 									</c:forEach>    
@@ -79,13 +79,13 @@
 		<div id="theRiskyDiv">
 				<button id="generateReport" class="buttonsR" onclick="makeDownloadButtonEnabled()">Generate Risk Report</button>
 				&nbsp&nbsp 
-				<a href="/doPDFDownload" class="buttonsR">Download Risk Report</a>
+				<div style="display:none;"><a href="/doPDFDownload" id="downloadButton" class="buttonsR">Download Risk Report</a></div>
 				<br><br>
 				<c:if test="${not empty riskObject.threshold}">
 					<p class="tableText">Threshold Specified : ${riskObject.threshold}</p>		
 				</c:if>
 				<c:if test="${not empty riskObject.country}">
-					<p class="tableText">Country : ${riskObject.country}</p><br><br>
+					<p class="tableText">Country : ${riskObject.country}</p><br>
 				</c:if>
 				<c:if test="${not empty riskObject.prosecutorStats && not empty riskObject.journalistStats && not empty riskObject.marketerStat}">
 					<h2>Attacker Models Statistics</h2> 
@@ -264,7 +264,7 @@ $(document).ready(function(){
 </script>
 <script type="text/javascript">
 function makeDownloadButtonEnabled() {
-	document.getElementById('downloadReport').disabled = false;
+	document.getElementById('downloadReport').style.display = 'block';
 }
 </script>
 </body>

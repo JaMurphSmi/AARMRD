@@ -10,6 +10,8 @@ public class AlgorithmObject {
 	
 	private String value;
 	
+	private String secValue;
+	
 	private String attributeType;
 	
 	
@@ -54,5 +56,13 @@ public class AlgorithmObject {
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public String getSecValue() {
+		return secValue;
+	}
+
+	public void setSecValue(String secValue) {
+		this.secValue = secValue;
 	}
 }
