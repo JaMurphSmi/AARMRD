@@ -22,11 +22,11 @@
   	<hr>
   	<!-- styled to float over the submit box -->
   	<div style="overflow:hidden;">
-			<div style="float:left;margin-left: 100px;max-width:550px;height:400px;overflow:auto;">
+			<div style="float:left;margin-left:50px;max-width:550px;height:400px;overflow:auto;">
 					<table id="tablesR">
 						<tr>
 							<c:forEach items="${headerRow}" var="head"><!-- maybe add a percentage column? -->
-								<th id="thsR" align="center">
+								<th id="cADTH" align="center">
 									${head}
 								</th>
 							</c:forEach>
@@ -50,11 +50,7 @@
 							<c:forEach items="${countries}" var="country">
 								<option value="${country}">${country}</option>
 							</c:forEach>
-						</select>
-					<label for="THRESHOLD">Threshold : </label>
-						<input name="THRESHOLD" id="THRESHOLD" type="number" min="0" max="1" step="0.01"/>
-						<input type="hidden" name="${_csrf.parameterName}"
-								value="${_csrf.token}" />
+						</select> 
 						<div class="tooltipsR">&#10068;
 							<span class="tooltiptext">
 								This page measures percentage risk of your dataset<br>
@@ -62,7 +58,12 @@
 								The threshold is the percentage risk that a record must not surpass, begins at 0, max 1(100%). ie threshold set to 0.5(50%)<br>
 								success if 47%, failure if 53%. It is to allow the user to control the risk posed to their records.
 							</span>
-						</div><br><br>
+						</div>
+					<label for="THRESHOLD">Threshold : </label>
+						<input name="THRESHOLD" id="THRESHOLD" type="number" min="0" max="1" step="0.01"/>
+						<input type="hidden" name="${_csrf.parameterName}"
+								value="${_csrf.token}" />
+						<br><br>
 						<input type="submit" class="buttonsR" value="Submit Your Files">
 				</form><br><br>
 				<form action="/returnSender" method="post">
@@ -87,7 +88,7 @@
 					<p class="tableText">Country : ${riskObject.country}</p><br><br>
 				</c:if>
 				<c:if test="${not empty riskObject.prosecutorStats && not empty riskObject.journalistStats && not empty riskObject.marketerStat}">
-					<h4>Attacker Models Statistics</h4> 
+					<h2>Attacker Models Statistics</h2> 
 					<table style="float:left;border-collapse: collapse;">
 						<tr>
 							<th></th>
@@ -121,23 +122,23 @@
 				<c:if test="${not empty riskObject.dataSetInputDistributionMetrics && not empty riskObject.dataSetOutputDistributionMetrics}">
 					<div id="riskGraphDiv" align="center">
 						<div id="riskInnerDivLeft">
-							Input Data Set Value Distribution Statistics <br><br>
+							<p class="textTable">Input Data Set Value Distribution Statistics</p> <br><br>
 							<!-- make the whole table in a loop? --> 
 							<c:forEach items="${riskObject.dataSetInputDistributionMetrics}" var="inputMapEntry">
 								<div class="riskInnerDivItem">
 									<div class="riskInnerDivFreqTable">
 										<table class="riskTable">
 											<tr>
-												<th colspan="2"><c:out value="${inputMapEntry.key}"/></th>
+												<th colspan="2" class="cellsSR"><c:out value="${inputMapEntry.key}"/></th>
 											</tr>
 											<tr>
-												<td>Value</td>
-												<td>Frequency</td>
+												<td class="cellsSR">Value</td>
+												<td class="cellsSR">Frequency</td>
 											</tr>
 											<c:forEach items="${inputMapEntry.value}" var="inputMapValueEntry">
 												<tr>
-													<td><c:out value="${inputMapValueEntry.key}"/></td>
-													<td><c:out value="${inputMapValueEntry.value}%"/></td>
+													<td class="cellsSR"><c:out value="${inputMapValueEntry.key}"/></td>
+													<td class="cellsSR"><c:out value="${inputMapValueEntry.value}%"/></td>
 												</tr>
 											</c:forEach>
 										</table>
@@ -148,22 +149,22 @@
 							</c:forEach>
 						</div>
 						<div id="riskInnerDivRight">
-							 Output Data Set Value Distribution Statistics <br><br>
+							 <p class="textTable">Output Data Set Value Distribution Statistics</p> <br><br>
 							<c:forEach items="${riskObject.dataSetOutputDistributionMetrics}" var="outputMapEntry">
 								<div class="riskInnerDivItem">
 									<div class="riskInnerDivFreqTable">
 										<table class="riskTable">
 											<tr>
-												<th colspan="2"><c:out value="${outputMapEntry.key}"/></th>
+												<th colspan="2" class="cellsSR"><c:out value="${outputMapEntry.key}"/></th>
 											</tr>
 											<tr>
-												<td>Value</td>
-												<td>Frequency</td>
+												<td class="cellsSR">Value</td>
+												<td class="cellsSR">Frequency</td>
 											</tr>
 											<c:forEach items="${outputMapEntry.value}" var="outputMapValueEntry">
 												<tr>
-													<td><c:out value="${outputMapValueEntry.key}"/></td>
-													<td><c:out value="${outputMapValueEntry.value}%"/></td>
+													<td class="cellsSR"><c:out value="${outputMapValueEntry.key}"/></td>
+													<td class="cellsSR"><c:out value="${outputMapValueEntry.value}%"/></td>
 												</tr>
 											</c:forEach>
 										</table>

@@ -22,10 +22,11 @@ function checkFieldNeeded(indexOfChange) {
 		return true;
 	}
 	else if (algoSelectBox === "k-anonymity") {
-		document.getElementByID("exValues_" + indexOfChange).steps = '1';
+		document.getElementById("valuesForMod_" + indexOfChange).step = '1';
+		document.getElementById("exValues_" + indexOfChange).readOnly = true;
 	}
 	else {
-		document.getElementById("exValues_" + indexOfChange).steps = '0.1';
+		document.getElementById("valuesForMod_" + indexOfChange).step = '0.1';
 		document.getElementById("exValues_" + indexOfChange).value = '0';
 		document.getElementById("exValues_" + indexOfChange).readOnly = true;
 		return false;

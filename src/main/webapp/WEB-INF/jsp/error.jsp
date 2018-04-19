@@ -16,15 +16,15 @@
 	<div class="americasNextTopDiv"><img src="https://i.imgur.com/hLCDoAZ.png"/></div>
   <h1>Error</h1>
   <hr>
-  <div align=center>You have encountered an error<br>
-  apologies for inconvenience caused</div>
+  <div align=center><p class="tableText">You have encountered an error<br>
+  apologies for inconvenience caused</p></div>
   <div class="form">
     <form action="/hadAnEror" method="post" onsubmit="return validate()">
       <input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" />
       <table>
         <tr>
-          <td><p class="tableText">Return to Home</p></td>
+          <td><p class="tableText">Looks like there's something I forgot to account for!</p></td>
           <td><input type="submit" class="formSubmitButton loginSubmit" value="Return"></td>
         </tr>
       </table>

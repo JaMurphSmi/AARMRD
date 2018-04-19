@@ -70,7 +70,7 @@
 								<form:option value="${algo}">${algo}</form:option>
 							</c:forEach>
 						</form:select>
-						&nbsp&nbspValue: <form:input type="number" path="valuesForModels[${fieldNumber.index}]" step="0.1"/>
+						&nbsp&nbspValue: <form:input type="number" id="valuesForMod_${fieldNumber.index}" path="valuesForModels[${fieldNumber.index}]" step="0.1"/>
 						<!-- span initially hidden -->
 						&nbsp&nbspSecond Value<form:input type="number" id="exValues_${fieldNumber.index}" path="extraForModels[${fieldNumber.index}]" step="0.1" readOnly="true"/>
 						&nbsp&nbspField Attribute Type: 

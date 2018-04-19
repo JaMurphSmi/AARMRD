@@ -4,6 +4,7 @@ package org.anonymize.anonymizationapp.controller;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 // Importing ARX required modules, dependencies etc
@@ -201,6 +202,16 @@ public class AnonymizationController extends AnonymizationBase {
    
    @RequestMapping("/hadAnError")
    public String getError(Model model) {
+	   sourceData = null;//remove data because of error
+	   try {
+		dataAspectsHelper.deleteAllFiles(empOrg);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	   model.addAttribute("empName", empName);
 	   model.addAttribute("orgName", orgName);
 	   return "index";
@@ -451,6 +462,7 @@ public class AnonymizationController extends AnonymizationBase {
 				algObject.setAttributeType(attributesChosen[index]);
 				
 				algorithmStats.add(algObject);
+				++index;
 			}
 	
 			DataHandle handle = sourceData.getHandle();
@@ -511,12 +523,9 @@ public class AnonymizationController extends AnonymizationBase {
 	        	}
 	        	else if (modelsChosen[i].equals("equal distance t-closeness")) {//for particular sensitive fields
 	        		anonymizationConfiguration.addPrivacyModel(new EqualDistanceTCloseness(header, valuesForModels[i]));
-	        	}
-	        	
-	        	
+	        	}	
 	        	++i;//needed sentinel i to control algorithm aspect
 	        }
-	        //anonymizationConfiguration.addPrivacyModel(new KAnonymity(2));//add privacy model, with supplied severity
 	        
 	        anonymizationConfiguration.setMaxOutliers(0d);
 
@@ -746,9 +755,8 @@ public class AnonymizationController extends AnonymizationBase {
 				public void deleteAnonymizedData() throws IOException {
 					//when work complete and user wants record gone, need to remove from file system
 					try {//will need to search through directory to get list for combo box
-						String deleteName = "src/main/resources/templates/outputs/" + empOrg + "/";
 						System.out.println("Just before delete");
-						dataAspectsHelper.deleteAnonFile(deleteName);
+						dataAspectsHelper.deleteAllFiles(empOrg);
 						System.out.println("Just after delete");
 					}
 					catch (IOException failure) {

@@ -22,7 +22,7 @@
   	<c:if test="${not empty errorMessage}"><div><p class="tableText">${errorMessage}</p></div></c:if>
 			
 		<c:if test="${not empty dataRows}">
-		<div style="float:left;margin-left: 100px; max-width:425px;height:400px;overflow:auto;">
+		<div style="float:left;margin-left: 25px; max-width:425px;height:400px;overflow:auto;">
 			<table style="border-collapse: collapse;">
 				<tr>
 					<c:forEach items="${headerRow}" var="head">
@@ -44,11 +44,11 @@
 		</div>
 		</c:if>
 		<c:if test="${not empty anonyRows}">
-		<div style="float:left;margin-left: 100px; max-width:425px;height:400px;overflow:auto;">
+		<div style="float:left;margin-left: 25px; max-width:425px;height:400px;overflow:auto;">
 			<table style="border-collapse: collapse;">
 				<tr>
 					<c:forEach items="${headerRow}" var="head">
-						<th align="center" style="width:35px;border:1px solid #ddd;background-color: #35d733;">
+						<th align="center" id="cADTH">
 							${head}
 						</th>
 					</c:forEach>
