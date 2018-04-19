@@ -48,7 +48,7 @@
 			<table style="border-collapse: collapse;">
 				<tr>
 					<c:forEach items="${headerRow}" var="head">
-						<th align="center" id="cADTH">
+						<th align="center" class="cADTH">
 							${head}
 						</th>
 					</c:forEach>

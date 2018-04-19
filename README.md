@@ -10,6 +10,10 @@ ARX (C) 2012-2017 Fabian Prasser, Florian Kohlmayer and Contributors.
   
 In the future it is also hoped to incorporate other anonymization suites to extend functionality and diversify options.  
 
+****How to run  
+To run AARMRD, when you have the files folder copied to their machine(desktop for easiest access, they should open a cmd command line  
+You should then navigate to the folder containing AARMRD's files. Once here it's just a case of typing "mvn spring-boot:run" Without Quotes.  
+
 ****File Format Notes:  
   
 For best results  
@@ -30,5 +34,10 @@ Notes for hierarchy file formats:
 
 The only format accepted currently is CSV  
 CSV: Please name your file in the format of [your dataset file's name]_hierarchy_[field name].csv to make import as successful as possible  
-No heading is required inside this data file, all that is required is your defined hierarchy, with values separated by a ';' ie age hierarchy: 34;<50;<=65;*
-										  
+No heading is required inside this data file, all that is required is your defined hierarchy, with values separated by a ';' ie age hierarchy: 34;<50;<=65;*  
+  
+----------------------------------------------------------------------------------------------------------------------------
+Notes for output file formats:
+----------------------------------------------------------------------------------------------------------------------------.
+  
+The standard format that the application will dispense upon completion is CSV  

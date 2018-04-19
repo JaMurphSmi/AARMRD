@@ -324,18 +324,18 @@ For needHierarchies.jsp
 For compareSet.jsp
 =================================================== */
 #thSR {
-	width:35px;
+	max-width:100px;
 	border:1px solid #ddd;
 	background-color: #35d733;
 }
 .cSDTH {
-	width:50px;
+	max-width:100px;
 	border:1px solid #ddd;
 	background-color: #e16830;
 	color:#d5ce66;
 }
 .cADTH {
-	width:35px;
+	width:50px;
 	border:1px solid #ddd;
 	background-color: #35d733;
 }
