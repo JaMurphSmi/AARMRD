@@ -11,6 +11,8 @@ public class AnonymizationReport {
 	private String journalistHighestRisk;
 	private String journalistSuccessRate;
 	private String marketerStat;
+	private String prosecutorGDPR;
+	private String journalistGDPR;
 	private String informationLoss;
 	private String timeTaken;
 	
@@ -100,6 +102,22 @@ public class AnonymizationReport {
 	}
 	public void setTimeTaken(String timeTaken) {
 		this.timeTaken = timeTaken;
+	}
+
+	public String getProsecutorGDPR() {
+		return prosecutorGDPR;
+	}
+
+	public void setProsecutorGDPR(String prosecutorGDPR) {
+		this.prosecutorGDPR = prosecutorGDPR;
+	}
+
+	public String getJournalistGDPR() {
+		return journalistGDPR;
+	}
+
+	public void setJournalistGDPR(String journalistGDPR) {
+		this.journalistGDPR = journalistGDPR;
 	}
 	
 }

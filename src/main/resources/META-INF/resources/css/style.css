@@ -28,6 +28,7 @@ h1 {
 }
 h2 {
 	color: #f4dc24;
+	font-size: 2em;
 }
 h4 {
 	color: #f4dc24;
@@ -38,6 +39,11 @@ h4 {
 
 .tableText{
 	color: #f4dc24;
+}
+
+.tableText1{
+	color: #f4dc24;
+	font-size: 1.5em;
 }
 /* ==================================================
 For login.jsp
@@ -62,6 +68,10 @@ For login.jsp
 	margin-left:135px;
 }
 
+#logoutForm {
+	margin-top: -100px;
+	margin-left: 1025px;
+}
 #blerbDiv {
 	margin-left:150px;	
 	padding-left:50px;
@@ -355,7 +365,7 @@ For compareSet.jsp
     border-radius: 6px;
     border-width: 2px;
     border-style: solid;
-    padding: 5px 0;
+    padding: 5px 5px 5px 5px;
     position: absolute;
     z-index: 1;
     bottom: 125%;
@@ -390,7 +400,7 @@ For compareSet.jsp
     border-radius: 6px;
     border-width: 2px;
     border-style: solid;
-    padding: 5px 0;
+    padding: 5px 5px 5px 5px;
     position: absolute;
     z-index: 1;
     bottom: 125%;

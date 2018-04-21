@@ -49,7 +49,7 @@
 				<tr>
 					<c:forEach items="${headerRow}" var="head">
 						<th align="center" class="cADTH">
-							${head}
+							<p class="tableText">${head}</p>
 						</th>
 					</c:forEach>
 				</tr>

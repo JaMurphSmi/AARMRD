@@ -43,9 +43,9 @@
 					</table>
 			</div>
 			<div id="setRiskDetails">
-				<h3>Set your Risk Assessment Details</h3>			
+				<h2><p class="tableText">Set your Risk Assessment Details</p></h2>			
 				<form action="/analyseRisks" method="POST">
-					<label for="populationRegion">Select Region : </label>
+					<label for="populationRegion"><span style="color: #f4dc24;">Select Region : </span></label>
 						<select name="populationRegion">
 							<c:forEach items="${countries}" var="country">
 								<option value="${country}">${country}</option>
@@ -59,7 +59,7 @@
 								success if 47%, failure if 53%. It is to allow the user to control the risk posed to their records.
 							</span>
 						</div>
-					<label for="THRESHOLD">Threshold : </label>
+					<label for="THRESHOLD"><span style="color: #f4dc24;">Threshold : </span></label>
 						<input name="THRESHOLD" id="THRESHOLD" type="number" min="0" max="1" step="0.01"/>
 						<input type="hidden" name="${_csrf.parameterName}"
 								value="${_csrf.token}" />
@@ -79,14 +79,14 @@
 		<div id="theRiskyDiv">
 				<button id="generateReport" class="buttonsR" onclick="makeDownloadButtonEnabled()">Generate Risk Report</button>
 				&nbsp&nbsp 
-				<div id="downloadButton" style="display:none;"><a href="/doPDFDownload" class="buttonsR">Download Risk Report</a></div>
-				<br><br>
+				<div id="downloadDiv" style="display:none;"><a href="/doPDFDownload" class="buttonsR">Download Risk Report</a></div>
+				<br><br><div class="form"><p class="tableText1">
 				<c:if test="${not empty riskObject.threshold}">
-					<p class="tableText">Threshold Specified : ${riskObject.threshold}</p>		
-				</c:if>
+					Threshold Specified : ${riskObject.threshold}		
+				</c:if>&nbsp&nbsp&nbsp
 				<c:if test="${not empty riskObject.country}">
-					<p class="tableText">Country : ${riskObject.country}</p><br>
-				</c:if>
+					Country : ${riskObject.country}<br>
+				</c:if></p></div>
 				<c:if test="${not empty riskObject.prosecutorStats && not empty riskObject.journalistStats && not empty riskObject.marketerStat}">
 					<h2>Attacker Models Statistics</h2> 
 					<table style="float:left;border-collapse: collapse;">
@@ -95,6 +95,7 @@
 							<th class="sRTh"><p class="tableText">Prosecutor Model</p></th>
 							<th class="sRTh"><p class="tableText">Journalist Model</p></th>
 							<th class="sRTh"><p class="tableText">Marketer Model</p></th>
+							<th class="sRTh"><p class="tableText">GDPR Compliant</p></th>
 						</tr>
 						<tr>
 							<td class="sRTh"><p class="tableText">Records at Risk</p></td>
@@ -113,6 +114,13 @@
 							<td class="srTd"><p class="tableText">${riskObject.prosecutorStats[2]}</p></td>
 							<td class="srTd"><p class="tableText">${riskObject.journalistStats[2]}</p></td>
 							<td class="srTd"><p class="tableText">${riskObject.marketerStat}</p></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td class="sRTh"><p class="tableText">GDPR Compliant</p></td>
+							<td class="srTdGDPR" style="background-color:${riskObject.prosecutorStats[4]};"><p class="tableText" id="GDPR1">${riskObject.prosecutorStats[3]}</p></td>
+							<td class="srTdGDPR" style="background-color:${riskObject.journalistStats[4]};"><p class="tableText" id="GDPR2">${riskObject.journalistStats[3]}</p></td>
+							<td></td>
 						</tr>
 					</table>
 				</c:if>
@@ -262,9 +270,9 @@ $(document).ready(function(){
 	});									
 });
 </script>
-<script type="text/javascript">
+<script>
 function makeDownloadButtonEnabled() {
-	document.getElementById('downloadReport').style.display = 'block';
+	document.getElementById('downloadDiv').style.display = 'inline';
 }
 </script>
 </body>

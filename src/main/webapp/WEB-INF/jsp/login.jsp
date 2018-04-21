@@ -13,7 +13,12 @@
 <link rel="icon" href="https://i.imgur.com/AEUtoVg.png" sizes="32x32" type="image/png">
 </head>
 <body>
-<h1>Login</h1>
+<h1>Identification</h1>
+<form action="/logout" id="logoutForm" method="post">
+		      <input type="submit" class="formSubmitButton loginSubmit" value="Logout">
+		      <input type="hidden" name="${_csrf.parameterName}"
+				value="${_csrf.token}" />
+		    </form>
 <hr>
 	<div class="armedGuard"><img src="https://i.imgur.com/zIg1yrH.png"/></div><br>
 	<c:if test="${param.error}">

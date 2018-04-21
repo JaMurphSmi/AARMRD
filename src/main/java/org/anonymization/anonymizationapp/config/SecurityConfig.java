@@ -37,6 +37,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         authenticationMgr.inMemoryAuthentication().withUser("testUser").password("testPassword")
             .authorities("ROLE_USER").and().withUser("demoUser").password("demoPassword")
             .authorities("ROLE_USER").and().withUser("newUser").password("demoPassword")
+            .authorities("ROLE_USER").and().withUser("michaelMcsorely").password("Tepid Heights")
+            .authorities("ROLE_USER").and().withUser("habitualCryer").password("theRightPass")
             .authorities("ROLE_USER");
     }
 }

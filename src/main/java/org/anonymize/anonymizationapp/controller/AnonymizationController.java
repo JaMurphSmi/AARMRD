@@ -592,7 +592,7 @@ public class AnonymizationController extends AnonymizationBase {
 	        
 	        String flubRow = Arrays.toString(transformed.next());// to remove header from answer also
 	       
-	        while((transformed.hasNext()) && (i % 801 != 0)) {
+	        while((transformed.hasNext()) && (i % 201 != 0)) {
 				String row = Arrays.toString(transformed.next());
 				String[] dataTemp = row.split("[\\[\\],]");//all data needs formatting to remove empty columns
 				String[] data = new String[dataTemp.length - 1];
@@ -775,7 +775,7 @@ public class AnonymizationController extends AnonymizationBase {
 		        
 		        File downloadFile = new File(fullPath);
 		        // quickly decrypt before downloading
-		        fileStructureAspects.fileEnDeCrypt(Cipher.DECRYPT_MODE, secret, downloadFile, downloadFile);
+		        //fileStructureAspects.fileEnDeCrypt(Cipher.DECRYPT_MODE, secret, downloadFile, downloadFile);
 		        
 		        FileInputStream inputStream = new FileInputStream(downloadFile);
 		         
@@ -895,7 +895,7 @@ public class AnonymizationController extends AnonymizationBase {
 	 */
 	private RiskObject analyzeDataRisk(DataHandle handle, String populationRegion, double THRESHOLD, RiskObject riskObject) {   
 	    
-		String[] proseJourn = new String[3];//temp string array for prosecutor/journalist to put into riskObject
+		String[] proseJourn = new String[5];//temp string array for prosecutor/journalist to put into riskObject
 		
 		riskObject.setThreshold(getPercent(THRESHOLD));
 		anonReport.setThreshold(getPercent(THRESHOLD));
@@ -920,6 +920,15 @@ public class AnonymizationController extends AnonymizationBase {
 	    anonReport.setProsecutorHighestRisk(getPercent(risks.getProsecutorRisk().getHighestRisk()));
 	    proseJourn[2] = getPercent(risks.getProsecutorRisk().getSuccessRate());
 	    anonReport.setProsecutorSuccessRate(getPercent(risks.getProsecutorRisk().getSuccessRate()));
+	    if(getPercent(risks.getProsecutorRisk().getSuccessRate()).equals("0%")) {
+	    	anonReport.setProsecutorGDPR("Compliant");
+	    	proseJourn[3] = "Compliant";
+	    	proseJourn[4] = "#35d733";
+	    } else {
+	    	anonReport.setProsecutorGDPR("Non-Compliant");
+	    	proseJourn[3] = "Non-Compliant";
+	    	proseJourn[4] = "#e16830";
+	    }
 	    //write prosecutor risks
 	    riskObject.setProsecutorStats(proseJourn);
 	    
@@ -935,6 +944,15 @@ public class AnonymizationController extends AnonymizationBase {
 	    anonReport.setJournalistHighestRisk(getPercent(risks.getJournalistRisk().getHighestRisk()));
 	    proseJourn[2] = getPercent(risks.getJournalistRisk().getSuccessRate());
 	    anonReport.setJournalistSuccessRate(getPercent(risks.getJournalistRisk().getSuccessRate()));
+	    if(getPercent(risks.getProsecutorRisk().getSuccessRate()).equals("0%")) {
+	    	anonReport.setJournalistGDPR("Compliant");
+	    	proseJourn[3] = "Compliant";
+	    	proseJourn[4] = "#35d733";
+	    } else {
+	    	anonReport.setJournalistGDPR("Non-Compliant");
+	    	proseJourn[3] = "Non-Compliant";
+	    	proseJourn[4] = "#e16830";
+	    }
 	    
 	    riskObject.setJournalistStats(proseJourn);
 	    
@@ -1047,6 +1065,8 @@ public class AnonymizationController extends AnonymizationBase {
 	      parameters.put("prosecutorRecordsAtRisk", anonReport.getProsecutorRecordsAtRisk());
 	      parameters.put("prosecutorSuccessRate", anonReport.getProsecutorSuccessRate());
 	      parameters.put("marketerStat", anonReport.getMarketerStat());
+	      parameters.put("journalistGDPR", anonReport.getJournalistGDPR());
+	      parameters.put("prosecutorGDPR", anonReport.getProsecutorGDPR());
 	      
 	      
 	      if(!new File(jrprintFile).exists()) {

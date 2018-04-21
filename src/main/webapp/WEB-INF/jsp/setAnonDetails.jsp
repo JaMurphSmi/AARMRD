@@ -42,7 +42,7 @@
 				</div>
 		</div>	
 		<br><br><br>
-		<div id="detailOptionsContainer">
+		<div id="detailOptionsContainer" style="color:#ecec00;">
 			<h2>Set the Attribute details for your data set!</h2>
 			<div class="tooltipsAD">&#10068;
   			<span class="tooltiptext">
@@ -64,7 +64,7 @@
 					<form:hidden path="fileName"/>
 					<c:forEach items="${headerRow}" var="head" varStatus="fieldNumber">
 						${head}:&nbsp&nbsp&nbsp&nbsp
-						<form:select path="modelsChosen[${fieldNumber.index}]" id="modChosen_${fieldNumber.index}" onchange="checkFieldNeeded(${fieldNumber.index})">
+						<form:select path="modelsChosen[${fieldNumber.index}]" id="modChosen_${fieldNumber.index}" onchange="checkFieldNeededAndType(${fieldNumber.index})">
 								<form:option value="- - NONE - -">- - NONE - -</form:option>
 							<c:forEach items="${models}" var="algo">
 								<form:option value="${algo}">${algo}</form:option>
@@ -72,9 +72,9 @@
 						</form:select>
 						&nbsp&nbspValue: <form:input type="number" id="valuesForMod_${fieldNumber.index}" path="valuesForModels[${fieldNumber.index}]" step="0.1"/>
 						<!-- span initially hidden -->
-						&nbsp&nbspSecond Value<form:input type="number" id="exValues_${fieldNumber.index}" path="extraForModels[${fieldNumber.index}]" step="0.1" readOnly="true"/>
-						&nbsp&nbspField Attribute Type: 
-						<form:select path="attributesChosen[${fieldNumber.index}]"><!-- attributes will be identifying by default -->
+						&nbsp&nbspSecond Value: <form:input type="number" id="exValues_${fieldNumber.index}" style="background:#d1d1d1;" path="extraForModels[${fieldNumber.index}]" step="0.1" readOnly="true"/>
+						&nbsp&nbspAttribute Type: 
+						<form:select path="attributesChosen[${fieldNumber.index}]" id="attValues_${fieldNumber.index}"><!-- attributes will be identifying by default -->
 							<c:forEach items="${attributes}" var="anAttribute"> 
 								<form:option value="${anAttribute}">${anAttribute}</form:option>
 							</c:forEach>

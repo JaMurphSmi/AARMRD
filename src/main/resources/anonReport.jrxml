@@ -18,6 +18,8 @@
 	<parameter name="prosecutorRecordsAtRisk" class="java.lang.String"/>
 	<parameter name="prosecutorSuccessRate" class="java.lang.String"/>
 	<parameter name="marketerStat" class="java.lang.String"/>
+	<parameter name="prosecutorGDPR" class="java.lang.String"/>
+	<parameter name="journalistGDPR" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -255,6 +257,29 @@
 			<textField>
 				<reportElement x="-30" y="10" width="60" height="50" uuid="35017d11-da5c-481a-b1a6-564a44dd4af9"/>
 				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="280" width="136" height="15" uuid="5afb2ec9-2575-48fe-acf4-b767c0c0d1c7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[GDPR Compliance]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="140" y="280" width="121" height="15" uuid="90cabbf1-0625-4875-8a75-a80e0d1a80c0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{prosecutorGDPR}]]></textFieldExpression>
+				<anchorNameExpression><![CDATA["prosecutorGDPR"]]></anchorNameExpression>
+			</textField>
+			<textField>
+				<reportElement x="279" y="280" width="121" height="15" uuid="7749ec18-f286-4755-9ce5-353b7529b974"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{journalistGDPR}]]></textFieldExpression>
+				<anchorNameExpression><![CDATA["journalistGDPR"]]></anchorNameExpression>
 			</textField>
 		</band>
 	</title>

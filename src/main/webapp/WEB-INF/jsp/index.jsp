@@ -15,12 +15,12 @@
 <body>
 	<div class="americasNextTopDiv"><img src="https://i.imgur.com/DpvFqJW.png"/></div>
   <h1>AARMRD - Homepage</h1>
-  <div id="blerbDiv"><p id="blerb"><strong>&nbsp&nbsp&nbsp&nbsp&nbspHello <c:if test="${empName ne null && orgName ne null}"><c:out value="${empName}" escapeXml="true"/> from <c:out value="${orgName}" escapeXml="true"/></c:if>!
-  <br>Let's get started with your data anonymization, please select your data file ( which has a maximum size of 1GB) and your hierarchy file(s) for each field, then submit!</strong></p></div>
+  <div id="blerbDiv" style="text-align:center;"><p id="blerb"><strong>&nbsp&nbsp&nbsp&nbsp&nbspHello <c:if test="${empName ne null && orgName ne null}"><c:out value="${empName}" escapeXml="true"/> from <c:out value="${orgName}" escapeXml="true"/></c:if>!
+  <br>Let's get started with your data anonymization, please select your data file (which has a maximum size of 1GB) and your hierarchy file(s) for each field, then submit!</strong></p></div>
   <hr>
 	<div align="center" class="inputFile">
 	    <form action="uploadFiles" name="fileForm" method="post" enctype="multipart/form-data">
-	    <p id="blerb"><b>Note</b> that AARMRD currently only produces a csv file separated by a ';' as the resulting file format</p>
+	    <p id="blerb"><strong><b>Note</b></strong> AARMRD currently only produces a csv separated by a ';' as the resulting file format</p>
 	    	<br>
 	    	<div id="import">
 		  		<input type="file" id="dataFile" name="dataFile" class="inputForFile inputForFile1" onchange="changeIt()">
