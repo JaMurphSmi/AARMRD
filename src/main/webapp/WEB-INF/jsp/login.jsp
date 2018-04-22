@@ -20,7 +20,7 @@
 				value="${_csrf.token}" />
 		    </form>
 <hr>
-	<div class="armedGuard"><img src="https://i.imgur.com/zIg1yrH.png"/></div><br>
+	<div class="armedGuard"><img src="https://i.imgur.com/eKAi0aJ.png"/></div><br>
 	<c:if test="${errorMsg}">
 		<c:out value="${errorMsg}"/>
 	</c:if>
@@ -30,7 +30,7 @@
     	<label class="text" for="empName">Employee Name</label>
                 <input type="text" id="empName" name="empName"/><br><br>       
         <label class="text" for="orgName">Organization Name</label>
-                <input type="text" id="orgName" name="orgName"/><br>
+                <input type="text" id="orgName" name="orgName"/><br><br>
         <label class="text" for="empPass">Personal Password</label>
                 <input type="password" id="empPass" name="empPass"/>
     	<input type="hidden" name="${_csrf.parameterName}"

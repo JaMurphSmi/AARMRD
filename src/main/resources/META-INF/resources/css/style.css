@@ -51,13 +51,13 @@ For login.jsp
 #auto margin both sides to assure centering on a variety of screen sizes
 =================================================== */
 .armedGuard {
-	margin-left: 47%;
+	margin-left: 48%;
 }
 
 .loginForm {
 	background:rgba(22,22,165,0.5);
 	width: 350px;
-	height: 125px;
+	height: 175px;
 	margin-left: 500px;
 	border-radius: 4px;
 	border-style: ridge;
@@ -457,6 +457,16 @@ For showRisks.jsp
 	border:1px solid #d6aa44;
 	background-color: #3d3db6;
 	width:100px;
+}
+
+.formShowRisks {
+	background:rgba(22,22,165,0.5);
+	background-color:#1616a5;
+	width: 400px;
+	height: 100px;
+	border-radius: 7px;
+	border-style: ridge;
+	padding: 20px;
 }
 
 .buttonsR {
