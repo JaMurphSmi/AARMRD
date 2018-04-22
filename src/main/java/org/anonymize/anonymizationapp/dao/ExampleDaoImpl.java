@@ -3,9 +3,11 @@ package org.anonymize.anonymizationapp.dao;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.anonymize.anonymizationapp.model.ExampleObject;
+import org.anonymize.anonymizationapp.model.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -16,7 +18,7 @@ public class ExampleDaoImpl implements ExampleDAO {
 
  public Connection connect() {
   // SQLite connection string
-  String dbFile = "C:\\sqlite\\db\\activity_log.db";
+  String dbFile = "src/main/resources/activity_log.db";
   String url = "jdbc:sqlite:"+dbFile;
   Connection conn = null;
   try {
@@ -28,25 +30,33 @@ public class ExampleDaoImpl implements ExampleDAO {
   return conn;
  }
 
- public  void save(ExampleObject exampleObject) {
-  String sql = "INSERT INTO app_activity_log (username, user_ip, date_accessed,photos_sent) "
-    + "values (?,?,?,?)";
+ public boolean fetch(Person exampleObject) {
+  String sql = "SELECT count(*) FROM userDetails  WHERE username=? AND password=? AND company=?";
 
   try (Connection conn = this.connect();
     PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-   pstmt.setString(1,exampleObject.getUsername());
-   pstmt.setString(2,exampleObject.getUserIp());
-   pstmt.setString(3,exampleObject.getDateAccessed().toString());
-   pstmt.setString(4,exampleObject.getPhotosSent());
+   pstmt.setString(1,exampleObject.getName());
+   pstmt.setString(2,exampleObject.getPassword());
+   pstmt.setString(3,exampleObject.getCompany());
 
-   pstmt.executeUpdate();
-   logger.info("Activity recorded");
+   ResultSet res = pstmt.executeQuery();
+   if (res.next()) {
+	   int numRows = res.getInt(1);
+	   logger.info("has a result row :)");
+	   if (numRows >= 1) {
+		   return true;
+	   } else {
+		   return false;
+	   }
+   }
+   else {
+	   System.out.println("connection problem");
+   }
   } catch (SQLException e) {
    System.out.println(e.getMessage());
   }
+  return false;
  }
-
-
 }
 

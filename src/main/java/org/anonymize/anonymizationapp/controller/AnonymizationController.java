@@ -52,10 +52,12 @@ import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.criteria.BasicBLikeness;
 import org.deidentifier.arx.risk.RiskEstimateBuilder;
 import org.deidentifier.arx.risk.RiskModelSampleSummary;
+import org.anonymize.anonymizationapp.dao.ExampleDaoImpl;
 import org.anonymize.anonymizationapp.model.AlgorithmObject;
 import org.anonymize.anonymizationapp.model.AnonymizationBase;
 import org.anonymize.anonymizationapp.model.AnonymizationObject;
 import org.anonymize.anonymizationapp.model.AnonymizationReport;
+import org.anonymize.anonymizationapp.model.Person;
 import org.anonymize.anonymizationapp.model.RiskObject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
@@ -115,7 +117,7 @@ public class AnonymizationController extends AnonymizationBase {
 	//also remove from anonymization object
 	private AnonymizationReport anonReport = new AnonymizationReport();
 	private ArrayList<AlgorithmObject> algorithmStats = new ArrayList<AlgorithmObject>();
-	
+	private Person person = new Person();
 	//may restrict all anonymization actions to the anonymization controller? not have multiple controllers?
 	
 	//private final InMemoryUserDetailsManager inMemoryUserDetailsManager;
@@ -129,6 +131,9 @@ public class AnonymizationController extends AnonymizationBase {
 	@Autowired
 	private PieChartGenerator pieChartGenerator;
 	
+	@Autowired 
+	ExampleDaoImpl checkCredsHelper;
+	
 	//preconfig to house a global object of user details for verification
 	/*@Autowired
     public AnonymizationController(InMemoryUserDetailsManager inMemoryUserDetailsManager) {
@@ -137,18 +142,28 @@ public class AnonymizationController extends AnonymizationBase {
 	
 	
    @RequestMapping("/")
-   public String index() {
+   public String index(Model model) {
+	   person = new Person();//destroy and recreate person object at each attempt
       return "login";
    }
   
    
    @RequestMapping("/home") 
    public String getDetails(@RequestParam(value="orgName", required=false) String orgaName, @RequestParam(value="empName", required=false) String emplName,
-		   Model model) {
+		@RequestParam(value="empPass", required=false) String empPass, Model model) {
 	   //using HtmlUtils to clean the user input from login screen, avoid XSS reflection, do not touch
 	   //a db to avoid potential persistent XSS and DOM based also
 	   orgaName = HtmlUtils.htmlEscape(orgaName);	  
 	   emplName = HtmlUtils.htmlEscape(emplName);
+	   empPass = HtmlUtils.htmlEscape(empPass);
+	   
+	   person = new Person(emplName, orgaName, empPass);
+	   
+	   if (!checkCredsHelper.fetch(person)) {
+		   model.addAttribute("errorMsg", "Incorrect Details");
+		   //didn't work, so return to login with message
+		   return "login";
+	   }
 	   
 	   //generate secret key for filestructureaspects immediately 
 	   String generatedString = RandomStringUtils.randomAlphanumeric(16);

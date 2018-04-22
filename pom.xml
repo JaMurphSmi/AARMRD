@@ -58,6 +58,11 @@
 	      <artifactId>javax.servlet.jsp.jstl-api</artifactId>
 	      <version>1.2.1</version>
 	    </dependency>
+	    
+	    <dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+		</dependency>
 	
 	    <dependency>
 	      <groupId>taglibs</groupId>
@@ -225,16 +230,15 @@
       <scope>provided</scope>
     </dependency>
 	</dependencies>
-
+ 	<!-- 
 	<build>
 		<plugins>
 			<plugin>
 			    <groupId>org.springframework.boot</groupId>
 			    <artifactId>spring-boot-maven-plugin</artifactId>
-			    <version>1.4.2.RELEASE</version>
 			</plugin>
 		</plugins>
-	</build>
+	</build> -->
 
 	<repositories>
 		<repository>

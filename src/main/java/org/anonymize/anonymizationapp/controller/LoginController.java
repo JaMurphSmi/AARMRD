@@ -57,13 +57,13 @@ public class LoginController {//potentially for utility AND risk analysis
    public String index(Model model) {
 	   model.addAttribute("revMessage", "This is where the reviews will be placed");
 	   
-	   List<Person> people = new ArrayList<Person>();//make a few objects and shit
+	   /*List<Person> people = new ArrayList<Person>();//make a few objects and shit
 	   people.add(new Person(1,"Ted", "Dunphy", "Manager", "Ireland"));
 	   people.add(new Person(2,"Fred", "Duffy", "Sales Assistant", "Ireland"));
 	   people.add(new Person(3,"Fuad", "Ganasse", "Sales Assistant", "Spain"));
 	   people.add(new Person(4,"Tovski", "Yobaniskov", "Sales Assistant", "Russia"));
-	   
-	   model.addAttribute("weThePeople", people);
+	   */
+	   //model.addAttribute("weThePeople", people);
 	   model.addAttribute("testExample", new ExampleObject());
 	   
 	   	// we record this request in the database
@@ -76,7 +76,7 @@ public class LoginController {//potentially for utility AND risk analysis
 	     exampObject.setUsername(username);
 	     exampObject.setUserIp("180.0.101.126");
 	     
-	     exampleDaoImpl.save(exampObject);
+	     //exampleDaoImpl.save(exampObject);
 	   
       return "review";
    }
@@ -92,7 +92,7 @@ public class LoginController {//potentially for utility AND risk analysis
 	        return "error";
 	    }
 	   //attempting to request map object from jsp input and add it to the database
-	   exampleDaoImpl.save(testExample);
+	   //exampleDaoImpl.save(testExample);
 	   
 	   return "review";
    }

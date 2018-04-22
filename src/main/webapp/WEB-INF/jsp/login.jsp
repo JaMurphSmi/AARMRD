@@ -21,20 +21,18 @@
 		    </form>
 <hr>
 	<div class="armedGuard"><img src="https://i.imgur.com/zIg1yrH.png"/></div><br>
-	<c:if test="${param.error}">
-	<div class="alert alert-error">    
-         <p>Invalid username and password.</p>
-    </div></c:if>
-    <c:if test="${param.logout}"><div class="alert alert-success"> 
-         <p>You have been logged out. Thank you for using AARMRD</p>
-    </div></c:if>
+	<c:if test="${errorMsg}">
+		<c:out value="${errorMsg}"/>
+	</c:if>
   <p id="blerb" class="centred"><strong>Halt! Before you enter, please let us know who we're dealing with</strong></p>
   <div class="loginForm">
     <form action="/home" id="innerLoginForm" method="post" onsubmit="return validate()">
     	<label class="text" for="empName">Employee Name</label>
                 <input type="text" id="empName" name="empName"/><br><br>       
         <label class="text" for="orgName">Organization Name</label>
-                <input type="text" id="orgName" name="orgName"/>
+                <input type="text" id="orgName" name="orgName"/><br>
+        <label class="text" for="empPass">Personal Password</label>
+                <input type="password" id="empPass" name="empPass"/>
     	<input type="hidden" name="${_csrf.parameterName}"
 				value="${_csrf.token}" /><br><br>
         <input type="submit" class="formSubmitButton loginSubmit" value="Enter"/>
