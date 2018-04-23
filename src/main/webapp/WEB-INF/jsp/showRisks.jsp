@@ -83,7 +83,7 @@
 				<br><br><div class="form"><p class="tableText1">
 				<c:if test="${not empty riskObject.threshold}">
 					Threshold Specified : ${riskObject.threshold}		
-				</c:if>&nbsp&nbsp&nbsp
+				</c:if>&nbsp&nbsp&nbsp<br>
 				<c:if test="${not empty riskObject.country}">
 					Country : ${riskObject.country}<br>
 				</c:if></p></div>

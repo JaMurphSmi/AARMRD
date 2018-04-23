@@ -187,6 +187,7 @@ public class DataAspects{
 			dataRows.add(data);
 			++i;
 		}
+		handle = null;
 		
 		return dataRows;
 	}

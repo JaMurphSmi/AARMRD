@@ -71,6 +71,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Controller;
@@ -95,7 +96,8 @@ import org.anonymize.anonymizationapp.util.FileStructureAspects;
 import org.anonymize.anonymizationapp.util.PieChartGenerator;
 
 
-@Controller											//implements
+@Controller	
+@Scope("session")//implements
 public class AnonymizationController extends AnonymizationBase {
 	//solution to the source data issue was to elevate the object to class scope
 	private Data sourceData;//now available in all methods within the anonymization controller
@@ -240,6 +242,11 @@ public class AnonymizationController extends AnonymizationBase {
 		
 	   if(sourceData != null) {
 		   System.out.println("Data object already exists, skipping the annoying bit");
+		   File directory=new File("src/main/resources/" + empOrg );
+			
+		   if(!directory.exists()) {
+			   fileStructureAspects.makeDirectory(directory);
+		   }
 	   }
 	   else if(sourceData == null && hierChecks == null) {
 			//attempting to cast multipartfile object to file(can be modularized later if successful)
@@ -273,6 +280,7 @@ public class AnonymizationController extends AnonymizationBase {
 				
 				String[] tempArray = fileName.split("[\\_\\.]");//split by underscore and dot		  0         1         2
 				hierFileList.add(tempArray[2]);//add file name to list for display reasons further on [dataset]_hierarchy_[column]
+				System.out.println("for hierFileList " + tempArray[2]);
 				hierarchyDataFiles.add(filePath);
 			}//removing the headerRow from this, need to make it in proper order
 			
@@ -358,6 +366,8 @@ public class AnonymizationController extends AnonymizationBase {
 				File hierPath = new File(path);
 				fileStructureAspects.fileEnDeCrypt(Cipher.ENCRYPT_MODE, secret, hierPath, hierPath);
 			}*/
+			dataRows = dataAspectsHelper.createDataRows(sourceData);
+			System.out.println("created the dataRows");
 	   }
 	   if(sourceData != null && hierChecks != null) {//to accommodate if the user wants to create hierarchies for a field
 		   //this is where integer field hierarchies are created
@@ -366,6 +376,9 @@ public class AnonymizationController extends AnonymizationBase {
 		   for(int i = 0; i < hierChecks.length; ++i) {
 			 	System.out.println("The input index that need hierarchies are : " + hierChecks[i]);
 			    String[] dataNeedsHierarchy = dataAspectsHelper.getCertainFieldValues(hierChecks[i], dataRows);
+			    for(String data : dataNeedsHierarchy) {
+			    	System.out.println("value " + data);
+			    }
 			    System.out.println("Setting definition for " + headerRow.get(Integer.valueOf(hierChecks[i])));
 			    sourceData.getDefinition().setHierarchy(headerRow.get(Integer.valueOf(hierChecks[i])), dataAspectsHelper.makeRedactionBasedHierarchy(dataNeedsHierarchy));
 		   }
@@ -392,8 +405,7 @@ public class AnonymizationController extends AnonymizationBase {
 			}
 	   }
 	   System.out.println("after creating the data successfully and all hierarchy aspects");
-	   dataRows = dataAspectsHelper.createDataRows(sourceData);
-	   System.out.println("created the dataRows");	
+	   	
 		
 		System.out.println(">" + headerRow + "<");//very weird as this shows the file has been opened successfully...
 		
@@ -461,6 +473,7 @@ public class AnonymizationController extends AnonymizationBase {
 			for(String anAttribute : attributesChosen) {
 				System.out.println("The attribute is: " + anAttribute);
 			}
+			algorithmStats = new ArrayList<AlgorithmObject>();
 			
 			System.out.println("Possibly proved concept?");
 			
@@ -478,6 +491,7 @@ public class AnonymizationController extends AnonymizationBase {
 			}
 	
 			DataHandle handle = sourceData.getHandle();
+
 			int i = 0;
 			
 			//define attribute type & determine the column's data type
@@ -502,8 +516,8 @@ public class AnonymizationController extends AnonymizationBase {
 				sourceData.getDefinition().setDataType(header, determineDataType(handle, i));
 				++i;
 			}
-			handle = null;//garbage collect, potentially fix handle held issue?
-			
+			handle.release();//garbage collect, potentially fix handle held issue?
+	
 		    // Create an instance of the anonymizer
 	        ARXAnonymizer anonymizer = new ARXAnonymizer();//create object
 	        ARXConfiguration anonymizationConfiguration = ARXConfiguration.create();//defining the privacy model
@@ -550,10 +564,10 @@ public class AnonymizationController extends AnonymizationBase {
 	        	model.addAttribute("orgName", orgName);
 	        	return "index";
 	        }
-	        handle = sourceData.getHandle();
+	        //handle = sourceData.getHandle();
 	        
 	        //// Display data collection
-	        Iterator<String[]> itHandle = handle.iterator();
+	        //Iterator<String[]> itHandle = handle.iterator();
 	        
 	        //removed due to moving the dataRows to global scope, only needs to be done once
 	        //String flubRow = Arrays.toString(itHandle.next());//remove the header row for display purposes
@@ -577,6 +591,7 @@ public class AnonymizationController extends AnonymizationBase {
 	        	System.out.println("There was no solution to the provided configuration, you may need to start again");
 	        	String errorMessage = "There was no solution to the provided configuration, you may need to start again";
 	        	//perhaps return to setAnonDetails to give user immediate retry chance
+	        	result = null; //trying to handle the dataHandle issue
 	        	model.addAttribute("headerRow", headerRow);
 	        	model.addAttribute("dataRows", dataRows);
 	        	model.addAttribute("errorMessage", errorMessage);//implement in jsp
@@ -602,7 +617,7 @@ public class AnonymizationController extends AnonymizationBase {
 	                }
 	            }
 	        }*/
-	        
+	        anonyRows = new ArrayList<String[]>(); //needed to void the anonymized rows as they were just continuously added to
 	        Iterator<String[]> transformed = result.getOutput(false).iterator();
 	        
 	        String flubRow = Arrays.toString(transformed.next());// to remove header from answer also
@@ -617,6 +632,8 @@ public class AnonymizationController extends AnonymizationBase {
 				anonyRows.add(data);
 				++i;
 			}
+	        
+	        transformed = null;
 	        ////// Display data collection
 	        
 	        String[] stats = printResult(result, sourceData);
