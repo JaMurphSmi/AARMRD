@@ -97,7 +97,7 @@ import org.anonymize.anonymizationapp.util.PieChartGenerator;
 
 
 @Controller	
-@Scope("session")//implements
+@Scope("session")//implements session control
 public class AnonymizationController extends AnonymizationBase {
 	//solution to the source data issue was to elevate the object to class scope
 	private Data sourceData;//now available in all methods within the anonymization controller
@@ -369,6 +369,7 @@ public class AnonymizationController extends AnonymizationBase {
 			dataRows = dataAspectsHelper.createDataRows(sourceData);
 			System.out.println("created the dataRows");
 	   }
+	   
 	   if(sourceData != null && hierChecks != null) {//to accommodate if the user wants to create hierarchies for a field
 		   //this is where integer field hierarchies are created
 
@@ -402,6 +403,9 @@ public class AnonymizationController extends AnonymizationBase {
 				model.addAttribute("headerRow", headerRow);
 				model.addAttribute("noHierArr", noHierArr);
 				return "needHierarchies";
+			}
+			else {
+				System.out.println("All hierarchies discovered");
 			}
 	   }
 	   System.out.println("after creating the data successfully and all hierarchy aspects");
