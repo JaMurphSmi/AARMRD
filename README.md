@@ -13,7 +13,7 @@ be the procedurally generated string held in the command logs (usually visible w
 Once this is done, the user may proceed to the application itself and begin their anonymization ventures
   
 To implement the anonymization functionality it is intended to make use of the open-source ARX Deidentification API library available @: https://github.com/arx-deidentifier/arx
-ARX (C) 2012-2017 Fabian Prasser, Florian Kohlmayer and Contributors.  
+ARX (C) 2012-2019 Fabian Prasser, Florian Kohlmayer and Contributors.  
   
 In the future it is also hoped to incorporate other anonymization suites to extend functionality and diversify options.  
   
