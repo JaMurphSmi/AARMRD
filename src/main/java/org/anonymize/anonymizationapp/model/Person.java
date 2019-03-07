@@ -1,18 +1,20 @@
 package org.anonymize.anonymizationapp.model;
 
+import org.springframework.web.util.HtmlUtils;
+
 public class Person {
 	
 	public Person() {
 		this.setName("");
-		this.setCompany("");
-		this.setPassword("");
+		this.setOrgName("");
+		this.setEmpPass("");
 		
 	}
 	
-	public Person(String name, String company, String password) {
+	public Person(String name, String org, String pass) {
 		this.setName(name);
-		this.setCompany(company);
-		this.setPassword(password);
+		this.setOrgName(org);
+		this.setEmpPass(pass);
 	}
 
 // @Id
@@ -20,35 +22,35 @@ public class Person {
 // @GeneratedValue(strategy = GenerationType.IDENTITY)
  
 // @Column(name = "FIRST_NAME")
- private String name;
+ private String empName;
  
 // @Column(name = "LAST_NAME")
- private String company;
+ private String orgName;
  
- private String password;
+ private String empPass;
 
  
-public String getName() {
-	return name;
+public String getEmpName() {
+	return empName;
 }
 
-public void setName(String name) {
-	this.name = name;
+public void setName(String empName) {
+	this.empName = HtmlUtils.htmlEscape(empName);
 }
 
-public String getCompany() {
-	return company;
+public String getOrgName() {
+	return orgName;
 }
 
-public void setCompany(String company) {
-	this.company = company;
+public void setOrgName(String orgName) {
+	this.orgName = HtmlUtils.htmlEscape(orgName);
 }
 
-public String getPassword() {
-	return password;
+public String getEmpPass() {
+	return empPass;
 }
 
-public void setPassword(String password) {
-	this.password = password;
+public void setEmpPass(String empPass) {
+	this.empPass = HtmlUtils.htmlEscape(empPass);
 }
 }

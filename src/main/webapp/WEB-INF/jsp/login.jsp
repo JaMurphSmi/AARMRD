@@ -27,7 +27,7 @@
   <p id="blerb" class="centred"><strong>Halt! Before you enter, please let us know who we're dealing with</strong></p>
   <div class="loginForm">
     <form action="/home" id="innerLoginForm" method="post" onsubmit="return validate()">
-    	<label class="text" for="empName">Employee Name</label>
+    	<label class="text" for="name">Employee Name</label>
                 <input type="text" id="empName" name="empName"/><br><br>       
         <label class="text" for="orgName">Organization Name</label>
                 <input type="text" id="orgName" name="orgName"/><br><br>

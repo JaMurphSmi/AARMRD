@@ -78,6 +78,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -150,22 +151,17 @@ public class AnonymizationController extends AnonymizationBase {
    }
   
    
+   
    @RequestMapping("/home") 
    public String getDetails(@RequestParam(value="orgName", required=false) String orgaName, @RequestParam(value="empName", required=false) String emplName,
-		@RequestParam(value="empPass", required=false) String empPass, Model model) {
-	   //using HtmlUtils to clean the user input from login screen, avoid XSS reflection, do not touch
-	   //a db to avoid potential persistent XSS and DOM based also
-	   orgaName = HtmlUtils.htmlEscape(orgaName);	  
-	   emplName = HtmlUtils.htmlEscape(emplName);
-	   empPass = HtmlUtils.htmlEscape(empPass);
-	   
+		   @RequestParam(value="empPass", required=false) String empPass, Model model) {
 	   person = new Person(emplName, orgaName, empPass);
-	   
-	   if (!checkCredsHelper.fetch(person)) {
-		   model.addAttribute("errorMsg", "Incorrect Details");
-		   //didn't work, so return to login with message
-		   return "login";
-	   }
+   
+//	   if (!checkCredsHelper.fetch(person)) {
+//		   model.addAttribute("errorMsg", "Incorrect Details");
+//		   //didn't work, so return to login with message
+//		   return "login";
+//	   }
 	   
 	   //generate secret key for filestructureaspects immediately 
 	   String generatedString = RandomStringUtils.randomAlphanumeric(16);
@@ -177,39 +173,39 @@ public class AnonymizationController extends AnonymizationBase {
 	   
 	   //orgName will be the shared password between employees in same establishment
 	   //empName will be their unique identifier
-	   if(orgaName != null && emplName != null) {
+	   if(person.getOrgName() != null && person.getEmpName() != null) {
 		   //inMemoryUserDetailsManager.createUser(User.withUsername(emplName).password(orgaName).roles("USER").build());
 		   //if the org & emp names are available, add to the model
-		   this.orgName = orgaName;
-		   this.empName = emplName;
+		   this.orgName = person.getOrgName();
+		   this.empName = person.getEmpName();
 		   
 		   //create the unique file structure for a user to avoid conflicts with multiple users
 		   //directory name is concat of details entered previous screen
 		   
-		   empOrg = empName + orgName;
-		   empOrg = empOrg.replace(' ', '_');//avoid errors with spaces in directory
+		   this.empOrg = person.getEmpName() + person.getOrgName();
+		   this.empOrg = this.empOrg.replace(' ', '_');//avoid errors with spaces in directory path
 		   
-		   
+		   System.out.println(this.empOrg);
 		   
 		   //jasper directory
-		   File dir = new File("src/main/resources/"+ empOrg);
+		   File dir = new File("src/main/resources/"+ this.empOrg);
 		   //attempt to create the jasper directory here
 		   fileStructureAspects.makeDirectory(dir); 
-		    dir = new File("src/main/resources/templates/data/" + empOrg);
+		    dir = new File("src/main/resources/templates/data/" + this.empOrg);
 		   //attempt to create the data directory here
 		   fileStructureAspects.makeDirectory(dir);
-		    dir = new File("src/main/resources/templates/hierarchy/" + empOrg);
+		    dir = new File("src/main/resources/templates/hierarchy/" + this.empOrg);
 		   //attempt to create the hierarchy directory here
 		   fileStructureAspects.makeDirectory(dir);
-		    dir = new File("src/main/resources/templates/outputs/" + empOrg);
+		    dir = new File("src/main/resources/templates/outputs/" + this.empOrg);
 		   //attempt to create the hierarchy directory here
 		   fileStructureAspects.makeDirectory(dir);
-		    dir = new File("src/main/resources/META-INF/resources/images/" + empOrg);
+		    dir = new File("src/main/resources/META-INF/resources/images/" + this.empOrg);
 		   //attempt to create the piechart images directory here
 		    fileStructureAspects.makeDirectory(dir);
 		   
-		   model.addAttribute("orgName", orgName);
-		   model.addAttribute("empName", empName);
+		   model.addAttribute("orgName", person.getOrgName());
+		   model.addAttribute("empName", person.getEmpName());
 	   }
 	   return "index";
    }
@@ -218,7 +214,7 @@ public class AnonymizationController extends AnonymizationBase {
    public String getError(Model model) {
 	   sourceData = null;//remove data because of error
 	   try {
-		dataAspectsHelper.deleteAllFiles(empOrg);
+		dataAspectsHelper.deleteAllFiles(this.empOrg);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -226,8 +222,8 @@ public class AnonymizationController extends AnonymizationBase {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	   model.addAttribute("empName", empName);
-	   model.addAttribute("orgName", orgName);
+	   model.addAttribute("orgName", person.getOrgName());
+	   model.addAttribute("empName", person.getEmpName());
 	   return "index";
    }
    

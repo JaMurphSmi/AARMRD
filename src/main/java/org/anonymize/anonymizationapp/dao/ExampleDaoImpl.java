@@ -36,9 +36,9 @@ public class ExampleDaoImpl implements ExampleDAO {
   try (Connection conn = this.connect();
     PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-   pstmt.setString(1,exampleObject.getName());
-   pstmt.setString(2,exampleObject.getPassword());
-   pstmt.setString(3,exampleObject.getCompany());
+   pstmt.setString(1,exampleObject.getEmpName());
+   pstmt.setString(2,exampleObject.getEmpPass());
+   pstmt.setString(3,exampleObject.getOrgName());
 
    ResultSet res = pstmt.executeQuery();
    if (res.next()) {
