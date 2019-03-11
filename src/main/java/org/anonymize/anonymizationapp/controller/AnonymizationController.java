@@ -1,31 +1,25 @@
 package org.anonymize.anonymizationapp.controller;
 
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-// Importing ARX required modules, dependencies etc
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-//import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.crypto.Cipher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +35,6 @@ import org.deidentifier.arx.Data;
 import org.deidentifier.arx.DataHandle;
 import org.deidentifier.arx.DataType;
 import org.deidentifier.arx.aggregates.StatisticsFrequencyDistribution;
-//import org.deidentifier.arx.aggregates.StatisticsQuality;//does not exist in the current jar
 import org.deidentifier.arx.criteria.DistinctLDiversity;
 import org.deidentifier.arx.criteria.EnhancedBLikeness;
 import org.deidentifier.arx.criteria.KAnonymity;
@@ -72,18 +65,13 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.HtmlUtils;
 
 //hopefully for jasper report
 import net.sf.jasperreports.engine.JRException; 
@@ -670,7 +658,6 @@ public class AnonymizationController extends AnonymizationBase {
 		 */
 		@RequestMapping("/goToRiskPage")
 		public String showRiskPage(Model model) {
-			
 	        model.addAttribute("countries", countries);
 			model.addAttribute("headerRow", headerRow);
 			model.addAttribute("anonyRows", anonyRows);
@@ -692,8 +679,7 @@ public class AnonymizationController extends AnonymizationBase {
 			
 	        System.out.println("\n ------------------------------------------------");
 	        System.out.println("\n ------------------------------------------------");
-	        
-	        
+
 	        // Perform risk analysis
 	        System.out.println("\n - Risk analysis:");
 	        System.out.println(" 	");
@@ -740,27 +726,11 @@ public class AnonymizationController extends AnonymizationBase {
 		}*/
 		
 		//Used to quickly determine the data type of each column in the dataset
-		   private static DataType<?> determineDataType(DataHandle handle, int column) {
-		       //System.out.println(" - Potential data types for attribute: "+handle.getAttributeName(column));
-		       List<Pair<DataType<?>, Double>> types = handle.getMatchingDataTypes(column);
-
-		       //After a substantial amount of testing, this is no longer needed, 
-		       //however printed entries sorted by match percentage
+		private static DataType<?> determineDataType(DataHandle handle, int column) {
+			List<Pair<DataType<?>, Double>> types = handle.getMatchingDataTypes(column);
 		       
-		       //for (Pair<DataType<?>, Double> entry : types) {
-		           //System.out.print("   * ");
-		           //System.out.print(entry.getKey().getDescription().getLabel());
-		           //if (entry.getKey().getDescription().hasFormat()) {
-		           //    System.out.print("[");
-		           //    System.out.print(((DataTypeWithFormat) entry.getKey()).getFormat());
-		           //    System.out.print("]");
-		           //}
-		           //System.out.print(": ");
-		           //System.out.println(entry.getValue());
-		       //}
-		       
-		       return types.get(0).getKey(); //first identified is usually the correct data type
-		   }
+			return types.get(0).getKey(); //first identified tends to be correct data type
+		}
 		
 	//method that allows the user to delete all files related to their anonymization from the final page
 		@RequestMapping("/deleteDataAndHierarchies")//available on first page? to allow users to cancel securely, remove all traces
@@ -848,16 +818,13 @@ public class AnonymizationController extends AnonymizationBase {
 		        sourceData = null;//destroy original data object to remove any possible traces
 		    }
 		   
-		//no need to remove anonymized dataset as of now, can be requested if needed later on, but not imperetive now
+		//no need to remove anonymized dataset as of now, can be requested if needed later on, but not imperative now
 	////////////////////////////////////////////////////////////////////////////////////////////// THIS IS WHERE THE VARIABLE INPUT TEST ENDS
 	//->>>>>change return type eventually to supply these values
 	private RiskObject getDistributionStatistics(RiskObject riskObject) {//potentially hierNames, or plain index?
-		//print frequencies
 		System.out.println("Inside getDistributionStatistics");
 		HashMap<String, HashMap<String, String>> inputDistributions = new HashMap<String, HashMap<String, String>>();
 		HashMap<String, HashMap<String, String>> outputDistributions = new HashMap<String, HashMap<String, String>>();
-		//HashMap<String, String> inputValues = new HashMap<String, String>();//these have to be local to the for loop
-		//HashMap<String, String> outputValues = new HashMap<String, String>();//otherwise just keep adding to them continuously
 		StatisticsFrequencyDistribution distribution;
 		DataHandle dataHandle = sourceData.getHandle();
 		DataHandle resultHandle = result.getOutput(false);
@@ -999,7 +966,7 @@ public class AnonymizationController extends AnonymizationBase {
 	   
 	   /**
 	    * Returns a region to be used for risk metrics
-	    * @param area
+	    * @param populationRegion
 	    * @return
 	    */
 	   private static ARXPopulationModel determineRegion(String populationRegion) {
