@@ -43,6 +43,7 @@ import org.deidentifier.arx.criteria.EqualDistanceTCloseness;
 import org.deidentifier.arx.criteria.EntropyLDiversity;
 import org.deidentifier.arx.criteria.RecursiveCLDiversity;
 import org.deidentifier.arx.criteria.BasicBLikeness;
+import org.deidentifier.arx.criteria.EqualDistanceTCloseness;
 import org.deidentifier.arx.risk.RiskEstimateBuilder;
 import org.deidentifier.arx.risk.RiskModelSampleSummary;
 import org.anonymize.anonymizationapp.dao.ExampleDaoImpl;
@@ -523,6 +524,9 @@ public class AnonymizationController extends AnonymizationBase {
 	        	else if (modelsChosen[i].equals("t-closeness")) {//for particular sensitive fields
 	        		anonymizationConfiguration.addPrivacyModel(new OrderedDistanceTCloseness(header, valuesForModels[i]));
 	        	}
+	        	else if (modelsChosen[i].equals("equal distance t-closeness")) {
+					anonymizationConfiguration.addPrivacyModel(new EqualDistanceTCloseness(header, valuesForModels[i]));
+				}
 	        	else if (modelsChosen[i].equals("recursive cl-diversity")) {//for particular sensitive fields
 	        		anonymizationConfiguration.addPrivacyModel(new RecursiveCLDiversity(header, valuesForModels[i], (int) extraValues[i]));
 	        	}
@@ -552,24 +556,6 @@ public class AnonymizationController extends AnonymizationBase {
 	        	model.addAttribute("orgName", orgName);
 	        	return "index";
 	        }
-	        //handle = sourceData.getHandle();
-	        
-	        //// Display data collection
-	        //Iterator<String[]> itHandle = handle.iterator();
-	        
-	        //removed due to moving the dataRows to global scope, only needs to be done once
-	        //String flubRow = Arrays.toString(itHandle.next());//remove the header row for display purposes
-	        
-	        /*while((itHandle.hasNext()) && (i % 801 != 0)) {//needs extra cleanup to remove empty column
-				String row = Arrays.toString(itHandle.next());
-				String[] dataTemp = row.split("[\\[\\],]");
-				String[] data = new String[dataTemp.length - 1];
-				for(int j = 0; j < dataTemp.length - 1; j++) {
-					data[j] = dataTemp[j+1].trim();
-				}
-				dataRows.add(data);
-				++i;
-			}*/
 	        
 	        String file = anonForm.getFileName();
 	        System.out.println("Name of the file is : " + file);
@@ -647,8 +633,7 @@ public class AnonymizationController extends AnonymizationBase {
 			model.addAttribute("headerRow", headerRow);
 			model.addAttribute("dataRows", dataRows);
 			model.addAttribute("anonyRows", anonyRows);
-			
-			return "compareSets";//returns to jsp page with all attributes set as before
+			return "compareSets";
 		}
 		
 		/** gateway method to the risk page, passing AnonyRows, dataRows is already there
